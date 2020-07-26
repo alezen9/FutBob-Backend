@@ -16,7 +16,7 @@ class MongoUser {
   
   async createUser (data: any): Promise<string> {
     const res = await MongoDBInstance.collection.user.findOne({ 'credentials.username': data.username })
-    if(res) throw new Error(ErrorMessages.username_already_exists)
+    if(res) throw new Error(ErrorMessages.user_username_already_exists)
     const now = moment().toISOString()
     const user = new User()
     user._id = new ObjectId()

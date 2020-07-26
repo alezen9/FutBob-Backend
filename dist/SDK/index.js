@@ -20,7 +20,7 @@ require('dotenv').config();
 class FutBobServer {
     constructor(_host) {
         this._self = axios_1.default.create({
-            baseURL: _host || process.env.NODE_ENV === 'prod' ? process.env.BASE_API_URL : 'http://localhost:7000',
+            baseURL: _host || process.env.NODE_ENV === 'production' ? process.env.BASE_API_URL : 'http://localhost:7000',
             timeout: 100000,
             headers: {
                 'Accept': 'application/json',
@@ -31,6 +31,18 @@ class FutBobServer {
             throw lodash_1.get(error, 'response.data.errors[0].message', error);
         });
     }
+    API({ query, name }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this._self.post('/graphql', { query })
+                .then((res) => {
+                const { data, errors } = res;
+                if (errors && errors.length)
+                    throw errors[0].message;
+                else
+                    return data[name];
+            });
+        });
+    }
     setToken(token) {
         const tokenSet = lodash_1.get(this._self, 'defaults.headers.common.Authorization', undefined);
         let _token = tokenSet ? tokenSet.split(' ')[1] : undefined;
@@ -38,27 +50,60 @@ class FutBobServer {
             this._self.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
     }
-    user_signUp(signupInput) {
+    user_signUp(signupInput, fields) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = `
     mutation {
-        signup(signupInput: ${helpers_1.paramsToString(signupInput)}){
-          token,
-          expiresIn
-        }
+        signup(signupInput: ${helpers_1.paramsToString(signupInput)})${fields}
     }`;
-            return yield this._self.post('/graphql', { query })
-                .then((res) => {
-                const { data, errors } = res;
-                if (errors && errors.length)
-                    throw errors[0].message;
-                else
-                    return data.signup;
-            });
+            return this.API({ query, name: 'signup' });
+        });
+    }
+    user_login(signinInput, fields) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    query {
+        login(signinInput: ${helpers_1.paramsToString(signinInput)})${fields}
+    }`;
+            return this.API({ query, name: 'login' });
+        });
+    }
+    user_getUserConnected(fields) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    query {
+        getUserConnected ${fields}
+    }`;
+            return this.API({ query, name: 'getUserConnected' });
+        });
+    }
+    user_changeUsername(newUsername) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    mutation {
+        changeUsername(newUsername: "${newUsername}")
+    }`;
+            return this.API({ query, name: 'changeUsername' });
+        });
+    }
+    user_changePassword(oldPassword, newPassword) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    mutation {
+        changePassword(oldPassword: "${oldPassword}", newPassword: "${newPassword}")
+    }`;
+            return this.API({ query, name: 'changePassword' });
+        });
+    }
+    user_updateUser(userInput) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    mutation {
+        updateUserConnected(userInput: ${helpers_1.paramsToString(userInput)})
+    }`;
+            return this.API({ query, name: 'updateUserConnected' });
         });
     }
 }
 exports.FutBobServer = FutBobServer;
-const apiInstance = new FutBobServer();
-exports.default = apiInstance;
 //# sourceMappingURL=index.js.map

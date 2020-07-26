@@ -5,6 +5,7 @@ import isAuth from './Middleware/isAuth'
 import http from 'http'
 import express from 'express'
 import cors from 'cors'
+const shell = require('shelljs')
 require('dotenv').config()
 
 const { ApolloServer, PubSub } = require('apollo-server-express')
@@ -42,9 +43,26 @@ const setupAndStartServer = async () => {
     httpServer.listen(port)
     console.log(`connected to DB, listening on port ${port}`)
   } catch (error) {
-    console.log(error)
+    console.log('')
+    console.log('')
+    console.log('')
+    console.log('')
+    console.log('error => ', error)
+    console.log('')
+    console.log('')
+    console.log('')
+    console.log('')
     await MongoDBInstance.closeConnection()
   }
 }
+
+process.on('SIGINT', async () => {
+  console.log('\nGracefully shutting down and cleaning mess...')
+  if (process.env.NODE_ENV !== 'production') {
+    await MongoDBInstance.closeConnection()
+    shell.exec('lsof -ti tcp:27017 | xargs kill')
+  }
+  process.exit()
+})
 
 setupAndStartServer()

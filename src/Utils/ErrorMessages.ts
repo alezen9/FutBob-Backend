@@ -1,8 +1,9 @@
 const ErrorMessages = Object.freeze({
-  unauthenticated: 'unauthenticated',
-  username_already_exists: 'username_already_exists',
-  user_not_exists: 'user_not_exists',
-  password_not_correct: 'password_not_correct'
+  user_unauthenticated: 'user_unauthenticated',
+  user_username_already_exists: 'user_username_already_exists',
+  user_user_not_exists: 'user_user_not_exists',
+  user_password_not_correct: 'user_password_not_correct',
+  user_new_old_password_equal: 'user_new_old_password_equal'
 })
 
 export default ErrorMessages

@@ -20,6 +20,8 @@
       "args": [
         "--no-timeouts",
         "--colors",
+        "--exit",
+        "--bail",
         "${workspaceFolder}/dist/Testsuite/*.test.js",
       ],
       "cwd": "${workspaceFolder}",
@@ -34,6 +36,8 @@
       "args": [
         "--no-timeouts",
         "--colors",
+        "--exit",
+        "--bail",
         "${workspaceFolder}/dist/Testsuite/Auth.test.js",
       ],
       "cwd": "${workspaceFolder}",

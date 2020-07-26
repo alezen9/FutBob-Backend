@@ -19,6 +19,7 @@ const isAuth_1 = __importDefault(require("./Middleware/isAuth"));
 const http_1 = __importDefault(require("http"));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const shell = require('shelljs');
 require('dotenv').config();
 const { ApolloServer, PubSub } = require('apollo-server-express');
 const app = express_1.default();
@@ -47,9 +48,25 @@ const setupAndStartServer = () => __awaiter(void 0, void 0, void 0, function* ()
         console.log(`connected to DB, listening on port ${port}`);
     }
     catch (error) {
-        console.log(error);
+        console.log('');
+        console.log('');
+        console.log('');
+        console.log('');
+        console.log('error => ', error);
+        console.log('');
+        console.log('');
+        console.log('');
+        console.log('');
         yield MongoDB_1.MongoDBInstance.closeConnection();
     }
 });
+process.on('SIGINT', () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('\nGracefully shutting down and cleaning mess...');
+    if (process.env.NODE_ENV !== 'production') {
+        yield MongoDB_1.MongoDBInstance.closeConnection();
+        shell.exec('lsof -ti tcp:27017 | xargs kill');
+    }
+    process.exit();
+}));
 setupAndStartServer();
 //# sourceMappingURL=index.js.map

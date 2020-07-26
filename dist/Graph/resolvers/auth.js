@@ -19,16 +19,18 @@ const ErrorMessages_1 = __importDefault(require("../../Utils/ErrorMessages"));
 const entities_1 = require("../../MongoDB/User/entities");
 const MongoDB_1 = require("../../MongoDB");
 const mongodb_1 = require("mongodb");
+const lodash_1 = require("lodash");
+const clean_deep_1 = __importDefault(require("clean-deep"));
 const authResolver = {
     Query: {
         login: (_, { signinInput }) => __awaiter(void 0, void 0, void 0, function* () {
             const { username, password } = signinInput;
             const user = yield MongoDB_1.MongoDBInstance.collection.user.findOne({ 'credentials.username': username });
             if (!user)
-                throw new Error(ErrorMessages_1.default.user_not_exists);
+                throw new Error(ErrorMessages_1.default.user_user_not_exists);
             const isEqual = yield bcrypt_1.default.compare(password, user.credentials.password);
             if (!isEqual)
-                throw new Error(ErrorMessages_1.default.password_not_correct);
+                throw new Error(ErrorMessages_1.default.user_password_not_correct);
             const tokenData = {
                 idUser: user._id.toHexString(),
                 privileges: user.privileges
@@ -41,10 +43,10 @@ const authResolver = {
         }),
         getUserConnected: (_, __, { req }) => __awaiter(void 0, void 0, void 0, function* () {
             if (!req.isAuth)
-                throw new Error(ErrorMessages_1.default.unauthenticated);
+                throw new Error(ErrorMessages_1.default.user_unauthenticated);
             const user = yield User_1.mongoUser.getUserById(req.idUser);
             if (!user)
-                throw new Error(ErrorMessages_1.default.user_not_exists);
+                throw new Error(ErrorMessages_1.default.user_user_not_exists);
             return User_1.mongoUser.getTypeUserFields(user);
         })
     },
@@ -68,30 +70,35 @@ const authResolver = {
         }),
         changePassword: (_, { oldPassword, newPassword }, { req }) => __awaiter(void 0, void 0, void 0, function* () {
             if (!req.isAuth)
-                throw new Error(ErrorMessages_1.default.unauthenticated);
+                throw new Error(ErrorMessages_1.default.user_unauthenticated);
+            const areEqual = oldPassword === newPassword;
+            if (areEqual)
+                throw new Error(ErrorMessages_1.default.user_new_old_password_equal);
             const user = yield User_1.mongoUser.getUserById(req.idUser);
             if (!user)
-                throw new Error(ErrorMessages_1.default.user_not_exists);
-            const isEqual = yield bcrypt_1.default.compare(oldPassword, user.credentials.password);
-            if (!isEqual)
-                throw new Error(ErrorMessages_1.default.password_not_correct);
-            const encryptedNewPassword = User_1.mongoUser.encryptPassword(newPassword);
+                throw new Error(ErrorMessages_1.default.user_user_not_exists);
+            const isEqualOld = yield bcrypt_1.default.compare(oldPassword, user.credentials.password);
+            if (!isEqualOld)
+                throw new Error(ErrorMessages_1.default.user_password_not_correct);
+            const encryptedNewPassword = yield User_1.mongoUser.encryptPassword(newPassword);
             MongoDB_1.MongoDBInstance.collection.user.updateOne({ _id: new mongodb_1.ObjectId(req.idUser) }, { $set: { 'credentials.password': encryptedNewPassword } }, { upsert: true });
             return true;
         }),
         changeUsername: (_, { newUsername }, { req }) => __awaiter(void 0, void 0, void 0, function* () {
             if (!req.isAuth)
-                throw new Error(ErrorMessages_1.default.unauthenticated);
+                throw new Error(ErrorMessages_1.default.user_unauthenticated);
             const existingNewUsername = yield MongoDB_1.MongoDBInstance.collection.user.findOne({ 'credentials.username': newUsername });
             if (existingNewUsername)
-                throw new Error(ErrorMessages_1.default.username_already_exists);
+                throw new Error(ErrorMessages_1.default.user_username_already_exists);
             MongoDB_1.MongoDBInstance.collection.user.updateOne({ _id: new mongodb_1.ObjectId(req.idUser) }, { $set: { 'credentials.username': newUsername } }, { upsert: true });
             return true;
         }),
         updateUserConnected: (_, { userInput }, { req }) => __awaiter(void 0, void 0, void 0, function* () {
             if (!req.isAuth)
-                throw new Error(ErrorMessages_1.default.unauthenticated);
+                throw new Error(ErrorMessages_1.default.user_unauthenticated);
             const { name, surname, dateOfBirth, phone, email, sex } = userInput;
+            if (lodash_1.isEmpty(clean_deep_1.default(userInput)))
+                return true;
             const updatedUser = new entities_1.User();
             if (name)
                 updatedUser.name = name;

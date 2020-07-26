@@ -40,7 +40,7 @@ class MongoUser {
         return __awaiter(this, void 0, void 0, function* () {
             const res = yield __1.MongoDBInstance.collection.user.findOne({ 'credentials.username': data.username });
             if (res)
-                throw new Error(ErrorMessages_1.default.username_already_exists);
+                throw new Error(ErrorMessages_1.default.user_username_already_exists);
             const now = moment_1.default().toISOString();
             const user = new entities_1.User();
             user._id = new mongodb_1.ObjectId();

@@ -1,7 +1,5 @@
 import { MongoClient } from 'mongodb'
 import { CollectionContainer } from './Entities'
-import Collections from './Collections'
-import { lowerCaseFirst } from '../Utils/helpers'
 require('dotenv').config()
 
 export enum MongoState {
@@ -11,7 +9,7 @@ export enum MongoState {
 
 export class MongoDB {
   collection: CollectionContainer
-  client: any
+  client: MongoClient
   dbUri: string
   dbName:string
   state: MongoState
@@ -25,10 +23,10 @@ export class MongoDB {
 
   getMongoInit (){
     return {
-      dbUri: process.env.NODE_ENV === 'prod'
+      dbUri: process.env.NODE_ENV === 'production'
         ? process.env.MONGO_DB_URI
         : 'mongodb://localhost:27017/',
-      dbName: process.env.NODE_ENV === 'prod'
+      dbName: process.env.NODE_ENV === 'production'
         ? 'main'
         : 'test'
     }
@@ -49,24 +47,25 @@ export class MongoDB {
 
   setupCollections(client:MongoClient) {
       const collection = new CollectionContainer()
-      for(const { name, indexes = [] } of Collections) {
-        client.db(this.dbName).createCollection(name)
-        if(indexes.length){
-          for(const index of indexes) {
-            client.db(this.dbName).collection(name).createIndex(index)
-          }
-        }
-        collection[lowerCaseFirst(name)] = client.db(this.dbName).collection(name)
-      }
+      // create collections
+      client.db(this.dbName).createCollection('User')
+      client.db(this.dbName).createCollection('Player')
+      client.db(this.dbName).createCollection('Match')
+      // create indexes
+      client.db(this.dbName).collection('User').createIndex({ 'credentials.username': 1 })
+      // populate colletion class
+      collection.user = client.db(this.dbName).collection('User')
+      collection.player = client.db(this.dbName).collection('Player')
+      collection.match = client.db(this.dbName).collection('Match')
+      // make collections and client available to class
       this.client = client
       this.collection = collection
   }
 
   async clearDb () {
-    for(let i = 0; i < Collections.length; i++) {
-      const name = lowerCaseFirst(Collections[i].name)
-      if(this.collection && this.collection[name]) await this.collection[name].deleteMany({})
-    }
+    await this.collection.user.deleteMany({})
+    await this.collection.player.deleteMany({})
+    await this.collection.match.deleteMany({})
   }
 
   async closeConnection () {
