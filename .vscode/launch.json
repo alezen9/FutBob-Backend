@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+    "name": "FutBob",
+    "type": "node",
+    "request": "launch",
+    "console": "integratedTerminal",
+    "program": "${workspaceFolder}/dist/index.js",
+    "envFile": "${workspaceFolder}/.env",
+    "preLaunchTask": "start_mongo"
+    },
+    {
+      "name": "TEST_ALL",
+      "type": "node",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "envFile": "${workspaceFolder}/.env",
+      "args": [
+        "--no-timeouts",
+        "--colors",
+        "${workspaceFolder}/dist/Testsuite/*.test.js",
+      ],
+      "cwd": "${workspaceFolder}",
+    },
+    {
+      "name": "Test_Auth",
+      "type": "node",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "envFile": "${workspaceFolder}/.env",
+      "args": [
+        "--no-timeouts",
+        "--colors",
+        "${workspaceFolder}/dist/Testsuite/Auth.test.js",
+      ],
+      "cwd": "${workspaceFolder}",
+    }
+  ]
+}

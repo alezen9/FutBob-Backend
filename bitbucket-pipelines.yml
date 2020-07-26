@@ -1,0 +1,23 @@
+pipelines:
+  default:
+    - step:
+            name: Create artifact
+            script:
+              - npm i typescript -g
+              - npm i node-typescript -g
+              - npm i
+              - tsc
+              - tar czfv application.tgz dist
+            artifacts:
+              - application.tgz
+    - step:
+            name: Deploy to production
+            deployment: production
+            script:
+              - pipe: atlassian/heroku-deploy:1.0.1
+                variables:
+                  HEROKU_API_KEY: $HEROKU_API_KEY
+                  HEROKU_APP_NAME: $HEROKU_APP_NAME
+                  ZIP_FILE: 'application.tgz'
+                  # WAIT: '<boolean>' # Optional.
+                  # DEBUG: '<boolean>' # Optional
