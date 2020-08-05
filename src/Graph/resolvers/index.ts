@@ -1,13 +1,17 @@
-import userResolver from './user'
 import authResolver from './auth'
+import userResolver from './user'
+import playerResolver from './player'
 
 const resolvers = {
   Query: {
-    // ...userResolver.Query
-    ...authResolver.Query
+    ...authResolver.Query,
+    ...userResolver.Query,
+    ...playerResolver.Query
   },
   Mutation: {
-    ...authResolver.Mutation
+    ...authResolver.Mutation,
+    ...userResolver.Mutation,
+    ...playerResolver.Mutation
     // ...parkingsResolver.Mutation,
     // ...bookingResolver.Mutation,
     // ...userResolver.Mutation,

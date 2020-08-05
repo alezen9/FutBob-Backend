@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Match = exports.MatchState = exports.MatchPlayer = void 0;
 class MatchPlayer {
 }
 exports.MatchPlayer = MatchPlayer;

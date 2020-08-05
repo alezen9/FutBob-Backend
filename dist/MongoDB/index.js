@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MongoDBInstance = exports.MongoDB = exports.MongoState = void 0;
 const mongodb_1 = require("mongodb");
 const Entities_1 = require("./Entities");
 require('dotenv').config();
@@ -55,6 +54,8 @@ class MongoDB {
         client.db(this.dbName).createCollection('Match');
         // create indexes
         client.db(this.dbName).collection('User').createIndex({ 'credentials.username': 1 });
+        client.db(this.dbName).collection('User').createIndex({ footballPlayer: 1 });
+        client.db(this.dbName).collection('User').createIndex({ futsalPlayer: 1 });
         // populate colletion class
         collection.user = client.db(this.dbName).collection('User');
         collection.player = client.db(this.dbName).collection('Player');

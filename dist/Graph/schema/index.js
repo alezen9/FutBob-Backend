@@ -14,17 +14,29 @@ ${types_1.TypeSuccessOrFailure}
 
 ${inputs_1.SignupInput}
 ${inputs_1.SigninInput}
-${inputs_1.UserInput}
+${inputs_1.UpdateUserConnectedInput}
+${inputs_1.UpdateUserInput}
+${inputs_1.CreatePlayerInput}
+${inputs_1.UpdatePlayerInput}
+${inputs_1.DeletePlayerInput}
+
+${inputs_1.PlayerFilters}
 
 type Query {
   login (signinInput: SigninInput!): AuthData!
   getUserConnected: User!
+  getPlayers (playerFilters: PlayerFilters!): [Player]!
 }
 type Mutation {
   signup (signupInput: SignupInput!): AuthData!
   changePassword (oldPassword: String!, newPassword: String!): Boolean!
   changeUsername (newUsername: String!): Boolean!
-  updateUserConnected (userInput: UserInput!): Boolean!
+  updateUserConnected (userInput: UpdateUserConnectedInput!): Boolean!,
+  updateUser (userInput: UpdateUserInput!): Boolean!,
+
+  createPlayer (createPlayerInput: CreatePlayerInput!): String!
+  updatePlayer (updatePlayerInput: UpdatePlayerInput!): Boolean!
+  deletePlayer (deletePlayerInput: DeletePlayerInput!): Boolean!
 }
 `);
 exports.default = typeDefs;

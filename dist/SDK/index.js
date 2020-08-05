@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FutBobServer = void 0;
 const axios_1 = __importDefault(require("axios"));
 const lodash_1 = require("lodash");
 const helpers_1 = require("../Utils/helpers");
@@ -95,13 +94,58 @@ class FutBobServer {
             return this.API({ query, name: 'changePassword' });
         });
     }
-    user_updateUser(userInput) {
+    user_updateUserConnected(userInput) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = `
     mutation {
         updateUserConnected(userInput: ${helpers_1.paramsToString(userInput)})
     }`;
             return this.API({ query, name: 'updateUserConnected' });
+        });
+    }
+    user_updateUser(userInput) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    mutation {
+        updateUser(userInput: ${helpers_1.paramsToString(userInput)})
+    }`;
+            return this.API({ query, name: 'updateUser' });
+        });
+    }
+    player_createPlayer(createPlayerInput) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    mutation {
+        createPlayer(createPlayerInput: ${helpers_1.paramsToString(createPlayerInput)})
+    }`;
+            return this.API({ query, name: 'createPlayer' });
+        });
+    }
+    player_updatePlayer(updatePlayerInput) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    mutation {
+        updatePlayer(updatePlayerInput: ${helpers_1.paramsToString(updatePlayerInput)})
+    }`;
+            return this.API({ query, name: 'updatePlayer' });
+        });
+    }
+    player_deletePlayer(deletePlayerInput) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    mutation {
+        deletePlayer(deletePlayerInput: ${helpers_1.paramsToString(deletePlayerInput)})
+    }`;
+            return this.API({ query, name: 'deletePlayer' });
+        });
+    }
+    player_getPlayers(playerFilters, fields) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `
+    query {
+        getPlayers(playerFilters: ${helpers_1.paramsToString(playerFilters)}) ${fields}
+    }`;
+            return this.API({ query, name: 'getPlayers' });
         });
     }
 }

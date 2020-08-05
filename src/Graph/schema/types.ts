@@ -19,10 +19,11 @@ export const TypeUser = `type User {
 
 export const TypePlayer = `type Player {
     _id: String!
-    positions: Int!,
+    positions: [Int]!,
     type: Int!,
     matches: [Match],
-    state: Int
+    state: Int,
+    user: User!
   }`
 
 export const TypeLocation = `type Location {

@@ -153,7 +153,7 @@ mocha_1.describe('Authentication', () => {
                 name: 'Boban',
                 surname: 'Cvetanoski'
             };
-            const ok = yield apiInstance.user_updateUser(newUserData);
+            const ok = yield apiInstance.user_updateUserConnected(newUserData);
             assert_1.default.strictEqual(ok, true);
             const { name, surname } = yield apiInstance.user_getUserConnected(`{
         name,
@@ -200,7 +200,7 @@ mocha_1.describe('Authentication', () => {
                     name: 'Boban',
                     surname: 'Cvetanoski'
                 };
-                yield noTokenApiInstance.user_updateUser(newUserData);
+                yield noTokenApiInstance.user_updateUserConnected(newUserData);
             }
             catch (error) {
                 assert_1.default.strictEqual(error, ErrorMessages_1.default.user_unauthenticated);
@@ -208,4 +208,4 @@ mocha_1.describe('Authentication', () => {
         }));
     });
 });
-//# sourceMappingURL=Auth.test.js.map
+//# sourceMappingURL=AuthUser.test.js.map

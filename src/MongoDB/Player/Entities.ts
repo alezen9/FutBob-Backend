@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb"
 
-export enum Positions {
+export enum PlayerPosition {
     Goalkeeper,
     Sweeper,
     CentreBack,
@@ -36,8 +36,11 @@ export enum PhysicalState {
 
 export class Player {
     _id: ObjectId
-    positions: Positions[]
+    user: ObjectId
+    positions: PlayerPosition[]
     type: PlayerType
     matches?: ObjectId[]
     state?: PhysicalState
+    createdAt: Date
+    updatedAt: Date
 }

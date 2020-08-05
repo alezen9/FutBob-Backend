@@ -6,6 +6,8 @@ import { MongoDBInstance, MongoState } from '..'
 import { ObjectId } from 'mongodb'
 import { Privilege } from '../Entities'
 import ErrorMessages from '../../Utils/ErrorMessages'
+import { PlayerType } from '../Player/Entities'
+import { ISODates } from '../../Utils/helpers'
 
 class MongoUser {
   tokenExpiration:string
@@ -15,32 +17,52 @@ class MongoUser {
   }
   
   async createUser (data: any): Promise<string> {
-    const res = await MongoDBInstance.collection.user.findOne({ 'credentials.username': data.username })
-    if(res) throw new Error(ErrorMessages.user_username_already_exists)
-    const now = moment().toISOString()
+    if(data.username && data.password){
+      const res = await this.getUser({ username: data.username })
+      if(res) throw new Error(ErrorMessages.user_username_already_exists)
+    }
+    const now = moment().toDate()
     const user = new User()
     user._id = new ObjectId()
     user.name = data.name
     user.surname = data.surname
     user.createdAt = now
     user.updatedAt = now
-    user.dateOfBirth = data.dateOfBirth
+    user.dateOfBirth = moment(data.dateOfBirth).toDate()
     user.sex = data.sex
     user.phone = data.phone
-    user.privileges = data.privilege || Privilege.Manager
+    user.privileges = [data.privilege || Privilege.Manager]
     if (data.email) user.email = data.email
-    const credentials = new Credentials()
-    credentials.username = data.username
-    const encryptedPassword: string = await this.encryptPassword(data.password)
-    credentials.password = encryptedPassword
-    user.credentials = credentials
+    if(data.username && data.password){
+      const credentials = new Credentials()
+      credentials.username = data.username
+      const encryptedPassword: string = await this.encryptPassword(data.password)
+      credentials.password = encryptedPassword
+      user.credentials = credentials
+    }
     await MongoDBInstance.collection.user.insertOne(user)
     return user._id.toHexString()
   }
 
-  async getUserById (_id: string): Promise<User> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ _id: new ObjectId(_id) })
+  async getUser (params: {_id?: string, username?: string}): Promise<User> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ 
+      ...params._id && { _id: new ObjectId(params._id) },
+      ...params.username && { 'credentials.username': params.username },
+    })
     return user
+  }
+
+  async assignPlayer (params: {idUser: string, footballPlayer?: string, futsalPlayer?: string}): Promise<boolean> {
+    const updateUser = new User()
+    if(params.footballPlayer) updateUser.footballPlayer = new ObjectId(params.footballPlayer)
+    if(params.futsalPlayer) updateUser.futsalPlayer = new ObjectId(params.futsalPlayer)
+
+    await MongoDBInstance.collection.user.updateOne(
+      { _id: new ObjectId(params.idUser) },
+      { $set: updateUser },
+      { upsert: true }
+    )
+    return true
   }
 
   async encryptPassword (password: string): Promise<string> {
@@ -50,11 +72,14 @@ class MongoUser {
   }
 
   getTypeUserFields (user: User):any {
-    const { credentials, _id, ...rest } = user
+    const { credentials, _id, futsalPlayer, footballPlayer, dateOfBirth, createdAt, updatedAt, ...rest } = user
     return {
       ...rest,
       _id: _id.toHexString(),
-      username: credentials.username
+      ...credentials && credentials.username && { username: credentials.username },
+      ...ISODates({ dateOfBirth, createdAt, updatedAt}),
+      ...futsalPlayer && { futsalPlayer: futsalPlayer.toHexString() },
+      ...footballPlayer && { footballPlayer: footballPlayer.toHexString() }
     }
   }
 

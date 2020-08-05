@@ -48,15 +48,7 @@ const setupAndStartServer = () => __awaiter(void 0, void 0, void 0, function* ()
         console.log(`connected to DB, listening on port ${port}`);
     }
     catch (error) {
-        console.log('');
-        console.log('');
-        console.log('');
-        console.log('');
-        console.log('error => ', error);
-        console.log('');
-        console.log('');
-        console.log('');
-        console.log('');
+        console.log(error);
         yield MongoDB_1.MongoDBInstance.closeConnection();
     }
 });

@@ -144,7 +144,7 @@ describe('Authentication', () => {
         name: 'Boban',
         surname: 'Cvetanoski'
       }
-      const ok = await apiInstance.user_updateUser(newUserData)
+      const ok = await apiInstance.user_updateUserConnected(newUserData)
       assert.strictEqual(ok, true)
       const { name, surname } = await apiInstance.user_getUserConnected(`{
         name,
@@ -192,7 +192,7 @@ describe('Authentication', () => {
           name: 'Boban',
           surname: 'Cvetanoski'
         }
-        await noTokenApiInstance.user_updateUser(newUserData)
+        await noTokenApiInstance.user_updateUserConnected(newUserData)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
       }

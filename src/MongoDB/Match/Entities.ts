@@ -22,6 +22,7 @@ export class Match {
     location?: Location
     state: MatchState
     type: PlayerType
+    invitedPlayers: ObjectId[]
     ditchedPlayers: ObjectId[]
     confirmedPlayers: MatchPlayer[]
     notes?: string

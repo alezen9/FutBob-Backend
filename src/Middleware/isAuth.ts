@@ -1,3 +1,6 @@
+import { Privilege } from "../MongoDB/Entities"
+import ErrorMessages from "../Utils/ErrorMessages"
+
 const jwt = require('jsonwebtoken')
 
 const isAuthMiddleware = (req: any, res: any, next: any) => {
@@ -29,8 +32,14 @@ const isAuthMiddleware = (req: any, res: any, next: any) => {
   }
   req.isAuth = true
   req.idUser = decodedToken.idUser
-  req.priveleges = decodedToken.privileges
+  req.privileges = decodedToken.privileges
   return next()
+}
+
+export const checkPrivileges = (req, params?: any) => {
+  if(!(req.privileges.includes(Privilege.Manager) || req.privileges.includes(Privilege.Developer))){
+    throw new Error(ErrorMessages.system_permission_denied)
+  }
 }
 
 export default isAuthMiddleware

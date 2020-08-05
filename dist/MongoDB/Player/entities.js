@@ -1,27 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Player = exports.PhysicalState = exports.PlayerType = exports.Positions = void 0;
-var Positions;
-(function (Positions) {
-    Positions[Positions["Goalkeeper"] = 0] = "Goalkeeper";
-    Positions[Positions["Sweeper"] = 1] = "Sweeper";
-    Positions[Positions["CentreBack"] = 2] = "CentreBack";
-    Positions[Positions["LeftFullBack"] = 3] = "LeftFullBack";
-    Positions[Positions["RightFullBack"] = 4] = "RightFullBack";
-    Positions[Positions["LeftWingBack"] = 5] = "LeftWingBack";
-    Positions[Positions["RightWingBack"] = 6] = "RightWingBack";
-    Positions[Positions["DefensiveMidfielder"] = 7] = "DefensiveMidfielder";
-    Positions[Positions["CentralMidfielder"] = 8] = "CentralMidfielder";
-    Positions[Positions["LeftMidfielder"] = 9] = "LeftMidfielder";
-    Positions[Positions["RightMidfielder"] = 10] = "RightMidfielder";
-    Positions[Positions["AttackingMidfielder"] = 11] = "AttackingMidfielder";
-    Positions[Positions["CenterForward"] = 12] = "CenterForward";
-    Positions[Positions["Striker"] = 13] = "Striker";
-    Positions[Positions["SecondStriker"] = 14] = "SecondStriker";
-    Positions[Positions["FutsalGoalKeeper"] = 15] = "FutsalGoalKeeper";
-    Positions[Positions["FutsalBack"] = 16] = "FutsalBack";
-    Positions[Positions["FutsalForward"] = 17] = "FutsalForward";
-})(Positions = exports.Positions || (exports.Positions = {}));
+var PlayerPosition;
+(function (PlayerPosition) {
+    PlayerPosition[PlayerPosition["Goalkeeper"] = 0] = "Goalkeeper";
+    PlayerPosition[PlayerPosition["Sweeper"] = 1] = "Sweeper";
+    PlayerPosition[PlayerPosition["CentreBack"] = 2] = "CentreBack";
+    PlayerPosition[PlayerPosition["LeftFullBack"] = 3] = "LeftFullBack";
+    PlayerPosition[PlayerPosition["RightFullBack"] = 4] = "RightFullBack";
+    PlayerPosition[PlayerPosition["LeftWingBack"] = 5] = "LeftWingBack";
+    PlayerPosition[PlayerPosition["RightWingBack"] = 6] = "RightWingBack";
+    PlayerPosition[PlayerPosition["DefensiveMidfielder"] = 7] = "DefensiveMidfielder";
+    PlayerPosition[PlayerPosition["CentralMidfielder"] = 8] = "CentralMidfielder";
+    PlayerPosition[PlayerPosition["LeftMidfielder"] = 9] = "LeftMidfielder";
+    PlayerPosition[PlayerPosition["RightMidfielder"] = 10] = "RightMidfielder";
+    PlayerPosition[PlayerPosition["AttackingMidfielder"] = 11] = "AttackingMidfielder";
+    PlayerPosition[PlayerPosition["CenterForward"] = 12] = "CenterForward";
+    PlayerPosition[PlayerPosition["Striker"] = 13] = "Striker";
+    PlayerPosition[PlayerPosition["SecondStriker"] = 14] = "SecondStriker";
+    PlayerPosition[PlayerPosition["FutsalGoalKeeper"] = 15] = "FutsalGoalKeeper";
+    PlayerPosition[PlayerPosition["FutsalBack"] = 16] = "FutsalBack";
+    PlayerPosition[PlayerPosition["FutsalForward"] = 17] = "FutsalForward";
+})(PlayerPosition = exports.PlayerPosition || (exports.PlayerPosition = {}));
 var PlayerType;
 (function (PlayerType) {
     PlayerType[PlayerType["Football"] = 0] = "Football";

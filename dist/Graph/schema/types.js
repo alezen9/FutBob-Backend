@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TypeSuccessOrFailure = exports.TypeMatchPlayer = exports.TypeMatch = exports.TypeLocation = exports.TypePlayer = exports.TypeUser = exports.TypeAuthData = void 0;
 exports.TypeAuthData = `type AuthData {
   token: String!,
   expiresIn: String!
@@ -20,10 +19,11 @@ exports.TypeUser = `type User {
 }`;
 exports.TypePlayer = `type Player {
     _id: String!
-    positions: Int!,
+    positions: [Int]!,
     type: Int!,
     matches: [Match],
-    state: Int
+    state: Int,
+    user: User!
   }`;
 exports.TypeLocation = `type Location {
     type: String!,

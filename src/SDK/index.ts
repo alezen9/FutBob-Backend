@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import { get } from 'lodash'
 import { paramsToString } from '../Utils/helpers'
-import { SigninInput, SignupInput, UserInput } from './Entities'
+import { SigninInput, SignupInput, UserInput, CreatePlayerInputWithId, CreatePlayerInputWithUser, DeletePlayerInput, PlayerFilters, UpdatePlayerInfoInput, UpdateUserPlayerInfoInput } from './Entities'
 require('dotenv').config()
 
 export class FutBobServer {
@@ -81,12 +81,52 @@ export class FutBobServer {
     return this.API({ query, name: 'changePassword' })
   }
 
-  async user_updateUser(userInput: UserInput): Promise<any> {
+  async user_updateUserConnected(userInput: UserInput): Promise<any> {
     const query = `
     mutation {
         updateUserConnected(userInput: ${paramsToString(userInput)})
     }`
     return this.API({ query, name: 'updateUserConnected' })
+  }
+
+  async user_updateUser(userInput: UpdateUserPlayerInfoInput): Promise<any> {
+    const query = `
+    mutation {
+        updateUser(userInput: ${paramsToString(userInput)})
+    }`
+    return this.API({ query, name: 'updateUser' })
+  }
+
+  async player_createPlayer(createPlayerInput: CreatePlayerInputWithId | CreatePlayerInputWithUser): Promise<any> {
+    const query = `
+    mutation {
+        createPlayer(createPlayerInput: ${paramsToString(createPlayerInput)})
+    }`
+    return this.API({ query, name: 'createPlayer' })
+  }
+
+  async player_updatePlayer(updatePlayerInput: UpdatePlayerInfoInput): Promise<any> {
+    const query = `
+    mutation {
+        updatePlayer(updatePlayerInput: ${paramsToString(updatePlayerInput)})
+    }`
+    return this.API({ query, name: 'updatePlayer' })
+  }
+
+  async player_deletePlayer(deletePlayerInput: DeletePlayerInput): Promise<any> {
+    const query = `
+    mutation {
+        deletePlayer(deletePlayerInput: ${paramsToString(deletePlayerInput)})
+    }`
+    return this.API({ query, name: 'deletePlayer' })
+  }
+
+  async player_getPlayers(playerFilters: PlayerFilters, fields: string): Promise<any> {
+    const query = `
+    query {
+        getPlayers(playerFilters: ${paramsToString(playerFilters)}) ${fields}
+    }`
+    return this.API({ query, name: 'getPlayers' })
   }
   
 }

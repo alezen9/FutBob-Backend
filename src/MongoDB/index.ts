@@ -53,6 +53,8 @@ export class MongoDB {
       client.db(this.dbName).createCollection('Match')
       // create indexes
       client.db(this.dbName).collection('User').createIndex({ 'credentials.username': 1 })
+      client.db(this.dbName).collection('User').createIndex({ footballPlayer: 1 })
+      client.db(this.dbName).collection('User').createIndex({ futsalPlayer: 1 })
       // populate colletion class
       collection.user = client.db(this.dbName).collection('User')
       collection.player = client.db(this.dbName).collection('Player')

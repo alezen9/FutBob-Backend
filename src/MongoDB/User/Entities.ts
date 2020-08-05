@@ -15,10 +15,10 @@ export class User {
     _id: ObjectId
     name: string
     surname: string
-    dateOfBirth: string
+    dateOfBirth: Date
     sex: Sex
-    createdAt: String
-    updatedAt: String
+    createdAt: Date
+    updatedAt: Date
     privileges: Privilege[]
     futsalPlayer?: ObjectId
     footballPlayer?: ObjectId

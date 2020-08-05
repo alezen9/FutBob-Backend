@@ -43,15 +43,7 @@ const setupAndStartServer = async () => {
     httpServer.listen(port)
     console.log(`connected to DB, listening on port ${port}`)
   } catch (error) {
-    console.log('')
-    console.log('')
-    console.log('')
-    console.log('')
-    console.log('error => ', error)
-    console.log('')
-    console.log('')
-    console.log('')
-    console.log('')
+    console.log(error)
     await MongoDBInstance.closeConnection()
   }
 }

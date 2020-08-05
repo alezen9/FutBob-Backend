@@ -1,5 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const Entities_1 = require("../MongoDB/Entities");
+const ErrorMessages_1 = __importDefault(require("../Utils/ErrorMessages"));
 const jwt = require('jsonwebtoken');
 const isAuthMiddleware = (req, res, next) => {
     const authHeader = req.get('Authorization');
@@ -31,8 +36,13 @@ const isAuthMiddleware = (req, res, next) => {
     }
     req.isAuth = true;
     req.idUser = decodedToken.idUser;
-    req.priveleges = decodedToken.privileges;
+    req.privileges = decodedToken.privileges;
     return next();
+};
+exports.checkPrivileges = (req, params) => {
+    if (!(req.privileges.includes(Entities_1.Privilege.Manager) || req.privileges.includes(Entities_1.Privilege.Developer))) {
+        throw new Error(ErrorMessages_1.default.system_permission_denied);
+    }
 };
 exports.default = isAuthMiddleware;
 //# sourceMappingURL=isAuth.js.map

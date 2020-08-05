@@ -23,7 +23,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mongoUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const moment_1 = __importDefault(require("moment"));
@@ -32,41 +31,57 @@ const __1 = require("..");
 const mongodb_1 = require("mongodb");
 const Entities_1 = require("../Entities");
 const ErrorMessages_1 = __importDefault(require("../../Utils/ErrorMessages"));
+const helpers_1 = require("../../Utils/helpers");
 class MongoUser {
     constructor() {
         this.tokenExpiration = '3h';
     }
     createUser(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield __1.MongoDBInstance.collection.user.findOne({ 'credentials.username': data.username });
-            if (res)
-                throw new Error(ErrorMessages_1.default.user_username_already_exists);
-            const now = moment_1.default().toISOString();
+            if (data.username && data.password) {
+                const res = yield this.getUser({ username: data.username });
+                if (res)
+                    throw new Error(ErrorMessages_1.default.user_username_already_exists);
+            }
+            const now = moment_1.default().toDate();
             const user = new entities_1.User();
             user._id = new mongodb_1.ObjectId();
             user.name = data.name;
             user.surname = data.surname;
             user.createdAt = now;
             user.updatedAt = now;
-            user.dateOfBirth = data.dateOfBirth;
+            user.dateOfBirth = moment_1.default(data.dateOfBirth).toDate();
             user.sex = data.sex;
             user.phone = data.phone;
-            user.privileges = data.privilege || Entities_1.Privilege.Manager;
+            user.privileges = [data.privilege || Entities_1.Privilege.Manager];
             if (data.email)
                 user.email = data.email;
-            const credentials = new entities_1.Credentials();
-            credentials.username = data.username;
-            const encryptedPassword = yield this.encryptPassword(data.password);
-            credentials.password = encryptedPassword;
-            user.credentials = credentials;
+            if (data.username && data.password) {
+                const credentials = new entities_1.Credentials();
+                credentials.username = data.username;
+                const encryptedPassword = yield this.encryptPassword(data.password);
+                credentials.password = encryptedPassword;
+                user.credentials = credentials;
+            }
             yield __1.MongoDBInstance.collection.user.insertOne(user);
             return user._id.toHexString();
         });
     }
-    getUserById(_id) {
+    getUser(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield __1.MongoDBInstance.collection.user.findOne({ _id: new mongodb_1.ObjectId(_id) });
+            const user = yield __1.MongoDBInstance.collection.user.findOne(Object.assign(Object.assign({}, params._id && { _id: new mongodb_1.ObjectId(params._id) }), params.username && { 'credentials.username': params.username }));
             return user;
+        });
+    }
+    assignPlayer(params) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updateUser = new entities_1.User();
+            if (params.footballPlayer)
+                updateUser.footballPlayer = new mongodb_1.ObjectId(params.footballPlayer);
+            if (params.futsalPlayer)
+                updateUser.futsalPlayer = new mongodb_1.ObjectId(params.futsalPlayer);
+            yield __1.MongoDBInstance.collection.user.updateOne({ _id: new mongodb_1.ObjectId(params.idUser) }, { $set: updateUser }, { upsert: true });
+            return true;
         });
     }
     encryptPassword(password) {
@@ -77,8 +92,8 @@ class MongoUser {
         });
     }
     getTypeUserFields(user) {
-        const { credentials, _id } = user, rest = __rest(user, ["credentials", "_id"]);
-        return Object.assign(Object.assign({}, rest), { _id: _id.toHexString(), username: credentials.username });
+        const { credentials, _id, futsalPlayer, footballPlayer, dateOfBirth, createdAt, updatedAt } = user, rest = __rest(user, ["credentials", "_id", "futsalPlayer", "footballPlayer", "dateOfBirth", "createdAt", "updatedAt"]);
+        return Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, rest), { _id: _id.toHexString() }), credentials && credentials.username && { username: credentials.username }), helpers_1.ISODates({ dateOfBirth, createdAt, updatedAt })), futsalPlayer && { futsalPlayer: futsalPlayer.toHexString() }), footballPlayer && { footballPlayer: footballPlayer.toHexString() });
     }
     generateJWT(data) {
         const token = jsonwebtoken_1.default.sign(Object.assign({}, data), process.env.SECRET, { expiresIn: this.tokenExpiration });
