@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TypeSuccessOrFailure = exports.TypeMatchPlayer = exports.TypeMatch = exports.TypeLocation = exports.TypePlayer = exports.TypeRadarData = exports.TypeUser = exports.TypeAuthData = void 0;
 exports.TypeAuthData = `type AuthData {
   token: String!,
   expiresIn: String!
@@ -17,13 +18,23 @@ exports.TypeUser = `type User {
     footballPlayer: Player,
     avatar: String
 }`;
+exports.TypeRadarData = `type RadarData {
+    speed: Int!,
+    stamina: Int!,
+    defence: Int!,
+    balance: Int!,
+    ballControl: Int!,
+    passing: Int!,
+    finishing: Int!
+}`;
 exports.TypePlayer = `type Player {
     _id: String!
     positions: [Int]!,
     type: Int!,
     matches: [Match],
     state: Int,
-    user: User!
+    user: User!,
+    radar: RadarData!
   }`;
 exports.TypeLocation = `type Location {
     type: String!,

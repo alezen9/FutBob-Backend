@@ -23,6 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mongoUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const moment_1 = __importDefault(require("moment"));
@@ -96,7 +97,7 @@ class MongoUser {
         return Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, rest), { _id: _id.toHexString() }), credentials && credentials.username && { username: credentials.username }), helpers_1.ISODates({ dateOfBirth, createdAt, updatedAt })), futsalPlayer && { futsalPlayer: futsalPlayer.toHexString() }), footballPlayer && { footballPlayer: footballPlayer.toHexString() });
     }
     generateJWT(data) {
-        const token = jsonwebtoken_1.default.sign(Object.assign({}, data), process.env.SECRET, { expiresIn: this.tokenExpiration });
+        const token = jsonwebtoken_1.default.sign(Object.assign({}, data), process.env.SECRET);
         return token;
     }
 }

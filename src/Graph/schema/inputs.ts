@@ -33,11 +33,23 @@ export const UpdateUserInput = `input UpdateUserInput {
     sex: Int
 }`
 
+export const RadarDataInput = `
+input radarData {
+  speed: Int!,
+  stamina: Int!,
+  defence: Int!,
+  balance: Int!,
+  ballControl: Int!,
+  passing: Int!,
+  finishing: Int!
+}`
+
 export const CreatePlayerInput = `
 input playerData {
   positions: [Int!]!,
   state: Int,
-  type: Int!
+  type: Int!,
+  radarData: radarData!
 }
 
 input userData {
@@ -66,7 +78,8 @@ export const PlayerFilters = `input PlayerFilters {
 export const UpdatePlayerInput = `input UpdatePlayerInput {
   _id: String!,
   positions: [Int],
-  state: Int
+  state: Int,
+  radarData: radarData
 }`
 
 export const DeletePlayerInput = `input DeletePlayerInput {

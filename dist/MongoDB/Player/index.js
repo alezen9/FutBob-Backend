@@ -23,6 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mongoPlayer = void 0;
 const moment_1 = __importDefault(require("moment"));
 const __1 = require("..");
 const mongodb_1 = require("mongodb");
@@ -40,6 +41,15 @@ class MongoPlayer {
             player.type = data.type;
             player.createdAt = now;
             player.updatedAt = now;
+            const radarData = new Entities_1.RadarData();
+            radarData.speed = data.radarData.speed;
+            radarData.stamina = data.radarData.stamina;
+            radarData.defence = data.radarData.defence;
+            radarData.balance = data.radarData.balance;
+            radarData.ballControl = data.radarData.ballControl;
+            radarData.passing = data.radarData.passing;
+            radarData.finishing = data.radarData.finishing;
+            player.radar = radarData;
             yield __1.MongoDBInstance.collection.player.insertOne(player);
             yield User_1.mongoUser.assignPlayer(Object.assign(Object.assign({ idUser: data.idUser }, player.type === Entities_1.PlayerType.Football && { footballPlayer: (player._id).toHexString() }), player.type === Entities_1.PlayerType.Futsal && { futsalPlayer: (player._id).toHexString() }));
             return player._id.toHexString();

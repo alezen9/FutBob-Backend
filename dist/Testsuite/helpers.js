@@ -20,6 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.setupTestsuite = exports.TestsuiteSetupStep = exports.validationErrorRegEx = exports.ShouldFail = exports.ShouldSucceed = void 0;
 const entities_1 = require("../MongoDB/User/entities");
 const Entities_1 = require("../MongoDB/Player/Entities");
 const ResetColor = '\x1b[0m';
@@ -56,7 +57,16 @@ const players = [
                 Entities_1.PlayerPosition.CentreBack,
                 Entities_1.PlayerPosition.DefensiveMidfielder
             ],
-            type: Entities_1.PlayerType.Football
+            type: Entities_1.PlayerType.Football,
+            radarData: {
+                speed: 75,
+                stamina: 78,
+                defence: 63,
+                balance: 82,
+                ballControl: 93,
+                passing: 95,
+                finishing: 89
+            }
         }
     },
     {
@@ -73,7 +83,16 @@ const players = [
                 Entities_1.PlayerPosition.FutsalForward,
                 Entities_1.PlayerPosition.FutsalForward
             ],
-            type: Entities_1.PlayerType.Futsal
+            type: Entities_1.PlayerType.Futsal,
+            radarData: {
+                speed: 85,
+                stamina: 83,
+                defence: 88,
+                balance: 89,
+                ballControl: 90,
+                passing: 95,
+                finishing: 86
+            }
         }
     },
     {
@@ -91,7 +110,16 @@ const players = [
                 Entities_1.PlayerPosition.FutsalForward,
                 Entities_1.PlayerPosition.FutsalGoalKeeper
             ],
-            type: Entities_1.PlayerType.Futsal
+            type: Entities_1.PlayerType.Futsal,
+            radarData: {
+                speed: 65,
+                stamina: 70,
+                defence: 70,
+                balance: 75,
+                ballControl: 78,
+                passing: 83,
+                finishing: 77
+            }
         }
     }
 ];

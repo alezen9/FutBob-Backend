@@ -5,7 +5,8 @@ import {
   TypeLocation,
   TypeMatch,
   TypeMatchPlayer,
-  TypeSuccessOrFailure
+  TypeSuccessOrFailure,
+  TypeRadarData
 } from './types'
 import {
   SigninInput,
@@ -15,7 +16,8 @@ import {
   CreatePlayerInput,
   UpdatePlayerInput,
   PlayerFilters,
-  DeletePlayerInput
+  DeletePlayerInput,
+  RadarDataInput
 } from './inputs'
 import { gql } from 'apollo-server'
 
@@ -27,6 +29,7 @@ ${TypeLocation}
 ${TypeMatch}
 ${TypeMatchPlayer}
 ${TypeSuccessOrFailure}
+${TypeRadarData}
 
 ${SignupInput}
 ${SigninInput}
@@ -35,7 +38,7 @@ ${UpdateUserInput}
 ${CreatePlayerInput}
 ${UpdatePlayerInput}
 ${DeletePlayerInput}
-
+${RadarDataInput}
 ${PlayerFilters}
 
 type Query {

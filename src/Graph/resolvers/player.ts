@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash'
 import cleanDeep from 'clean-deep'
 import { mongoUser } from '../../MongoDB/User'
 import { checkPrivileges } from '../../Middleware/isAuth'
-import { Player, PlayerType } from '../../MongoDB/Player/Entities'
+import { Player, PlayerType, RadarData } from '../../MongoDB/Player/Entities'
 import moment from 'moment'
 import { gql_User, gql_Player, playerLoader } from './transform'
 
@@ -38,13 +38,24 @@ const playerResolver = {
     },
     updatePlayer: async (_, { updatePlayerInput }, { req }) => {
       if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const { _id, positions, state } = updatePlayerInput
+      const { _id, positions, state, radarData } = updatePlayerInput
 
       if (isEmpty(cleanDeep(updatePlayerInput))) return true
 
       const updatedPlayer = new Player()
       if (positions && positions instanceof Array) updatedPlayer.positions = positions
       if (state !== undefined) updatedPlayer.state = state
+      if(radarData) {
+        const _radarData = new RadarData()
+        _radarData.speed = radarData.speed
+        _radarData.stamina = radarData.stamina
+        _radarData.defence = radarData.defence
+        _radarData.balance = radarData.balance
+        _radarData.ballControl = radarData.ballControl
+        _radarData.passing = radarData.passing
+        _radarData.finishing = radarData.finishing
+        updatedPlayer.radar = _radarData
+      }
       updatedPlayer.updatedAt = moment().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.player.updateOne(

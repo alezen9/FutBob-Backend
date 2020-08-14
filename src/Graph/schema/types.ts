@@ -17,13 +17,24 @@ export const TypeUser = `type User {
     avatar: String
 }`
 
+export const TypeRadarData = `type RadarData {
+    speed: Int!,
+    stamina: Int!,
+    defence: Int!,
+    balance: Int!,
+    ballControl: Int!,
+    passing: Int!,
+    finishing: Int!
+}`
+
 export const TypePlayer = `type Player {
     _id: String!
     positions: [Int]!,
     type: Int!,
     matches: [Match],
     state: Int,
-    user: User!
+    user: User!,
+    radar: RadarData!
   }`
 
 export const TypeLocation = `type Location {

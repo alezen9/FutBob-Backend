@@ -11,6 +11,7 @@ ${types_1.TypeLocation}
 ${types_1.TypeMatch}
 ${types_1.TypeMatchPlayer}
 ${types_1.TypeSuccessOrFailure}
+${types_1.TypeRadarData}
 
 ${inputs_1.SignupInput}
 ${inputs_1.SigninInput}
@@ -19,7 +20,7 @@ ${inputs_1.UpdateUserInput}
 ${inputs_1.CreatePlayerInput}
 ${inputs_1.UpdatePlayerInput}
 ${inputs_1.DeletePlayerInput}
-
+${inputs_1.RadarDataInput}
 ${inputs_1.PlayerFilters}
 
 type Query {

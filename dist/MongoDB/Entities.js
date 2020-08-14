@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Location = exports.Privilege = exports.CollectionContainer = void 0;
 class CollectionContainer {
 }
 exports.CollectionContainer = CollectionContainer;

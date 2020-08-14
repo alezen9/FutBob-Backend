@@ -1,6 +1,11 @@
 import { ObjectId } from "mongodb"
 
 export enum PlayerPosition {
+    FutsalGoalKeeper,
+    FutsalBack,
+    FutsalLeftWing,
+    FutsalRightWing,
+    FutsalForward,
     Goalkeeper,
     Sweeper,
     CentreBack,
@@ -15,10 +20,17 @@ export enum PlayerPosition {
     AttackingMidfielder,
     CenterForward,
     Striker,
-    SecondStriker,
-    FutsalGoalKeeper,
-    FutsalBack,
-    FutsalForward
+    SecondStriker
+}
+
+export class RadarData {
+    speed: number
+    stamina: number
+    defence: number
+    balance: number
+    ballControl: number
+    passing: number
+    finishing: number
 }
 
 export enum PlayerType {
@@ -43,4 +55,5 @@ export class Player {
     state?: PhysicalState
     createdAt: Date
     updatedAt: Date
+    radar: RadarData
 }

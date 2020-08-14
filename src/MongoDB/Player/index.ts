@@ -2,7 +2,7 @@ import moment from 'moment'
 import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { mongoUser } from '../User'
-import { Player, PhysicalState, PlayerType } from './Entities'
+import { Player, PhysicalState, PlayerType, RadarData } from './Entities'
 
 class MongoPlayer {
   
@@ -16,6 +16,15 @@ class MongoPlayer {
     player.type = data.type
     player.createdAt = now
     player.updatedAt = now
+    const radarData = new RadarData()
+    radarData.speed = data.radarData.speed
+    radarData.stamina = data.radarData.stamina
+    radarData.defence = data.radarData.defence
+    radarData.balance = data.radarData.balance
+    radarData.ballControl = data.radarData.ballControl
+    radarData.passing = data.radarData.passing
+    radarData.finishing = data.radarData.finishing
+    player.radar = radarData
     await MongoDBInstance.collection.player.insertOne(player)
     await mongoUser.assignPlayer({
         idUser: data.idUser,

@@ -87,7 +87,7 @@ class MongoUser {
     const token = jwt.sign(
         { ...data },
         process.env.SECRET,
-        { expiresIn: this.tokenExpiration }
+        // { expiresIn: this.tokenExpiration }
     )
     return token
   }

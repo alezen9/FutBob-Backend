@@ -50,7 +50,16 @@ const players = [
                 PlayerPosition.CentreBack,
                 PlayerPosition.DefensiveMidfielder
             ],
-            type: PlayerType.Football
+            type: PlayerType.Football,
+            radarData: {
+                speed: 75,
+                stamina: 78,
+                defence: 63,
+                balance: 82,
+                ballControl: 93,
+                passing: 95,
+                finishing: 89
+            }
         }
     },
     {
@@ -67,7 +76,16 @@ const players = [
                 PlayerPosition.FutsalForward,
                 PlayerPosition.FutsalForward
             ],
-            type: PlayerType.Futsal
+            type: PlayerType.Futsal,
+            radarData: {
+                speed: 85,
+                stamina: 83,
+                defence: 88,
+                balance: 89,
+                ballControl: 90,
+                passing: 95,
+                finishing: 86
+            }
         }
     },
     {
@@ -85,7 +103,16 @@ const players = [
                 PlayerPosition.FutsalForward,
                 PlayerPosition.FutsalGoalKeeper
             ],
-            type: PlayerType.Futsal
+            type: PlayerType.Futsal,
+            radarData: {
+                speed: 65,
+                stamina: 70,
+                defence: 70,
+                balance: 75,
+                ballControl: 78,
+                passing: 83,
+                finishing: 77
+            }
         }
     }
 ]
