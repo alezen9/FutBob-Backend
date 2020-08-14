@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TypeSuccessOrFailure = exports.TypeMatchPlayer = exports.TypeMatch = exports.TypeLocation = exports.TypePlayer = exports.TypeRadarData = exports.TypeUser = exports.TypeAuthData = void 0;
 exports.TypeAuthData = `type AuthData {
   token: String!,
   expiresIn: String!

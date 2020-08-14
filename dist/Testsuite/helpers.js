@@ -20,7 +20,6 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupTestsuite = exports.TestsuiteSetupStep = exports.validationErrorRegEx = exports.ShouldFail = exports.ShouldSucceed = void 0;
 const entities_1 = require("../MongoDB/User/entities");
 const Entities_1 = require("../MongoDB/Player/Entities");
 const ResetColor = '\x1b[0m';

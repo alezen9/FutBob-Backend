@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeletePlayerInput = exports.UpdatePlayerInput = exports.PlayerFilters = exports.CreatePlayerInput = exports.RadarDataInput = exports.UpdateUserInput = exports.UpdateUserConnectedInput = exports.SignupInput = exports.SigninInput = void 0;
 exports.SigninInput = `input SigninInput {
     username: String!,
     password: String!
