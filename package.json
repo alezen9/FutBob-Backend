@@ -11,7 +11,7 @@
     "dist/**/*"
   ],
   "scripts": {
-    "start": "ts-node dist/index.ts",
+    "start": "ts-node index.ts",
     "start-local": "./scripts/start_local.sh",
     "test": "mocha"
   },
