@@ -18,12 +18,11 @@ const resolvers_1 = __importDefault(require("./Graph/resolvers"));
 const isAuth_1 = __importDefault(require("./Middleware/isAuth"));
 const http_1 = __importDefault(require("http"));
 const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const shell = require('shelljs');
 require('dotenv').config();
 const { ApolloServer, PubSub } = require('apollo-server-express');
 const app = express_1.default();
-app.use(cors_1.default());
+// app.use(cors())
 app.use(isAuth_1.default);
 const pubsub = new PubSub();
 const server = new ApolloServer({
