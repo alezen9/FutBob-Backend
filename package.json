@@ -11,9 +11,9 @@
     "dist/**/*"
   ],
   "scripts": {
+    "serve": "node dist/index.js",
     "start": "npm run serve",
     "start-local": "./scripts/start_local.sh",
-    "serve": "node dist/index.js",
     "build-ts": "tsc",
     "postinstall": "npm run build-ts",
     "test": "mocha"
