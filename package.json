@@ -11,11 +11,10 @@
     "dist/**/*"
   ],
   "scripts": {
-    "serve": "node dist/index.js",
-    "start": "npm run serve",
+    "start": "node dist/index.js",
     "start-local": "./scripts/start_local.sh",
     "build-ts": "tsc",
-    "postinstall": "npm run build-ts",
+    "postinstall": "yarn build-ts",
     "test": "mocha"
   },
   "author": "Aleksandar Gjoreski",
