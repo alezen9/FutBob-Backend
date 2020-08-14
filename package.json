@@ -13,8 +13,6 @@
   "scripts": {
     "start": "node dist/index.js",
     "start-local": "./scripts/start_local.sh",
-    "build": "tsc",
-    "postinstall": "npm run build",
     "test": "mocha"
   },
   "author": "Aleksandar Gjoreski",
