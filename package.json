@@ -14,9 +14,9 @@
     "start": "tsc && node dist/index.js",
     "start-local": "./scripts/start_local.sh",
     "build": "tsc",
-    "postinstall": "npm run build",
-    "heroku-prebuild": "npm run build",
-    "heroku-postbuild": "npm run build",
+    "postinstall": "yarn build",
+    "heroku-prebuild": "yarn build",
+    "heroku-postbuild": "yarn build",
     "test": "mocha"
   },
   "author": "Aleksandar Gjoreski",
