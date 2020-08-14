@@ -11,10 +11,12 @@
     "dist/**/*"
   ],
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "ode dist/index.js",
     "start-local": "./scripts/start_local.sh",
-    "build-ts": "tsc",
-    "postinstall": "yarn build-ts",
+    "build": "tsc",
+    "postinstall": "yarn build",
+    "heroku-prebuild": "yarn build",
+    "heroku-postbuild": "yarn build",
     "test": "mocha"
   },
   "author": "Aleksandar Gjoreski",
