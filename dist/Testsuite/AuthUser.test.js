@@ -37,7 +37,7 @@ const managerCredentials = {
     username: 'alezen9',
     password: 'alezen9'
 };
-const manager = Object.assign({ name: 'Aleksandar', surname: 'Gjroeski', dateOfBirth: '1993-07-02T22:00:00.000Z', phone: '+39 1234567890', sex: entities_1.Sex.Male }, managerCredentials);
+const manager = Object.assign({ name: 'Aleksandar', surname: 'Gjroeski', dateOfBirth: '1993-07-02T22:00:00.000Z', phone: '+39 1234567890', sex: entities_1.Sex.Male, country: 'MK' }, managerCredentials);
 const authDataFields = `{
   token,
   expiresIn

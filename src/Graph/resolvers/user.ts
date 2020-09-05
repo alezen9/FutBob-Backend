@@ -58,7 +58,7 @@ const userResolver = {
     },
     updateUserConnected: async (_, { userInput }, { req }) => {
       if(!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const { name, surname, dateOfBirth, phone, email, sex } = userInput
+      const { name, surname, dateOfBirth, phone, email, sex, country } = userInput
 
       if(isEmpty(cleanDeep(userInput))) return true
 
@@ -69,6 +69,7 @@ const userResolver = {
       if(phone) updatedUser.phone = phone
       if(email) updatedUser.email = email
       if(sex) updatedUser.sex = sex
+      if(country) updatedUser.country = country
       updatedUser.updatedAt = moment().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
@@ -83,7 +84,7 @@ const userResolver = {
     },
     updateUser: async (_, { userInput }, { req }) => {
       if(!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const { _id, name, surname, dateOfBirth, phone, email, sex } = userInput
+      const { _id, name, surname, dateOfBirth, phone, email, sex, country } = userInput
 
       if(isEmpty(cleanDeep(userInput))) return true
 
@@ -94,6 +95,7 @@ const userResolver = {
       if(phone) updatedUser.phone = phone
       if(email) updatedUser.email = email
       if(sex) updatedUser.sex = sex
+      if(country) updatedUser.country = country
       updatedUser.updatedAt = moment().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(

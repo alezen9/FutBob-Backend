@@ -21,6 +21,7 @@ const manager = {
   dateOfBirth: '1993-07-02T22:00:00.000Z',
   phone: '+39 1234567890',
   sex: Sex.Male,
+  country: 'MK',
   ...managerCredentials
 }
 

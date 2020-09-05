@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkPrivileges = void 0;
 const Entities_1 = require("../MongoDB/Entities");
 const ErrorMessages_1 = __importDefault(require("../Utils/ErrorMessages"));
 const jwt = require('jsonwebtoken');

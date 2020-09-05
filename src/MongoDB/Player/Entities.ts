@@ -23,14 +23,60 @@ export enum PlayerPosition {
     SecondStriker
 }
 
-export class RadarData {
-    speed: number
-    stamina: number
-    defence: number
-    balance: number
-    ballControl: number
-    passing: number
+export class Pace {
+    acceleration: number
+    sprintSpeed: number
+}
+
+export class Shooting {
+    positioning: number
     finishing: number
+    shotPower: number
+    longShots: number
+    volleys: number
+    penalties: number
+}
+
+export class Passing {
+    vision: number
+    crossing: number
+    freeKick: number
+    shortPassing: number
+    longPassing: number
+    curve: number
+}
+
+export class Dribbling {
+    agility: number
+    balance: number
+    reactions: number
+    ballControl: number
+    dribbling: number
+    composure: number
+}
+
+export class Defense {
+    interceptions: number
+    heading: number
+    defensiveAwareness: number
+    standingTackle: number
+    slidingTackle: number
+}
+
+export class Physical {
+    jumping: number
+    stamina: number
+    strength: number
+    aggression: number
+}
+
+export class PlayerScore {
+    pace: Pace
+    shooting: Shooting
+    passing: Passing
+    dribbling: Dribbling
+    defense: Defense
+    physical: Physical
 }
 
 export enum PlayerType {
@@ -55,5 +101,5 @@ export class Player {
     state?: PhysicalState
     createdAt: Date
     updatedAt: Date
-    radar: RadarData
+    score: PlayerScore
 }

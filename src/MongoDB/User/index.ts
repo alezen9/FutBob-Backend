@@ -30,6 +30,7 @@ class MongoUser {
     user.updatedAt = now
     user.dateOfBirth = moment(data.dateOfBirth).toDate()
     user.sex = data.sex
+    user.country = data.country
     user.phone = data.phone
     user.privileges = [data.privilege || Privilege.Manager]
     if (data.email) user.email = data.email

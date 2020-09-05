@@ -11,20 +11,67 @@ export const TypeUser = `type User {
     phone: String!,
     email: String,
     sex: Int!,
+    country: String!,
     username: String!,
     futsalPlayer: Player,
     footballPlayer: Player,
     avatar: String
 }`
 
-export const TypeRadarData = `type RadarData {
-    speed: Int!,
-    stamina: Int!,
-    defence: Int!,
+export const TypePace = `type PlayerScorePace {
+    acceleration: Int!,
+    sprintSpeed: Int!
+}`
+
+export const TypeShooting = `type PlayerScoreShooting {
+    positioning: Int!,
+    finishing: Int!,
+    shotPower: Int!,
+    longShots: Int!,
+    volleys: Int!,
+    penalties: Int!
+}`
+
+export const TypePassing = `type PlayerScorePassing {
+    vision: Int!,
+    crossing: Int!,
+    freeKick: Int!,
+    shortPassing: Int!,
+    longPassing: Int!,
+    curve: Int!
+}`
+
+export const TypeDribbling = `type PlayerScoreDribbling {
+    agility: Int!,
     balance: Int!,
+    reactions: Int!,
     ballControl: Int!,
-    passing: Int!,
-    finishing: Int!
+    dribbling: Int!,
+    composure: Int!
+}`
+
+export const TypeDefense = `type PlayerScoreDefense {
+    interceptions: Int!,
+    heading: Int!,
+    defensiveAwareness: Int!,
+    standingTackle: Int!,
+    slidingTackle: Int!
+}`
+
+export const TypePhysical = `type PlayerScorePhysical {
+    jumping: Int!,
+    stamina: Int!,
+    strength: Int!,
+    aggression: Int!
+}`
+
+export const TypeScore = `type PlayerScore {
+    pace: PlayerScorePace!,
+    shooting: PlayerScoreShooting!,
+    passing: PlayerScorePassing!,
+    dribbling: PlayerScoreDribbling!,
+    defense: PlayerScoreDefense!,
+    physical: PlayerScorePhysical!
 }`
 
 export const TypePlayer = `type Player {
@@ -34,7 +81,7 @@ export const TypePlayer = `type Player {
     matches: [Match],
     state: Int,
     user: User!,
-    radar: RadarData!
+    score: PlayerScore!
   }`
 
 export const TypeLocation = `type Location {

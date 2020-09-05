@@ -2,7 +2,7 @@ import moment from 'moment'
 import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { mongoUser } from '../User'
-import { Player, PhysicalState, PlayerType, RadarData } from './Entities'
+import { Player, PhysicalState, PlayerType, PlayerScore, Pace, Shooting, Passing, Dribbling, Defense, Physical } from './Entities'
 
 class MongoPlayer {
   
@@ -16,15 +16,8 @@ class MongoPlayer {
     player.type = data.type
     player.createdAt = now
     player.updatedAt = now
-    const radarData = new RadarData()
-    radarData.speed = data.radarData.speed
-    radarData.stamina = data.radarData.stamina
-    radarData.defence = data.radarData.defence
-    radarData.balance = data.radarData.balance
-    radarData.ballControl = data.radarData.ballControl
-    radarData.passing = data.radarData.passing
-    radarData.finishing = data.radarData.finishing
-    player.radar = radarData
+    player.score = this.assignScoreValues(data)
+
     await MongoDBInstance.collection.player.insertOne(player)
     await mongoUser.assignPlayer({
         idUser: data.idUser,
@@ -46,6 +39,55 @@ class MongoPlayer {
     ? await MongoDBInstance.collection.player.aggregate(query).toArray()
     : await MongoDBInstance.collection.player.find({}).toArray()
     return players
+  }
+
+  assignScoreValues (data):PlayerScore {
+    const score = new PlayerScore()
+    
+    const pace = new Pace()
+    pace.acceleration = data.score.pace.acceleration
+    pace.sprintSpeed = data.score.pace.sprintSpeed
+    const shooting = new Shooting()
+    shooting.finishing = data.score.shooting.finishing
+    shooting.longShots = data.score.shooting.longShots
+    shooting.penalties = data.score.shooting.penalties
+    shooting.positioning = data.score.shooting.positioning
+    shooting.shotPower = data.score.shooting.shotPower
+    shooting.volleys = data.score.shooting.volleys
+    const passing = new Passing()
+    passing.crossing = data.score.passing.crossing
+    passing.curve = data.score.passing.curve
+    passing.freeKick = data.score.passing.freeKick
+    passing.longPassing = data.score.passing.longPassing
+    passing.shortPassing = data.score.passing.shortPassing
+    passing.vision = data.score.passing.vision
+    const dribbling = new Dribbling()
+    dribbling.agility = data.score.dribbling.agility
+    dribbling.balance = data.score.dribbling.balance
+    dribbling.ballControl = data.score.dribbling.ballControl
+    dribbling.composure = data.score.dribbling.composure
+    dribbling.dribbling = data.score.dribbling.dribbling
+    dribbling.reactions = data.score.dribbling.reactions
+    const defense = new Defense()
+    defense.defensiveAwareness = data.score.defense.defensiveAwareness
+    defense.heading = data.score.defense.heading
+    defense.interceptions = data.score.defense.interceptions
+    defense.slidingTackle = data.score.defense.slidingTackle
+    defense.standingTackle = data.score.defense.standingTackle
+    const physical = new Physical()
+    physical.aggression = data.score.physical.aggression
+    physical.jumping = data.score.physical.jumping
+    physical.stamina = data.score.physical.stamina
+    physical.strength = data.score.physical.strength
+
+    score.pace = pace
+    score.shooting = shooting
+    score.passing = passing
+    score.dribbling = dribbling
+    score.defense = defense
+    score.physical = physical
+
+    return score
   }
 
   async getPlayerById (_id: string): Promise<Player> {

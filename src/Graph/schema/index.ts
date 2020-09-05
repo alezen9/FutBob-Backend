@@ -6,7 +6,13 @@ import {
   TypeMatch,
   TypeMatchPlayer,
   TypeSuccessOrFailure,
-  TypeRadarData
+  TypePace,
+  TypeShooting,
+  TypePassing,
+  TypeDribbling,
+  TypeDefense,
+  TypePhysical,
+  TypeScore
 } from './types'
 import {
   SigninInput,
@@ -17,7 +23,7 @@ import {
   UpdatePlayerInput,
   PlayerFilters,
   DeletePlayerInput,
-  RadarDataInput
+  PlayerScoreInput
 } from './inputs'
 import { gql } from 'apollo-server'
 
@@ -29,7 +35,13 @@ ${TypeLocation}
 ${TypeMatch}
 ${TypeMatchPlayer}
 ${TypeSuccessOrFailure}
-${TypeRadarData}
+${TypePace}
+${TypeShooting}
+${TypePassing}
+${TypeDribbling}
+${TypeDefense}
+${TypePhysical}
+${TypeScore}
 
 ${SignupInput}
 ${SigninInput}
@@ -38,7 +50,7 @@ ${UpdateUserInput}
 ${CreatePlayerInput}
 ${UpdatePlayerInput}
 ${DeletePlayerInput}
-${RadarDataInput}
+${PlayerScoreInput}
 ${PlayerFilters}
 
 type Query {

@@ -65,7 +65,7 @@ const userResolver = {
         updateUserConnected: (_, { userInput }, { req }) => __awaiter(void 0, void 0, void 0, function* () {
             if (!req.isAuth)
                 throw new Error(ErrorMessages_1.default.user_unauthenticated);
-            const { name, surname, dateOfBirth, phone, email, sex } = userInput;
+            const { name, surname, dateOfBirth, phone, email, sex, country } = userInput;
             if (lodash_1.isEmpty(clean_deep_1.default(userInput)))
                 return true;
             const updatedUser = new entities_1.User();
@@ -81,6 +81,8 @@ const userResolver = {
                 updatedUser.email = email;
             if (sex)
                 updatedUser.sex = sex;
+            if (country)
+                updatedUser.country = country;
             updatedUser.updatedAt = moment_1.default().toDate();
             const { modifiedCount } = yield MongoDB_1.MongoDBInstance.collection.user.updateOne({ _id: new mongodb_1.ObjectId(req.idUser) }, { $set: updatedUser });
             if (modifiedCount === 0)
@@ -91,7 +93,7 @@ const userResolver = {
         updateUser: (_, { userInput }, { req }) => __awaiter(void 0, void 0, void 0, function* () {
             if (!req.isAuth)
                 throw new Error(ErrorMessages_1.default.user_unauthenticated);
-            const { _id, name, surname, dateOfBirth, phone, email, sex } = userInput;
+            const { _id, name, surname, dateOfBirth, phone, email, sex, country } = userInput;
             if (lodash_1.isEmpty(clean_deep_1.default(userInput)))
                 return true;
             const updatedUser = new entities_1.User();
@@ -107,6 +109,8 @@ const userResolver = {
                 updatedUser.email = email;
             if (sex)
                 updatedUser.sex = sex;
+            if (country)
+                updatedUser.country = country;
             updatedUser.updatedAt = moment_1.default().toDate();
             const { modifiedCount } = yield MongoDB_1.MongoDBInstance.collection.user.updateOne({ _id: new mongodb_1.ObjectId(_id) }, { $set: updatedUser });
             if (modifiedCount === 0)

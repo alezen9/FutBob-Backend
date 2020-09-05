@@ -23,6 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mongoUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const moment_1 = __importDefault(require("moment"));
@@ -52,6 +53,7 @@ class MongoUser {
             user.updatedAt = now;
             user.dateOfBirth = moment_1.default(data.dateOfBirth).toDate();
             user.sex = data.sex;
+            user.country = data.country;
             user.phone = data.phone;
             user.privileges = [data.privilege || Entities_1.Privilege.Manager];
             if (data.email)

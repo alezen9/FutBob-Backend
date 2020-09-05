@@ -17,6 +17,7 @@ export class User {
     surname: string
     dateOfBirth: Date
     sex: Sex
+    country: string
     createdAt: Date
     updatedAt: Date
     privileges: Privilege[]

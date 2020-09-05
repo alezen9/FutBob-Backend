@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Player = exports.PhysicalState = exports.PlayerType = exports.PlayerScore = exports.Physical = exports.Defense = exports.Dribbling = exports.Passing = exports.Shooting = exports.Pace = exports.PlayerPosition = void 0;
 var PlayerPosition;
 (function (PlayerPosition) {
     PlayerPosition[PlayerPosition["FutsalGoalKeeper"] = 0] = "FutsalGoalKeeper";
@@ -23,9 +24,27 @@ var PlayerPosition;
     PlayerPosition[PlayerPosition["Striker"] = 18] = "Striker";
     PlayerPosition[PlayerPosition["SecondStriker"] = 19] = "SecondStriker";
 })(PlayerPosition = exports.PlayerPosition || (exports.PlayerPosition = {}));
-class RadarData {
+class Pace {
 }
-exports.RadarData = RadarData;
+exports.Pace = Pace;
+class Shooting {
+}
+exports.Shooting = Shooting;
+class Passing {
+}
+exports.Passing = Passing;
+class Dribbling {
+}
+exports.Dribbling = Dribbling;
+class Defense {
+}
+exports.Defense = Defense;
+class Physical {
+}
+exports.Physical = Physical;
+class PlayerScore {
+}
+exports.PlayerScore = PlayerScore;
 var PlayerType;
 (function (PlayerType) {
     PlayerType[PlayerType["Football"] = 0] = "Football";

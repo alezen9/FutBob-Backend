@@ -1,5 +1,5 @@
 import { Sex } from "../MongoDB/User/entities";
-import { PlayerPosition, PhysicalState, PlayerType, RadarData } from "../MongoDB/Player/Entities";
+import { PlayerPosition, PhysicalState, PlayerType, PlayerScore } from "../MongoDB/Player/Entities";
 
 export interface SignupInput {
     name: string,
@@ -7,7 +7,8 @@ export interface SignupInput {
     dateOfBirth: string,
     phone: string,
     email?: string,
-    sex?: Sex,
+    sex: Sex,
+    country: string,
     username: string,
     password: string
 }
@@ -23,7 +24,8 @@ export interface UserInput {
     dateOfBirth?: string,
     phone?: string,
     email?: string,
-    sex?: Sex
+    sex?: Sex,
+    country?: string
 }
 
 export interface UserInputRequired {
@@ -32,14 +34,15 @@ export interface UserInputRequired {
     dateOfBirth: string,
     phone: string,
     email?: string,
-    sex: Sex
+    sex: Sex,
+    country: string
 }
 
 export interface playerData {
   positions: PlayerPosition[],
   state?: PhysicalState,
   type: PlayerType,
-  radarData: RadarData
+  score: PlayerScore
 }
 
 interface CreatePlayerInput {
@@ -60,7 +63,7 @@ export interface UpdatePlayerInfoInput {
     _id: string,
     positions?: PlayerPosition[],
     state?: PhysicalState,
-    radarData?: RadarData
+    score?: PlayerScore
 }
 
 export interface UpdateUserPlayerInfoInput {
@@ -70,7 +73,8 @@ export interface UpdateUserPlayerInfoInput {
     dateOfBirth?: string,
     phone?: string,
     email?: string,
-    sex?: Sex
+    sex?: Sex,
+    country?: string
 }
 
 export interface DeletePlayerInput {

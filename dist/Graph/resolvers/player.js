@@ -27,8 +27,7 @@ const transform_1 = require("./transform");
 const playerResolver = {
     Query: {
         getPlayers: (_, { playerFilters }, { req }) => __awaiter(void 0, void 0, void 0, function* () {
-            if (!req.isAuth)
-                throw new Error(ErrorMessages_1.default.user_unauthenticated);
+            // if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
             const players = yield Player_1.mongoPlayer.getPlayers(playerFilters);
             return players.map(transform_1.gql_Player);
         })
@@ -56,7 +55,7 @@ const playerResolver = {
         updatePlayer: (_, { updatePlayerInput }, { req }) => __awaiter(void 0, void 0, void 0, function* () {
             if (!req.isAuth)
                 throw new Error(ErrorMessages_1.default.user_unauthenticated);
-            const { _id, positions, state, radarData } = updatePlayerInput;
+            const { _id, positions, state, score } = updatePlayerInput;
             if (lodash_1.isEmpty(clean_deep_1.default(updatePlayerInput)))
                 return true;
             const updatedPlayer = new Entities_2.Player();
@@ -64,17 +63,8 @@ const playerResolver = {
                 updatedPlayer.positions = positions;
             if (state !== undefined)
                 updatedPlayer.state = state;
-            if (radarData) {
-                const _radarData = new Entities_2.RadarData();
-                _radarData.speed = radarData.speed;
-                _radarData.stamina = radarData.stamina;
-                _radarData.defence = radarData.defence;
-                _radarData.balance = radarData.balance;
-                _radarData.ballControl = radarData.ballControl;
-                _radarData.passing = radarData.passing;
-                _radarData.finishing = radarData.finishing;
-                updatedPlayer.radar = _radarData;
-            }
+            if (score)
+                updatedPlayer.score = Player_1.mongoPlayer.assignScoreValues({ score });
             updatedPlayer.updatedAt = moment_1.default().toDate();
             const { modifiedCount } = yield MongoDB_1.MongoDBInstance.collection.player.updateOne({ _id: new mongodb_1.ObjectId(_id) }, { $set: updatedPlayer });
             if (modifiedCount === 0)

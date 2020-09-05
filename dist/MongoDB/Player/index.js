@@ -23,6 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mongoPlayer = void 0;
 const moment_1 = __importDefault(require("moment"));
 const __1 = require("..");
 const mongodb_1 = require("mongodb");
@@ -40,15 +41,7 @@ class MongoPlayer {
             player.type = data.type;
             player.createdAt = now;
             player.updatedAt = now;
-            const radarData = new Entities_1.RadarData();
-            radarData.speed = data.radarData.speed;
-            radarData.stamina = data.radarData.stamina;
-            radarData.defence = data.radarData.defence;
-            radarData.balance = data.radarData.balance;
-            radarData.ballControl = data.radarData.ballControl;
-            radarData.passing = data.radarData.passing;
-            radarData.finishing = data.radarData.finishing;
-            player.radar = radarData;
+            player.score = this.assignScoreValues(data);
             yield __1.MongoDBInstance.collection.player.insertOne(player);
             yield User_1.mongoUser.assignPlayer(Object.assign(Object.assign({ idUser: data.idUser }, player.type === Entities_1.PlayerType.Football && { footballPlayer: (player._id).toHexString() }), player.type === Entities_1.PlayerType.Futsal && { futsalPlayer: (player._id).toHexString() }));
             return player._id.toHexString();
@@ -73,6 +66,51 @@ class MongoPlayer {
                 : yield __1.MongoDBInstance.collection.player.find({}).toArray();
             return players;
         });
+    }
+    assignScoreValues(data) {
+        const score = new Entities_1.PlayerScore();
+        const pace = new Entities_1.Pace();
+        pace.acceleration = data.score.pace.acceleration;
+        pace.sprintSpeed = data.score.pace.sprintSpeed;
+        const shooting = new Entities_1.Shooting();
+        shooting.finishing = data.score.shooting.finishing;
+        shooting.longShots = data.score.shooting.longShots;
+        shooting.penalties = data.score.shooting.penalties;
+        shooting.positioning = data.score.shooting.positioning;
+        shooting.shotPower = data.score.shooting.shotPower;
+        shooting.volleys = data.score.shooting.volleys;
+        const passing = new Entities_1.Passing();
+        passing.crossing = data.score.passing.crossing;
+        passing.curve = data.score.passing.curve;
+        passing.freeKick = data.score.passing.freeKick;
+        passing.longPassing = data.score.passing.longPassing;
+        passing.shortPassing = data.score.passing.shortPassing;
+        passing.vision = data.score.passing.vision;
+        const dribbling = new Entities_1.Dribbling();
+        dribbling.agility = data.score.dribbling.agility;
+        dribbling.balance = data.score.dribbling.balance;
+        dribbling.ballControl = data.score.dribbling.ballControl;
+        dribbling.composure = data.score.dribbling.composure;
+        dribbling.dribbling = data.score.dribbling.dribbling;
+        dribbling.reactions = data.score.dribbling.reactions;
+        const defense = new Entities_1.Defense();
+        defense.defensiveAwareness = data.score.defense.defensiveAwareness;
+        defense.heading = data.score.defense.heading;
+        defense.interceptions = data.score.defense.interceptions;
+        defense.slidingTackle = data.score.defense.slidingTackle;
+        defense.standingTackle = data.score.defense.standingTackle;
+        const physical = new Entities_1.Physical();
+        physical.aggression = data.score.physical.aggression;
+        physical.jumping = data.score.physical.jumping;
+        physical.stamina = data.score.physical.stamina;
+        physical.strength = data.score.physical.strength;
+        score.pace = pace;
+        score.shooting = shooting;
+        score.passing = passing;
+        score.dribbling = dribbling;
+        score.defense = defense;
+        score.physical = physical;
+        return score;
     }
     getPlayerById(_id) {
         return __awaiter(this, void 0, void 0, function* () {
