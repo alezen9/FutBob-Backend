@@ -1,5 +1,5 @@
 import cleanDeep from "clean-deep"
-import { User } from "../../MongoDB/User/entities"
+import { User } from "../../MongoDB/User/Entities"
 import { ObjectId } from "mongodb"
 import { MongoDBInstance } from "../../MongoDB"
 import ErrorMessages from "../../Utils/ErrorMessages"

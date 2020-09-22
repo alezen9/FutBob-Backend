@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Player = exports.PhysicalState = exports.PlayerType = exports.PlayerScore = exports.Physical = exports.Defense = exports.Dribbling = exports.Passing = exports.Shooting = exports.Pace = exports.PlayerPosition = void 0;
 var PlayerPosition;
 (function (PlayerPosition) {
     PlayerPosition[PlayerPosition["FutsalGoalKeeper"] = 0] = "FutsalGoalKeeper";

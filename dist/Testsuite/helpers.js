@@ -20,9 +20,8 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupTestsuite = exports.TestsuiteSetupStep = exports.validationErrorRegEx = exports.ShouldFail = exports.ShouldSucceed = void 0;
-const entities_1 = require("../MongoDB/User/entities");
-const Entities_1 = require("../MongoDB/Player/Entities");
+const Entities_1 = require("../MongoDB/User/Entities");
+const Entities_2 = require("../MongoDB/Player/Entities");
 const ResetColor = '\x1b[0m';
 const FgGreen = '\x1b[32m';
 const FgRed = '\x1b[31m';
@@ -36,7 +35,7 @@ const managerCredentials = {
     username: 'alezen9',
     password: 'alezen9'
 };
-const manager = Object.assign({ name: 'Aleksandar', surname: 'Gjroeski', dateOfBirth: '1993-07-02T22:00:00.000Z', phone: '+39 1234567890', sex: entities_1.Sex.Male, country: 'MK' }, managerCredentials);
+const manager = Object.assign({ name: 'Aleksandar', surname: 'Gjroeski', dateOfBirth: '1993-07-02T22:00:00.000Z', phone: '+39 1234567890', sex: Entities_1.Sex.Male, country: 'MK' }, managerCredentials);
 const authDataFields = `{
   token,
   expiresIn
@@ -49,17 +48,17 @@ const players = [
             surname: 'Cvetanoski',
             dateOfBirth: '1997-08-17T22:00:00.000Z',
             phone: '+39 7686787874',
-            sex: entities_1.Sex.Male,
+            sex: Entities_1.Sex.Male,
             country: 'MK'
         },
         playerData: {
             positions: [
-                Entities_1.PlayerPosition.FutsalLeftWing,
-                Entities_1.PlayerPosition.FutsalRightWing,
-                Entities_1.PlayerPosition.FutsalBack,
-                Entities_1.PlayerPosition.FutsalGoalKeeper
+                Entities_2.PlayerPosition.FutsalLeftWing,
+                Entities_2.PlayerPosition.FutsalRightWing,
+                Entities_2.PlayerPosition.FutsalBack,
+                Entities_2.PlayerPosition.FutsalGoalKeeper
             ],
-            type: Entities_1.PlayerType.Futsal,
+            type: Entities_2.PlayerType.Futsal,
             score: {
                 pace: {
                     acceleration: 35,
@@ -112,17 +111,17 @@ const players = [
             surname: 'Gjoreski',
             dateOfBirth: '1993-03-06T23:00:00.000Z',
             phone: '+39 3408947641',
-            sex: entities_1.Sex.Male,
+            sex: Entities_1.Sex.Male,
             country: 'MK'
         },
         playerData: {
             positions: [
-                Entities_1.PlayerPosition.FutsalLeftWing,
-                Entities_1.PlayerPosition.FutsalRightWing,
-                Entities_1.PlayerPosition.FutsalBack,
-                Entities_1.PlayerPosition.FutsalGoalKeeper
+                Entities_2.PlayerPosition.FutsalLeftWing,
+                Entities_2.PlayerPosition.FutsalRightWing,
+                Entities_2.PlayerPosition.FutsalBack,
+                Entities_2.PlayerPosition.FutsalGoalKeeper
             ],
-            type: Entities_1.PlayerType.Futsal,
+            type: Entities_2.PlayerType.Futsal,
             score: {
                 pace: {
                     acceleration: 78,

@@ -28,7 +28,7 @@ const MongoDB_1 = require("../MongoDB");
 const SDK_1 = require("../SDK");
 const mocha_1 = require("mocha");
 const helpers_1 = require("./helpers");
-const entities_1 = require("../MongoDB/User/entities");
+const Entities_1 = require("../MongoDB/User/Entities");
 const ErrorMessages_1 = __importDefault(require("../Utils/ErrorMessages"));
 const moment_1 = __importDefault(require("moment"));
 const apiInstance = new SDK_1.FutBobServer();
@@ -37,7 +37,7 @@ const managerCredentials = {
     username: 'alezen9',
     password: 'alezen9'
 };
-const manager = Object.assign({ name: 'Aleksandar', surname: 'Gjroeski', dateOfBirth: '1993-07-02T22:00:00.000Z', phone: '+39 1234567890', sex: entities_1.Sex.Male, country: 'MK' }, managerCredentials);
+const manager = Object.assign({ name: 'Aleksandar', surname: 'Gjroeski', dateOfBirth: '1993-07-02T22:00:00.000Z', phone: '+39 1234567890', sex: Entities_1.Sex.Male, country: 'MK' }, managerCredentials);
 const authDataFields = `{
   token,
   expiresIn

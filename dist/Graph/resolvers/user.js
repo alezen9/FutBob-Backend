@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const clean_deep_1 = __importDefault(require("clean-deep"));
-const entities_1 = require("../../MongoDB/User/entities");
+const Entities_1 = require("../../MongoDB/User/Entities");
 const mongodb_1 = require("mongodb");
 const MongoDB_1 = require("../../MongoDB");
 const ErrorMessages_1 = __importDefault(require("../../Utils/ErrorMessages"));
@@ -68,7 +68,7 @@ const userResolver = {
             const { name, surname, dateOfBirth, phone, email, sex, country } = userInput;
             if (lodash_1.isEmpty(clean_deep_1.default(userInput)))
                 return true;
-            const updatedUser = new entities_1.User();
+            const updatedUser = new Entities_1.User();
             if (name)
                 updatedUser.name = name;
             if (surname)
@@ -96,7 +96,7 @@ const userResolver = {
             const { _id, name, surname, dateOfBirth, phone, email, sex, country } = userInput;
             if (lodash_1.isEmpty(clean_deep_1.default(userInput)))
                 return true;
-            const updatedUser = new entities_1.User();
+            const updatedUser = new Entities_1.User();
             if (name)
                 updatedUser.name = name;
             if (surname)

@@ -28,9 +28,9 @@ const MongoDB_1 = require("../MongoDB");
 const SDK_1 = require("../SDK");
 const mocha_1 = require("mocha");
 const helpers_1 = require("./helpers");
-const entities_1 = require("../MongoDB/User/entities");
+const Entities_1 = require("../MongoDB/User/Entities");
 const ErrorMessages_1 = __importDefault(require("../Utils/ErrorMessages"));
-const Entities_1 = require("../MongoDB/Player/Entities");
+const Entities_2 = require("../MongoDB/Player/Entities");
 const lodash_1 = require("lodash");
 const apiInstance = new SDK_1.FutBobServer();
 const noTokenApiInstance = new SDK_1.FutBobServer();
@@ -42,16 +42,16 @@ const player1 = {
         surname: 'Gjroeski',
         dateOfBirth: '1985-01-03T23:00:00.000Z',
         phone: '+39 234234342',
-        sex: entities_1.Sex.Male,
+        sex: Entities_1.Sex.Male,
         country: 'MK'
     },
     playerData: {
         positions: [
-            Entities_1.PlayerPosition.CenterForward,
-            Entities_1.PlayerPosition.CentreBack,
-            Entities_1.PlayerPosition.DefensiveMidfielder
+            Entities_2.PlayerPosition.CenterForward,
+            Entities_2.PlayerPosition.CentreBack,
+            Entities_2.PlayerPosition.DefensiveMidfielder
         ],
-        type: Entities_1.PlayerType.Football,
+        type: Entities_2.PlayerType.Football,
         score: {
             pace: {
                 acceleration: 78,
@@ -105,17 +105,17 @@ const player2 = {
         surname: 'Cvetanoski',
         dateOfBirth: '1997-08-17T22:00:00.000Z',
         phone: '+39 7686787874',
-        sex: entities_1.Sex.Male,
+        sex: Entities_1.Sex.Male,
         country: 'MK'
     },
     playerData: {
         positions: [
-            Entities_1.PlayerPosition.FutsalLeftWing,
-            Entities_1.PlayerPosition.FutsalRightWing,
-            Entities_1.PlayerPosition.FutsalBack,
-            Entities_1.PlayerPosition.FutsalGoalKeeper
+            Entities_2.PlayerPosition.FutsalLeftWing,
+            Entities_2.PlayerPosition.FutsalRightWing,
+            Entities_2.PlayerPosition.FutsalBack,
+            Entities_2.PlayerPosition.FutsalGoalKeeper
         ],
-        type: Entities_1.PlayerType.Futsal,
+        type: Entities_2.PlayerType.Futsal,
         score: {
             pace: {
                 acceleration: 35,
@@ -168,17 +168,17 @@ const _players = [
             surname: 'Cvetanoski',
             dateOfBirth: '1997-08-17T22:00:00.000Z',
             phone: '+39 7686787874',
-            sex: entities_1.Sex.Male,
+            sex: Entities_1.Sex.Male,
             country: 'MK'
         },
         playerData: {
             positions: [
-                Entities_1.PlayerPosition.FutsalLeftWing,
-                Entities_1.PlayerPosition.FutsalRightWing,
-                Entities_1.PlayerPosition.FutsalBack,
-                Entities_1.PlayerPosition.FutsalGoalKeeper
+                Entities_2.PlayerPosition.FutsalLeftWing,
+                Entities_2.PlayerPosition.FutsalRightWing,
+                Entities_2.PlayerPosition.FutsalBack,
+                Entities_2.PlayerPosition.FutsalGoalKeeper
             ],
-            type: Entities_1.PlayerType.Futsal,
+            type: Entities_2.PlayerType.Futsal,
             score: {
                 pace: {
                     acceleration: 35,
@@ -230,17 +230,17 @@ const _players = [
             surname: 'Gjoreski',
             dateOfBirth: '1993-03-06T23:00:00.000Z',
             phone: '+39 3408947641',
-            sex: entities_1.Sex.Male,
+            sex: Entities_1.Sex.Male,
             country: 'MK'
         },
         playerData: {
             positions: [
-                Entities_1.PlayerPosition.FutsalLeftWing,
-                Entities_1.PlayerPosition.FutsalRightWing,
-                Entities_1.PlayerPosition.FutsalBack,
-                Entities_1.PlayerPosition.FutsalGoalKeeper
+                Entities_2.PlayerPosition.FutsalLeftWing,
+                Entities_2.PlayerPosition.FutsalRightWing,
+                Entities_2.PlayerPosition.FutsalBack,
+                Entities_2.PlayerPosition.FutsalGoalKeeper
             ],
-            type: Entities_1.PlayerType.Futsal,
+            type: Entities_2.PlayerType.Futsal,
             score: {
                 pace: {
                     acceleration: 78,
@@ -396,11 +396,11 @@ mocha_1.describe('Player', () => {
             const { _id } = player1;
             const done = yield apiInstance.player_updatePlayer({
                 _id,
-                positions: [Entities_1.PlayerPosition.Striker]
+                positions: [Entities_2.PlayerPosition.Striker]
             });
             const players = yield apiInstance.player_getPlayers({ ids: [_id] }, `{ _id, positions }`);
             assert_1.default.strictEqual(players.length, 1);
-            assert_1.default.strictEqual(lodash_1.isEqual(players[0].positions, [Entities_1.PlayerPosition.Striker]), true);
+            assert_1.default.strictEqual(lodash_1.isEqual(players[0].positions, [Entities_2.PlayerPosition.Striker]), true);
         }));
         mocha_1.it('Update a player score values', () => __awaiter(void 0, void 0, void 0, function* () {
             const { _id, playerData: { score } } = player1;
@@ -441,7 +441,7 @@ mocha_1.describe('Player', () => {
             try {
                 yield apiInstance.player_updatePlayer({
                     _id,
-                    positions: [Entities_1.PlayerPosition.LeftWingBack]
+                    positions: [Entities_2.PlayerPosition.LeftWingBack]
                 });
             }
             catch (error) {

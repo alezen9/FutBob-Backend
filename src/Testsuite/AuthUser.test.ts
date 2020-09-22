@@ -3,7 +3,7 @@ import { MongoDBInstance, MongoState } from '../MongoDB'
 import { FutBobServer } from '../SDK'
 import { describe, it } from 'mocha'
 import { validationErrorRegEx } from './helpers'
-import { Sex } from '../MongoDB/User/entities'
+import { Sex } from '../MongoDB/User/Entities'
 import ErrorMessages from '../Utils/ErrorMessages'
 import moment from 'moment'
 

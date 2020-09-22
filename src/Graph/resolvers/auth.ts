@@ -2,7 +2,7 @@ import { mongoUser } from '../../MongoDB/User'
 import { Privilege } from '../../MongoDB/Entities'
 import bcrypt from 'bcrypt'
 import ErrorMessages from '../../Utils/ErrorMessages'
-import { User } from '../../MongoDB/User/entities'
+import { User } from '../../MongoDB/User/Entities'
 
 const authResolver = {
   Query: {

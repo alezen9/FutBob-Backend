@@ -1,4 +1,4 @@
-import { Sex } from "../MongoDB/User/entities";
+import { Sex } from "../MongoDB/User/Entities";
 import { PlayerPosition, PhysicalState, PlayerType, PlayerScore } from "../MongoDB/Player/Entities";
 
 export interface SignupInput {

@@ -1,5 +1,5 @@
 import { FutBobServer } from "../SDK"
-import { Sex } from "../MongoDB/User/entities"
+import { Sex } from "../MongoDB/User/Entities"
 import { PlayerPosition, PlayerType } from "../MongoDB/Player/Entities"
 
 const ResetColor = '\x1b[0m'
