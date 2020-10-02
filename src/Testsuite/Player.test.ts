@@ -444,9 +444,9 @@ describe('Player', () => {
     // only for testing
     it('Populate players', async () => {
       let lotOfPlayers = _players
-      // for(let i = 0; i < 100; i++) {
-      //   lotOfPlayers = [...lotOfPlayers, ..._players]
-      // }
+      for(let i = 0; i < 100; i++) {
+        lotOfPlayers = [...lotOfPlayers, ..._players]
+      }
       const promises = lotOfPlayers.map(body => apiInstance.player_createPlayer(body))
       await Promise.all(promises)
     })

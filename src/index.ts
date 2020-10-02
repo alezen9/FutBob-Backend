@@ -4,42 +4,37 @@ import resolvers from './Graph/resolvers'
 import isAuth from './Middleware/isAuth'
 import http from 'http'
 import express from 'express'
-import cors from 'cors'
 const shell = require('shelljs')
 require('dotenv').config()
 
 const { ApolloServer, PubSub } = require('apollo-server-express')
 
-const app = express()
-
-// app.use(cors())
-
-app.use(isAuth)
-
-const pubsub = new PubSub()
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  introspection: true,
-  context: ({ req, res }) => ({ req, res, pubsub }),
-  playground: {
-    settings: {
-      'editor.theme': 'dark'
-    }
-  }
-})
-
-server.applyMiddleware({ app })
-
-const httpServer = http.createServer(app)
-server.installSubscriptionHandlers(httpServer)
-
-const port = process.env.PORT || 7000
-
-const setupAndStartServer = async () => {
+const main = async () => {
   try {
     await MongoDBInstance.startConnection()
+
+    const port = process.env.PORT || 7000
+
+    const app = express()
+    app.use(isAuth)
+    const pubsub = new PubSub()
+    const server = new ApolloServer({
+      typeDefs,
+      resolvers,
+      context: ({ req, res }) => ({ req, res, pubsub }),
+      ...process.env.NODE_ENV === 'development' && {
+        introspection: true,
+        playground: {
+          settings: {
+            'editor.theme': 'dark'
+          }
+        }
+      }
+    })
+    server.applyMiddleware({ app })
+    const httpServer = http.createServer(app)
+    server.installSubscriptionHandlers(httpServer)
+
     httpServer.listen(port)
     console.log(`connected to DB, listening on port ${port}`)
   } catch (error) {
@@ -57,4 +52,4 @@ process.on('SIGINT', async () => {
   process.exit()
 })
 
-setupAndStartServer()
+main()
