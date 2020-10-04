@@ -1,5 +1,5 @@
 import { mongoPlayer } from '../../MongoDB/Player'
-import { Privilege } from '../../MongoDB/Entities'
+import { List, Privilege } from '../../MongoDB/Entities'
 import ErrorMessages from '../../Utils/ErrorMessages'
 import { MongoDBInstance } from '../../MongoDB'
 import { ObjectId } from 'mongodb'
@@ -14,9 +14,12 @@ import { gql_User, gql_Player, playerLoader } from './transform'
 const playerResolver = {
   Query: {
     getPlayers: async (_, { playerFilters }, { req }) => {
-      // if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const players: Player[] = await mongoPlayer.getPlayers(playerFilters)
-      return players.map(gql_Player)
+      if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
+      const { result, ...rest }: List<Player> = await mongoPlayer.getPlayers(playerFilters)
+      return {
+        ...rest,
+        result: result.map(gql_Player)
+      }
     }
   },
   Mutation: {

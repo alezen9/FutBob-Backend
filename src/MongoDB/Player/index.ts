@@ -3,6 +3,10 @@ import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { mongoUser } from '../User'
 import { Player, PhysicalState, PlayerType, PlayerScore, Pace, Shooting, Passing, Dribbling, Defense, Physical } from './Entities'
+import { playerToUserLookupStage, unsetUserDataLookup } from './helpers'
+import { facetCount } from '../helpers'
+import { get } from 'lodash'
+import { List } from '../Entities'
 
 class MongoPlayer {
   
@@ -27,18 +31,60 @@ class MongoPlayer {
     return player._id.toHexString()
   }
 
-  async getPlayers (filters: any): Promise<Player[]> {
-    const { ids, position, type, matchId, state } = filters
-    const query = []
-    if(ids && ids.length) query.push({ $match: { _id: { $in: ids.map(ObjectId) } } } )
+  async getPlayers (filters: any): Promise<List<Player>> {
+    const { 
+      ids = [],
+      positions = [],
+      type,
+      matchIds = [],
+      states = [],
+      countries = [],
+      searchText,
+      pagination = {}
+    } = filters
+    const { skip = 0, limit } = pagination
+    const _limit = !limit || limit < 0 || limit > 100
+      ? 100
+      : limit
+    let query = []
+    let lookupAdded = false
+    if(ids.length) query.push({ $match: { _id: { $in: ids.map(ObjectId) } } })
     if(type !== undefined) query.push({ type })
-    if(state !== undefined) query.push({ state })
-    if(position !== undefined) query.push({ positions: { $elemMatch: position } })
-    if(matchId !== undefined) query.push({ matches: { $elemMatch: matchId } })
-    const players: Player[] = query.length
-    ? await MongoDBInstance.collection.player.aggregate(query).toArray()
-    : await MongoDBInstance.collection.player.find({}).toArray()
-    return players
+    if(states.length) query.push({ $match: { state: { $in: states } } })
+    if(positions.length) query.push({ $match: { positions: { $in: positions } }})
+    if(matchIds.length) query.push({ $match: { positions: { $in: matchIds } }})
+    if(countries.length) {
+      query = [
+        ...query,
+        ...playerToUserLookupStage,
+        { $match: { 'userData.country': { $in: countries } }}
+      ]
+      lookupAdded = true
+    }
+    if(searchText) {
+      query = [
+        ...!lookupAdded ? playerToUserLookupStage : [],
+        {
+          $addFields: {
+              "fullName": { $concat: [ "$userData.surname", ' ', "$userData.name" ] }
+          }
+        },
+        { $match: { fullName: new RegExp(searchText, 'i') } },
+        { $unset: "fullName" }
+      ]
+      lookupAdded = true
+    }
+    if(lookupAdded) query.push(unsetUserDataLookup)
+    query.push(facetCount({ skip, limit: _limit }))
+    const res: Player[] = await MongoDBInstance.collection.player.aggregate(query).toArray()
+    const result = {
+      totalCount: get(res, '[0].totalCount[0].count', 0) as number,
+      result: get(res, '[0].result', []) as Player[],
+      currentCount: query.length > 1
+        ? get(res, '[0].currentCount[0].count', undefined)
+        : undefined,
+    }
+    return result
   }
 
   assignScoreValues (data):PlayerScore {

@@ -109,3 +109,9 @@ export const TypeSuccessOrFailure = `type SuccessOrFailure {
     errorMessage: String,
     success: Boolean!
   }`
+
+export const TypeListOf = (type: string) => `type ListOf${type} {
+  totalCount: Int!,
+  result: [${type}],
+  currentCount: Int
+}`

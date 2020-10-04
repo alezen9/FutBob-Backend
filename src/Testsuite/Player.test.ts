@@ -6,8 +6,9 @@ import { validationErrorRegEx, setupTestsuite, TestsuiteSetupStep } from './help
 import { Sex, User } from '../MongoDB/User/Entities'
 import ErrorMessages from '../Utils/ErrorMessages'
 import moment from 'moment'
-import { PlayerPosition, PlayerType, PlayerScore } from '../MongoDB/Player/Entities'
+import { PlayerPosition, PlayerType, PlayerScore, Player } from '../MongoDB/Player/Entities'
 import { isEqual }from 'lodash'
+import { List } from '../MongoDB/Entities'
 
 const apiInstance = new FutBobServer()
 const noTokenApiInstance = new FutBobServer()
@@ -289,7 +290,8 @@ describe('Player', () => {
       const { _id, idUser, ...body } = player1
       const playerId: string = await apiInstance.player_createPlayer(body)
       player1._id = playerId
-      const players: Array<{ _id: string, user: User, type: PlayerType }> = await apiInstance.player_getPlayers({}, `{ _id, user { _id }, type }`)
+      const res = await apiInstance.player_getPlayers({}, `{ result { _id, user { _id }, type } }`)
+      const players: Array<{ _id: string, user: User, type: PlayerType }> = res.result
       assert.strictEqual(players.length, 1)
       assert.strictEqual(players[0]._id, playerId)
       assert.strictEqual(players[0].type, player1.playerData.type)
@@ -350,7 +352,8 @@ describe('Player', () => {
       })
 
       assert.strictEqual(done, true)
-      const players: Array<{_id: string}> = await apiInstance.player_getPlayers({}, `{ _id }`)
+      const res = await apiInstance.player_getPlayers({}, `{ result { _id } }`)
+      const players: Array<{_id: string}> = res.result
       assert.strictEqual(players.length, 0)
       player1._id = undefined
       player1.idUser = undefined
@@ -364,7 +367,8 @@ describe('Player', () => {
       const { _id: _id2, idUser: idUser2, ...body2 } = player2
       const playerId2: string = await apiInstance.player_createPlayer(body2)
 
-      const players: Array<{ _id: string, user: User, type: PlayerType }> = await apiInstance.player_getPlayers({}, `{ _id, user { _id }, type }`)
+      const res = await apiInstance.player_getPlayers({}, `{ result { _id, user { _id }, type } }`)
+      const players: Array<{ _id: string, user: User, type: PlayerType }> = res.result
       assert.strictEqual(players.length, 2)
       assert.strictEqual(players[0]._id, playerId)
       assert.strictEqual(players[0].type, player1.playerData.type)
@@ -383,7 +387,8 @@ describe('Player', () => {
         positions: [PlayerPosition.Striker]
       })
 
-      const players: Array<{ _id: string, type: PlayerType, positions: PlayerPosition[] }> = await apiInstance.player_getPlayers({ ids: [_id]}, `{ _id, positions }`)
+      const res = await apiInstance.player_getPlayers({ ids: [_id]}, `{ result { _id, positions } }`)
+      const players: Array<{ _id: string, type: PlayerType, positions: PlayerPosition[] }> = res.result
       assert.strictEqual(players.length, 1)
       assert.strictEqual(isEqual(players[0].positions, [PlayerPosition.Striker]), true)
     })
@@ -402,7 +407,8 @@ describe('Player', () => {
         score: newScoreValues
       })
 
-      const players: Array<{ _id: string, type: PlayerType, score: PlayerScore }> = await apiInstance.player_getPlayers({ ids: [_id]}, `{ _id, score { pace { acceleration, sprintSpeed } } }`)
+      const res = await apiInstance.player_getPlayers({ ids: [_id]}, `{ result { _id, score { pace { acceleration, sprintSpeed } } } }`)
+      const players: Array<{ _id: string, type: PlayerType, score: PlayerScore }> = res.result
       assert.strictEqual(players.length, 1)
       assert.strictEqual(players[0].score.pace.acceleration, newScoreValues.pace.acceleration)
       assert.strictEqual(players[0].score.pace.sprintSpeed, newScoreValues.pace.sprintSpeed)
@@ -416,7 +422,8 @@ describe('Player', () => {
         name: newName
       })
 
-      const players: Array<{ _id: string, user: User, type: PlayerType, positions: PlayerPosition[] }> = await apiInstance.player_getPlayers({ ids: [_id]}, `{ _id, user { _id, name } }`)
+      const res = await apiInstance.player_getPlayers({ ids: [_id]}, `{ result { _id, user { _id, name } } }`)
+      const players: Array<{ _id: string, user: User, type: PlayerType, positions: PlayerPosition[] }> = res.result
       assert.strictEqual(players.length, 1)
       assert.strictEqual(players[0].user._id, idUser)
       assert.strictEqual(players[0].user.name, newName)
@@ -429,7 +436,8 @@ describe('Player', () => {
         idUser,
         type
       })
-      const players = await apiInstance.player_getPlayers({ ids: [_id]}, `{ _id }`)
+      const res = await apiInstance.player_getPlayers({ ids: [_id]}, `{ result { _id } }`)
+      const players: Array<{ _id: string }> = res.result
       assert.strictEqual(players.length, 0)
       try {
         await apiInstance.player_updatePlayer({
@@ -449,6 +457,13 @@ describe('Player', () => {
       }
       const promises = lotOfPlayers.map(body => apiInstance.player_createPlayer(body))
       await Promise.all(promises)
+    })
+
+    // only for testing
+    it('Get players pagination', async () => {
+      const res = await apiInstance.player_getPlayers({ pagination: { skip: 0, limit: 18 } }, `{ result { _id, user { _id }, type } }`)
+      const players: any[] = res.result
+      assert.strictEqual(players.length, 18)
     })
   })
 })

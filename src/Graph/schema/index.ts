@@ -12,7 +12,8 @@ import {
   TypeDribbling,
   TypeDefense,
   TypePhysical,
-  TypeScore
+  TypeScore,
+  TypeListOf
 } from './types'
 import {
   SigninInput,
@@ -23,7 +24,8 @@ import {
   UpdatePlayerInput,
   PlayerFilters,
   DeletePlayerInput,
-  PlayerScoreInput
+  PlayerScoreInput,
+  PaginationInput
 } from './inputs'
 import { gql } from 'apollo-server'
 
@@ -42,7 +44,9 @@ ${TypeDribbling}
 ${TypeDefense}
 ${TypePhysical}
 ${TypeScore}
+${TypeListOf('Player')}
 
+${PaginationInput}
 ${SignupInput}
 ${SigninInput}
 ${UpdateUserConnectedInput}
@@ -56,7 +60,7 @@ ${PlayerFilters}
 type Query {
   login (signinInput: SigninInput!): AuthData!
   getUserConnected: User!
-  getPlayers (playerFilters: PlayerFilters!): [Player]!
+  getPlayers (playerFilters: PlayerFilters!): ListOfPlayer!
 }
 type Mutation {
   signup (signupInput: SignupInput!): AuthData!

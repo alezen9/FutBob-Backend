@@ -117,12 +117,20 @@ input CreatePlayerInput {
   playerData: playerData!
 }`
 
+export const PaginationInput = `input PaginationInput {
+  skip: Int,
+  limit: Int
+}`
+
 export const PlayerFilters = `input PlayerFilters {
   ids: [String],
-  position: Int,
+  positions: [Int],
   type: Int,
-  matchId: String,
-  state: Int
+  matchIds: [String],
+  states: [Int],
+  countries: [String],
+  searchText: String,
+  pagination: PaginationInput
 }`
 
 export const UpdatePlayerInput = `input UpdatePlayerInput {

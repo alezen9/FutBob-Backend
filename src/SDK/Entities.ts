@@ -1,6 +1,11 @@
 import { Sex } from "../MongoDB/User/Entities";
 import { PlayerPosition, PhysicalState, PlayerType, PlayerScore } from "../MongoDB/Player/Entities";
 
+export interface Pagination {
+    skip?: number,
+    limit?: number
+}
+
 export interface SignupInput {
     name: string,
     surname: string,
@@ -85,8 +90,11 @@ export interface DeletePlayerInput {
 
 export interface PlayerFilters {
     ids?: string[],
-    position?: PlayerPosition,
+    positions?: PlayerPosition[],
     type?: PlayerType,
-    matchId?: string,
-    state?: PhysicalState
+    matchIds?: string[],
+    states?: PhysicalState[],
+    countries?: string[],
+    searchText?: string,
+    pagination?: Pagination
 }

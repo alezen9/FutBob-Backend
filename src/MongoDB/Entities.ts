@@ -18,3 +18,9 @@ export class Location {
     type: string
     coordinates: string[]
 }
+
+export interface List<T> {
+    totalCount: number,
+    result: T[],
+    currentCount?: number|undefined
+}
