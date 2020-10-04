@@ -1,13 +1,12 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import moment from 'moment'
-import { User, Credentials } from './entities'
-import { MongoDBInstance, MongoState } from '..'
+import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { Privilege } from '../Entities'
 import ErrorMessages from '../../Utils/ErrorMessages'
-import { PlayerType } from '../Player/Entities'
 import { ISODates } from '../../Utils/helpers'
+import { Credentials, User } from './Entities'
 
 class MongoUser {
   tokenExpiration:string
