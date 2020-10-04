@@ -10,7 +10,6 @@ export const withCountStages = [
 export const facetCount = ({skip = 10, limit = 100}: { skip?: number, limit?: number }) => Object.freeze({
   $facet: {
     totalCount: [{ $count: 'count' }],
-    result: [{ $skip: skip }, { $limit: limit }],
-    currentCount: [{ $skip: skip }, { $limit: limit }, { $count: 'count' }]
+    result: [{ $skip: skip }, { $limit: limit }]
   }
 })

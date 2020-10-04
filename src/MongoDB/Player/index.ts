@@ -63,6 +63,7 @@ class MongoPlayer {
     }
     if(searchText) {
       query = [
+        ...query,
         ...!lookupAdded ? playerToUserLookupStage : [],
         {
           $addFields: {
@@ -79,10 +80,7 @@ class MongoPlayer {
     const res: Player[] = await MongoDBInstance.collection.player.aggregate(query).toArray()
     const result = {
       totalCount: get(res, '[0].totalCount[0].count', 0) as number,
-      result: get(res, '[0].result', []) as Player[],
-      currentCount: query.length > 1
-        ? get(res, '[0].currentCount[0].count', undefined)
-        : undefined,
+      result: get(res, '[0].result', []) as Player[]
     }
     return result
   }

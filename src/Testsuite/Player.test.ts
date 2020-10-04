@@ -8,7 +8,6 @@ import ErrorMessages from '../Utils/ErrorMessages'
 import moment from 'moment'
 import { PlayerPosition, PlayerType, PlayerScore, Player } from '../MongoDB/Player/Entities'
 import { isEqual }from 'lodash'
-import { List } from '../MongoDB/Entities'
 
 const apiInstance = new FutBobServer()
 const noTokenApiInstance = new FutBobServer()

@@ -21,6 +21,5 @@ export class Location {
 
 export interface List<T> {
     totalCount: number,
-    result: T[],
-    currentCount?: number|undefined
+    result: T[]
 }

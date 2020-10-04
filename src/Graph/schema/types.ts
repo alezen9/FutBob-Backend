@@ -112,6 +112,5 @@ export const TypeSuccessOrFailure = `type SuccessOrFailure {
 
 export const TypeListOf = (type: string) => `type ListOf${type} {
   totalCount: Int!,
-  result: [${type}],
-  currentCount: Int
+  result: [${type}]
 }`
