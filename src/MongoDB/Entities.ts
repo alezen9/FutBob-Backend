@@ -3,9 +3,7 @@ import { Collection } from 'mongodb'
 export class CollectionContainer {
     user: Collection
     player: Collection
-    match: Collection
-    aggregationMatches: Collection
-    aggregationPlayer: Collection
+    fields: Collection
 }
 
 export enum Privilege {
@@ -14,9 +12,9 @@ export enum Privilege {
     User
 }
 
-export class Location {
+export class GeoPoint {
     type: string
-    coordinates: string[]
+    coordinates: number[]
 }
 
 export interface List<T> {

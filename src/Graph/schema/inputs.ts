@@ -145,3 +145,45 @@ export const DeletePlayerInput = `input DeletePlayerInput {
   idUser: String!,
   type: Int!
 }`
+
+export const CreateFieldInput = `
+input LocationInput {
+  type: String!,
+  coordinates: [Float!]
+}
+
+input MeasurementsInput {
+  width: Float!,
+  height: Float!
+}
+
+input CreateFieldInput {
+  type: Int!,
+  name: String!,
+  cost: Int!,
+  state: Int!,
+  location: LocationInput,
+  measurements: MeasurementsInput
+}`
+
+export const FieldsFilters = `input FieldsFilters {
+  ids: [String],
+  type: Int,
+  states: [Int],
+  searchText: String,
+  pagination: PaginationInput
+}`
+
+export const UpdateFieldInput = `input UpdateFieldInput {
+  _id: String!,
+  type: Int,
+  name: String,
+  cost: Int,
+  state: Int,
+  location: LocationInput,
+  measurements: MeasurementsInput
+}`
+
+export const DeleteFieldInput = `input DeleteFieldInput {
+  _id: String!
+}`

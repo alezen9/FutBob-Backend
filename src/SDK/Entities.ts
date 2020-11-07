@@ -1,5 +1,7 @@
 import { Sex } from "../MongoDB/User/Entities";
 import { PlayerPosition, PhysicalState, PlayerType, PlayerScore } from "../MongoDB/Player/Entities";
+import { FieldState, FieldType, Measurements } from "../MongoDB/Fields/Entities";
+import { GeoPoint } from "../MongoDB/Entities";
 
 export interface Pagination {
     skip?: number,
@@ -98,3 +100,23 @@ export interface PlayerFilters {
     searchText?: string,
     pagination?: Pagination
 }
+
+export interface FieldFilters {
+    ids?: string[],
+    type?: FieldType,
+    states?: FieldState[],
+    searchText?: string,
+    pagination?: Pagination
+}
+
+export interface UpdateFieldInput {
+    _id: string,
+    state?: FieldState,
+    type?: FieldType,
+    name?: string,
+    cost?: number,
+    measurements?: Measurements,
+    location?: GeoPoint
+}
+
+export type CreateFieldInput = Required<Omit<UpdateFieldInput, '_id'>>

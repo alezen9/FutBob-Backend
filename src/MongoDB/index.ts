@@ -50,7 +50,8 @@ export class MongoDB {
       // create collections
       client.db(this.dbName).createCollection('User')
       client.db(this.dbName).createCollection('Player')
-      client.db(this.dbName).createCollection('Match')
+      client.db(this.dbName).createCollection('Fields')
+      // client.db(this.dbName).createCollection('Matches')
       // create indexes
       client.db(this.dbName).collection('User').createIndex({ 'credentials.username': 1 })
       client.db(this.dbName).collection('User').createIndex({ footballPlayer: 1 })
@@ -58,7 +59,7 @@ export class MongoDB {
       // populate colletion class
       collection.user = client.db(this.dbName).collection('User')
       collection.player = client.db(this.dbName).collection('Player')
-      collection.match = client.db(this.dbName).collection('Match')
+      collection.fields = client.db(this.dbName).collection('Fields')
       // make collections and client available to class
       this.client = client
       this.collection = collection
@@ -67,7 +68,7 @@ export class MongoDB {
   async clearDb () {
     await this.collection.user.deleteMany({})
     await this.collection.player.deleteMany({})
-    await this.collection.match.deleteMany({})
+    await this.collection.fields.deleteMany({})
   }
 
   async closeConnection () {

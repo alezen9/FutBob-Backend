@@ -1,6 +1,6 @@
 import { PlayerType } from "../Player/Entities"
 import { ObjectId } from "mongodb"
-import { Location } from "../Entities"
+import { GeoPoint } from "../Entities"
 
 export class MatchPlayer {
     playerId: ObjectId
@@ -19,7 +19,7 @@ export class Match {
     _id: ObjectId
     createdAt: Date
     updatedAt: Date
-    location?: Location
+    location?: GeoPoint
     state: MatchState
     type: PlayerType
     invitedPlayers: ObjectId[]

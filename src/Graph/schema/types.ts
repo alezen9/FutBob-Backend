@@ -84,14 +84,29 @@ export const TypePlayer = `type Player {
     score: PlayerScore!
   }`
 
-export const TypeLocation = `type Location {
+export const TypeGeoPoint = `type GeoPoint {
     type: String!,
     coordinates: [Float!]
   }`
 
+export const TypeMeasurements = `type Measurements {
+    width: Float!,
+    height: Float!
+  }`
+
+export const TypeField = `type Field {
+    _id: String!
+    type: Int!,
+    name: String!,
+    measurements: Measurements!,
+    state: Int!,
+    cost: Int!,
+    location: GeoPoint!
+  }`
+
 export const TypeMatch = `type Match {
     _id: String!,
-    location: Location
+    location: GeoPoint
     state: Int!
     type: Int!
     ditchedPlayers: [Player]

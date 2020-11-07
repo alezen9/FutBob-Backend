@@ -43,7 +43,7 @@
       "cwd": "${workspaceFolder}",
     },
     {
-      "name": "Test_Player",
+      "name": "Test_Players",
       "type": "node",
       "request": "launch",
       "console": "integratedTerminal",
@@ -55,6 +55,22 @@
         "--exit",
         "--bail",
         "${workspaceFolder}/dist/Testsuite/Player.test.js",
+      ],
+      "cwd": "${workspaceFolder}",
+    },
+    {
+      "name": "Test_Fields",
+      "type": "node",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "envFile": "${workspaceFolder}/.env",
+      "args": [
+        "--no-timeouts",
+        "--colors",
+        "--exit",
+        "--bail",
+        "${workspaceFolder}/dist/Testsuite/Fields.test.js",
       ],
       "cwd": "${workspaceFolder}",
     }

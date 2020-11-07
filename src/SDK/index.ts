@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import { get } from 'lodash'
 import { paramsToString } from '../Utils/helpers'
-import { SigninInput, SignupInput, UserInput, CreatePlayerInputWithId, CreatePlayerInputWithUser, DeletePlayerInput, PlayerFilters, UpdatePlayerInfoInput, UpdateUserPlayerInfoInput } from './Entities'
+import { SigninInput, SignupInput, UserInput, CreatePlayerInputWithId, CreatePlayerInputWithUser, DeletePlayerInput, PlayerFilters, UpdatePlayerInfoInput, UpdateUserPlayerInfoInput, FieldFilters, CreateFieldInput, UpdateFieldInput } from './Entities'
 require('dotenv').config()
 
 export class FutBobServer {
@@ -127,6 +127,38 @@ export class FutBobServer {
         getPlayers(playerFilters: ${paramsToString(playerFilters)}) ${fields}
     }`
     return this.API({ query, name: 'getPlayers' })
+  }
+
+  async field_getFields(fieldsFilters: FieldFilters, fields: string): Promise<any> {
+    const query = `
+    query {
+        getFields(fieldsFilters: ${paramsToString(fieldsFilters)}) ${fields}
+    }`
+    return this.API({ query, name: 'getFields' })
+  }
+
+  async field_createField(createFieldInput: CreateFieldInput): Promise<any> {
+    const query = `
+    mutation {
+        createField(createFieldInput: ${paramsToString(createFieldInput)})
+    }`
+    return this.API({ query, name: 'createField' })
+  }
+
+  async field_updateField(updateFieldInput: UpdateFieldInput): Promise<any> {
+    const query = `
+    mutation {
+        updateField(updateFieldInput: ${paramsToString(updateFieldInput)})
+    }`
+    return this.API({ query, name: 'updateField' })
+  }
+
+  async field_deleteField(deleteFieldInput: { _id: string }): Promise<any> {
+    const query = `
+    mutation {
+        deleteField(deleteFieldInput: ${paramsToString(deleteFieldInput)})
+    }`
+    return this.API({ query, name: 'deleteField' })
   }
   
 }

@@ -1,5 +1,4 @@
 import DataLoader from 'dataloader'
-import { chunk, flatten } from 'lodash'
 import { mongoUser } from '../../../MongoDB/User'
 import { User } from '../../../MongoDB/User/Entities'
 import { mongoPlayer } from '../../../MongoDB/Player'

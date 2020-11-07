@@ -2,7 +2,7 @@ import {
   TypeAuthData,
   TypeUser,
   TypePlayer,
-  TypeLocation,
+  TypeGeoPoint,
   TypeMatch,
   TypeMatchPlayer,
   TypeSuccessOrFailure,
@@ -13,7 +13,9 @@ import {
   TypeDefense,
   TypePhysical,
   TypeScore,
-  TypeListOf
+  TypeListOf,
+  TypeField,
+  TypeMeasurements
 } from './types'
 import {
   SigninInput,
@@ -25,7 +27,11 @@ import {
   PlayerFilters,
   DeletePlayerInput,
   PlayerScoreInput,
-  PaginationInput
+  PaginationInput,
+  CreateFieldInput,
+  UpdateFieldInput,
+  DeleteFieldInput,
+  FieldsFilters
 } from './inputs'
 import { gql } from 'apollo-server'
 
@@ -33,7 +39,7 @@ const typeDefs = gql(`
 ${TypeAuthData}
 ${TypeUser}
 ${TypePlayer}
-${TypeLocation}
+${TypeGeoPoint}
 ${TypeMatch}
 ${TypeMatchPlayer}
 ${TypeSuccessOrFailure}
@@ -44,7 +50,11 @@ ${TypeDribbling}
 ${TypeDefense}
 ${TypePhysical}
 ${TypeScore}
+${TypeField}
+${TypeMeasurements}
 ${TypeListOf('Player')}
+${TypeListOf('Field')}
+
 
 ${PaginationInput}
 ${SignupInput}
@@ -56,11 +66,17 @@ ${UpdatePlayerInput}
 ${DeletePlayerInput}
 ${PlayerScoreInput}
 ${PlayerFilters}
+${CreateFieldInput}
+${UpdateFieldInput}
+${DeleteFieldInput}
+${FieldsFilters}
+
 
 type Query {
   login (signinInput: SigninInput!): AuthData!
   getUserConnected: User!
   getPlayers (playerFilters: PlayerFilters!): ListOfPlayer!
+  getFields (fieldsFilters: FieldsFilters!): ListOfField!
 }
 type Mutation {
   signup (signupInput: SignupInput!): AuthData!
@@ -72,6 +88,10 @@ type Mutation {
   createPlayer (createPlayerInput: CreatePlayerInput!): String!
   updatePlayer (updatePlayerInput: UpdatePlayerInput!): Boolean!
   deletePlayer (deletePlayerInput: DeletePlayerInput!): Boolean!
+
+  createField (createFieldInput: CreateFieldInput!): String!
+  updateField (updateFieldInput: UpdateFieldInput!): Boolean!
+  deleteField (deleteFieldInput: DeleteFieldInput!): Boolean!
 }
 `)
 
