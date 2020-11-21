@@ -160,7 +160,7 @@ input MeasurementsInput {
 input CreateFieldInput {
   type: Int!,
   name: String!,
-  cost: Int!,
+  price: Int!,
   state: Int!,
   location: LocationInput,
   measurements: MeasurementsInput
@@ -178,7 +178,7 @@ export const UpdateFieldInput = `input UpdateFieldInput {
   _id: String!,
   type: Int,
   name: String,
-  cost: Int,
+  price: Int,
   state: Int,
   location: LocationInput,
   measurements: MeasurementsInput

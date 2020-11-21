@@ -100,7 +100,7 @@ export const TypeField = `type Field {
     name: String!,
     measurements: Measurements!,
     state: Int!,
-    cost: Int!,
+    price: Int!,
     location: GeoPoint!
   }`
 

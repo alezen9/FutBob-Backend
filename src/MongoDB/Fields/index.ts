@@ -14,7 +14,7 @@ class MongoFields {
     field._id = new ObjectId()
     field.createdAt = now
     field.updatedAt = now
-    field.cost = data.cost
+    field.price = data.price
     field.location = new GeoPoint()
     field.location.type = 'Point'
     field.location.coordinates = data.location.coordinates

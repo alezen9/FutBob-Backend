@@ -18,7 +18,7 @@ const fieldBolbeno = {
       width: 15,
       height: 25
    },
-   cost: 1200,
+   price: 1200,
    state: FieldState.NotGreatNotTerrible,
    location: {
       type: 'Point',
@@ -34,7 +34,7 @@ const fieldTione = {
       width: 17,
       height: 28
    },
-   cost: 1000,
+   price: 1000,
    state: FieldState.Terrible,
    location: {
       type: 'Point',
@@ -81,7 +81,7 @@ describe('Fields', () => {
 
     it('Try to create a new field with missing required fields', async () => {
       try {
-        const { _id, cost, ...body } = fieldBolbeno
+        const { _id, price, ...body } = fieldBolbeno
         // @ts-expect-error => playerData is required
         await apiInstance.field_createField(body)
       } catch (error) {
@@ -131,17 +131,17 @@ describe('Fields', () => {
       fieldTione._id = fieldId2
     })
 
-    it('Update a field cost', async () => {
+    it('Update a field price', async () => {
       const { _id } = fieldBolbeno
       const done: boolean = await apiInstance.field_updateField({
         _id,
-        cost: 15000
+        price: 15000
       })
 
-      const res = await apiInstance.field_getFields({ ids: [_id]}, `{ result { _id, cost } }`)
-      const fields: Array<{ _id: string, type: FieldType, cost: number }> = res.result
+      const res = await apiInstance.field_getFields({ ids: [_id]}, `{ result { _id, price } }`)
+      const fields: Array<{ _id: string, type: FieldType, price: number }> = res.result
       assert.strictEqual(fields.length, 1)
-      assert.strictEqual(isEqual(fields[0].cost, 15000), true)
+      assert.strictEqual(isEqual(fields[0].price, 15000), true)
     })
 
     it('Update a field\'s name', async () => {
