@@ -14,7 +14,7 @@ const fieldsResolver = {
   Query: {
     getFields: async (_, { fieldsFilters }, { req }) => {
       if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const res: List<Field> = await mongoFields.getFields(fieldsFilters)
+      const res: List<Field> = await mongoFields.getFields(fieldsFilters, req.idUser)
       return res
     }
   },
@@ -23,7 +23,7 @@ const fieldsResolver = {
       try {
         if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
         checkPrivileges(req)
-        const idField = await mongoFields.createField(createFieldInput)
+        const idField = await mongoFields.createField(createFieldInput, req.idUser)
         return idField
       } catch (error) {
         throw error

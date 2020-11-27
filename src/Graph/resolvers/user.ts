@@ -8,6 +8,7 @@ import {isEmpty} from 'lodash'
 import moment from 'moment'
 import bcrypt from 'bcrypt'
 import { gql_User, userLoader } from "./transform"
+import { checkPrivileges } from "../../Middleware/isAuth"
 
 const userResolver = {
   Query: {
@@ -84,6 +85,7 @@ const userResolver = {
     },
     updateUser: async (_, { userInput }, { req }) => {
       if(!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
+      checkPrivileges(req)
       const { _id, name, surname, dateOfBirth, phone, email, sex, country } = userInput
 
       if(isEmpty(cleanDeep(userInput))) return true
@@ -99,7 +101,7 @@ const userResolver = {
       updatedUser.updatedAt = moment().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
-        {_id: new ObjectId(_id)},
+        { _id: new ObjectId(_id), createdBy: new ObjectId(req.idUser) },
         { $set: updatedUser},
       )
       

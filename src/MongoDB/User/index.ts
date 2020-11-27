@@ -15,14 +15,16 @@ class MongoUser {
     this.tokenExpiration = '3h'
   }
   
-  async createUser (data: any): Promise<string> {
+  async createUser (data: any, createdBy?: string): Promise<string> {
     if(data.username && data.password){
       const res = await this.getUser({ username: data.username })
       if(res) throw new Error(ErrorMessages.user_username_already_exists)
     }
     const now = moment().toDate()
+    const userID = new ObjectId()
     const user = new User()
-    user._id = new ObjectId()
+    user._id = userID
+    user.createdBy = createdBy ? new ObjectId(createdBy) : userID
     user.name = data.name
     user.surname = data.surname
     user.createdAt = now
@@ -72,12 +74,13 @@ class MongoUser {
   }
 
   getTypeUserFields (user: User):any {
-    const { credentials, _id, futsalPlayer, footballPlayer, dateOfBirth, createdAt, updatedAt, ...rest } = user
+    const { credentials, _id, futsalPlayer, footballPlayer, dateOfBirth, createdAt, updatedAt, createdBy, ...rest } = user
     return {
       ...rest,
       _id: _id.toHexString(),
+      createdBy: createdBy.toHexString(),
       ...credentials && credentials.username && { username: credentials.username },
-      ...ISODates({ dateOfBirth, createdAt, updatedAt}),
+      ...ISODates({ dateOfBirth, createdAt, updatedAt }),
       ...futsalPlayer && { futsalPlayer: futsalPlayer.toHexString() },
       ...footballPlayer && { footballPlayer: footballPlayer.toHexString() }
     }

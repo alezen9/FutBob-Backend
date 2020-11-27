@@ -1,4 +1,4 @@
-import { ObjectID } from "mongodb"
+import { ObjectId } from "mongodb"
 import { GeoPoint } from '../Entities'
 
 export enum FieldType {
@@ -18,7 +18,8 @@ export class Measurements {
 }
 
 export class Field {
-   _id: ObjectID
+   _id: ObjectId
+   createdBy: ObjectId
    createdAt: Date
    updatedAt: Date
    type: FieldType

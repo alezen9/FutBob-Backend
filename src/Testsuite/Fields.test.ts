@@ -54,7 +54,7 @@ describe('Fields', () => {
 
   describe('Setup', () => {
     it('Register a new manager', async () => {
-      await setupTestsuite(TestsuiteSetupStep.WithManager, apiInstance)
+      await setupTestsuite(TestsuiteSetupStep.WithPlayers, apiInstance)
     })
   })
 

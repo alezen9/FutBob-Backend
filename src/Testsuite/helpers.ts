@@ -30,6 +30,21 @@ const manager = {
   ...managerCredentials
 }
 
+const manager2Credentials = {
+  username: 'alezen7',
+  password: 'alezen7'
+}
+
+const manager2 = {
+  name: 'Naumche',
+  surname: 'Gjroeski',
+  dateOfBirth: '1985-07-02T22:00:00.000Z',
+  phone: '+39 1234567890',
+  sex: Sex.Male,
+  country: 'MK',
+  ...manager2Credentials
+}
+
 const authDataFields = `{
   token,
   expiresIn
@@ -172,6 +187,7 @@ export enum TestsuiteSetupStep {
 export const setupTestsuite = async (step: TestsuiteSetupStep, apiInstance: FutBobServer): Promise<any> => {
     // register manager
     const { token } = await apiInstance.user_signUp(manager, authDataFields)
+    await apiInstance.user_signUp(manager2, authDataFields)
     apiInstance.setToken(token)
     if(step === TestsuiteSetupStep.WithManager) {
         return {

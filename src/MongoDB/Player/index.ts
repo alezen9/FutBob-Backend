@@ -10,10 +10,11 @@ import { List } from '../Entities'
 
 class MongoPlayer {
   
-  async createPlayer (data: any): Promise<string> {
+  async createPlayer (data: any, createdBy: string): Promise<string> {
     const now = moment().toDate()
     const player = new Player()
     player._id = new ObjectId()
+    player.createdBy = new ObjectId(createdBy)
     player.user = new ObjectId(data.idUser)
     player.positions = data.positions
     player.state = data.state || PhysicalState.Top
@@ -31,7 +32,7 @@ class MongoPlayer {
     return player._id.toHexString()
   }
 
-  async getPlayers (filters: any): Promise<List<Player>> {
+  async getPlayers (filters: any, createdBy: string): Promise<List<Player>> {
     const { 
       ids = [],
       positions = [],
@@ -48,6 +49,7 @@ class MongoPlayer {
       : limit
     let query = []
     let lookupAdded = false
+    query.push({ $match: { createdBy: new ObjectId(createdBy) } })
     if(ids.length) query.push({ $match: { _id: { $in: ids.map(ObjectId) } } })
     if(type !== undefined) query.push({ type })
     if(states.length) query.push({ $match: { state: { $in: states } } })
@@ -140,10 +142,11 @@ class MongoPlayer {
   }
 
   getTypePlayerFields (player: Player):any {
-    const { _id, matches = [], user, ...rest } = player
+    const { _id, matches = [], user, createdBy, ...rest } = player
     return {
       ...rest,
       _id: _id.toHexString(),
+      createdBy: createdBy.toHexString(),
       user: user.toHexString(),
       matches: matches.map((_id: ObjectId) => _id.toHexString())
     }

@@ -94,6 +94,7 @@ export enum PhysicalState {
 
 export class Player {
     _id: ObjectId
+    createdBy: ObjectId
     user: ObjectId
     positions: PlayerPosition[]
     type: PlayerType

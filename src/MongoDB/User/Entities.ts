@@ -13,6 +13,7 @@ export class Credentials {
 
 export class User {
     _id: ObjectId
+    createdBy: ObjectId
     name: string
     surname: string
     dateOfBirth: Date

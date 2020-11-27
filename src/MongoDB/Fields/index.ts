@@ -8,10 +8,11 @@ import { Field, Measurements } from './Entities'
 
 class MongoFields {
   
-  async createField (data: Omit<Field, '_id'|'createdAt'|'updatedAt'>): Promise<string> {
+  async createField (data: Omit<Field, '_id'|'createdAt'|'updatedAt'|'createdBy'>, createdBy: string): Promise<string> {
     const now = moment().toDate()
     const field = new Field()
     field._id = new ObjectId()
+    field.createdBy = new ObjectId(createdBy)
     field.createdAt = now
     field.updatedAt = now
     field.price = data.price
@@ -29,7 +30,7 @@ class MongoFields {
     return field._id.toHexString()
   }
 
-  async getFields (filters: any): Promise<List<Field>> {
+  async getFields (filters: any, createdBy: string): Promise<List<Field>> {
     const { 
       ids = [],
       searchText,
@@ -42,6 +43,7 @@ class MongoFields {
       ? 100
       : limit
     let query = []
+    query.push({ $match: { createdBy: new ObjectId(createdBy) } })
     if(ids.length) query.push({ $match: { _id: { $in: ids.map(ObjectId) } } })
     if(type !== undefined) query.push({ $match: { type } })
     if(states.length) query.push({ $match: { state: { $in: states } } })
@@ -55,16 +57,17 @@ class MongoFields {
     return result
   }
 
-  async getFieldById (_id: string): Promise<Field> {
-    const field: Field = await MongoDBInstance.collection.fields.findOne({ _id: new ObjectId(_id) })
+  async getFieldById (_id: string, createdBy: string): Promise<Field> {
+    const field: Field = await MongoDBInstance.collection.fields.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
     return field
   }
 
   getTypeFieldFields (field: Field):any {
-    const { _id, ...rest } = field
+    const { _id, createdBy, ...rest } = field
     return {
       ...rest,
-      _id: _id.toHexString()
+      _id: _id.toHexString(),
+      createdBy: createdBy.toHexString()
     }
   }
 }
