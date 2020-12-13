@@ -3,27 +3,12 @@ import { MongoDBInstance, MongoState } from '../MongoDB'
 import { FutBobServer } from '../SDK'
 import { describe, it } from 'mocha'
 import { validationErrorRegEx } from './helpers'
-import { Sex } from '../MongoDB/User/Entities'
 import ErrorMessages from '../Utils/ErrorMessages'
 import moment from 'moment'
+import { manager1, manager1Credentials } from './helpers/MockData/managers'
 
 const apiInstance = new FutBobServer()
 const noTokenApiInstance = new FutBobServer()
-
-const managerCredentials = {
-  username: 'alezen9',
-  password: 'alezen9'
-}
-
-const manager = {
-  name: 'Aleksandar',
-  surname: 'Gjroeski',
-  dateOfBirth: '1993-07-02T22:00:00.000Z',
-  phone: '+39 1234567890',
-  sex: Sex.Male,
-  country: 'MK',
-  ...managerCredentials
-}
 
 const authDataFields = `{
   token,
@@ -42,14 +27,14 @@ describe('Authentication', () => {
 
   describe('Signup', () => {
     it('Register a new manager', async () => {
-      const { token, expiresIn } = await apiInstance.user_signUp(manager, authDataFields)
+      const { token, expiresIn } = await apiInstance.user_signUp(manager1, authDataFields)
       assert.strictEqual(typeof token, 'string')
       assert.strictEqual(typeof expiresIn, 'string')
     })
 
     it('Try to register a manager with another user\'s username', async () => {
       try {
-        await noTokenApiInstance.user_signUp(manager, authDataFields)
+        await noTokenApiInstance.user_signUp(manager1, authDataFields)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_username_already_exists)
       }
@@ -57,7 +42,7 @@ describe('Authentication', () => {
 
     it('Try to register a manager with missing required fields', async () => {
       try {
-        const { name, ...rest } = manager
+        const { name, ...rest } = manager1
         // @ts-expect-error => name is required
         await noTokenApiInstance.user_signUp(rest, authDataFields)
       } catch (error) {
@@ -69,7 +54,7 @@ describe('Authentication', () => {
 
   describe('Login', () => {
     it('Login manager', async () => {
-      const { token, expiresIn } = await apiInstance.user_login(managerCredentials, authDataFields)
+      const { token, expiresIn } = await apiInstance.user_login(manager1Credentials, authDataFields)
       assert.strictEqual(typeof token, 'string')
       assert.strictEqual(typeof expiresIn, 'string')
       apiInstance.setToken(token)
@@ -77,7 +62,7 @@ describe('Authentication', () => {
 
     it('Try to login with wrong password', async () => {
       try {
-        const { username } = managerCredentials
+        const { username } = manager1Credentials
         await noTokenApiInstance.user_login({ username, password: 'wrongPassword' }, authDataFields)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_password_not_correct)
@@ -86,7 +71,7 @@ describe('Authentication', () => {
 
     it('Try to login with non existing username', async () => {
       try {
-        const { password } = managerCredentials
+        const { password } = manager1Credentials
         await noTokenApiInstance.user_login({ username: 'eminem72', password }, authDataFields)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_user_not_exists)
@@ -103,11 +88,11 @@ describe('Authentication', () => {
         phone,
         sex
       }`)
-      assert.strictEqual(name, manager.name)
-      assert.strictEqual(surname, manager.surname)
-      assert.strictEqual(moment(dateOfBirth).isSame(manager.dateOfBirth), true)
-      assert.strictEqual(phone, manager.phone)
-      assert.strictEqual(sex, manager.sex)
+      assert.strictEqual(name, manager1.name)
+      assert.strictEqual(surname, manager1.surname)
+      assert.strictEqual(moment(dateOfBirth).isSame(manager1.dateOfBirth), true)
+      assert.strictEqual(phone, manager1.phone)
+      assert.strictEqual(sex, manager1.sex)
     })
 
     it('Try to get user data without token', async () => {
@@ -130,14 +115,14 @@ describe('Authentication', () => {
       const newUsername = 'alezen7'
       const ok = await apiInstance.user_changeUsername(newUsername)
       assert.strictEqual(ok, true)
-      managerCredentials.username = newUsername
+      manager1Credentials.username = newUsername
     })
 
     it('Change password', async () => {
       const newPassword = 'alezen7'
-      const ok = await apiInstance.user_changePassword(managerCredentials.password, newPassword)
+      const ok = await apiInstance.user_changePassword(manager1Credentials.password, newPassword)
       assert.strictEqual(ok, true)
-      managerCredentials.password = newPassword
+      manager1Credentials.password = newPassword
     })
 
     it('Update some user info', async () => {
@@ -165,7 +150,7 @@ describe('Authentication', () => {
 
     it('Try to change password without token', async () => {
       try {
-        await noTokenApiInstance.user_changePassword(managerCredentials.password, 'test')
+        await noTokenApiInstance.user_changePassword(manager1Credentials.password, 'test')
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
       }
@@ -181,7 +166,7 @@ describe('Authentication', () => {
 
     it('Try to set new password equal to new password', async () => {
       try {
-        await apiInstance.user_changePassword(managerCredentials.password, managerCredentials.password)
+        await apiInstance.user_changePassword(manager1Credentials.password, manager1Credentials.password)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_new_old_password_equal)
       }

@@ -24,7 +24,7 @@ export class FutBobServer {
     )
   }
 
-  async API ({query, name}) {
+  async API ({ query, name }) {
     return await this._self.post('/graphql', { query })
       .then((res:any) => {
         const { data, errors } = res
@@ -41,6 +41,7 @@ export class FutBobServer {
     }
   }
 
+  /** USER */
   async user_signUp(signupInput: SignupInput, fields: string): Promise<any> {
     const query = `
     mutation {
@@ -97,6 +98,7 @@ export class FutBobServer {
     return this.API({ query, name: 'updateUser' })
   }
 
+  /** Player */
   async player_createPlayer(createPlayerInput: CreatePlayerInputWithId | CreatePlayerInputWithUser): Promise<any> {
     const query = `
     mutation {
@@ -129,6 +131,7 @@ export class FutBobServer {
     return this.API({ query, name: 'getPlayers' })
   }
 
+  /** Field */
   async field_getFields(fieldsFilters: FieldFilters, fields: string): Promise<any> {
     const query = `
     query {

@@ -5,42 +5,11 @@ import { describe, it } from 'mocha'
 import { validationErrorRegEx, setupTestsuite, TestsuiteSetupStep } from './helpers'
 import ErrorMessages from '../Utils/ErrorMessages'
 import { isEqual }from 'lodash'
-import { FieldState, FieldType } from '../MongoDB/Fields/Entities'
+import { FieldType } from '../MongoDB/Fields/Entities'
+import { field1, field2 } from './helpers/MockData/fields'
 
 const apiInstance = new FutBobServer()
 const noTokenApiInstance = new FutBobServer()
-
-const fieldBolbeno = {
-   _id: undefined,
-   type: FieldType.Outdoor,
-   name: 'Bolbeno arena',
-   measurements: {
-      width: 15,
-      height: 25
-   },
-   price: 1200,
-   state: FieldState.NotGreatNotTerrible,
-   location: {
-      type: 'Point',
-      coordinates: [46.03369715,10.7372789]
-   }
-}
-
-const fieldTione = {
-   _id: undefined,
-   type: FieldType.Outdoor,
-   name: 'Tione arena',
-   measurements: {
-      width: 17,
-      height: 28
-   },
-   price: 1000,
-   state: FieldState.Terrible,
-   location: {
-      type: 'Point',
-      coordinates: [46.03362,10.728869]
-   }
-}
 
 describe('Fields', () => {
   describe('Clear database', () => {
@@ -60,19 +29,19 @@ describe('Fields', () => {
 
   describe('Create', () => {
     it('Create a new field', async () => {
-      const { _id, ...body } = fieldBolbeno
+      const { _id, ...body } = field1
       const fieldId: string = await apiInstance.field_createField(body)
-      fieldBolbeno._id = fieldId
+      field1._id = fieldId
       const res = await apiInstance.field_getFields({}, `{ result { _id, type } }`)
       const fields: Array<{ _id: string, type: FieldType }> = res.result
       assert.strictEqual(fields.length, 1)
       assert.strictEqual(fields[0]._id, fieldId)
-      assert.strictEqual(fields[0].type, fieldBolbeno.type)
+      assert.strictEqual(fields[0].type, field1.type)
     })
 
     it('Try to create a new field without token', async () => {
       try {
-        const { _id, ...body } = fieldBolbeno
+        const { _id, ...body } = field1
         await noTokenApiInstance.field_createField(body)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
@@ -81,7 +50,7 @@ describe('Fields', () => {
 
     it('Try to create a new field with missing required fields', async () => {
       try {
-        const { _id, price, ...body } = fieldBolbeno
+        const { _id, price, ...body } = field1
         // @ts-expect-error => playerData is required
         await apiInstance.field_createField(body)
       } catch (error) {
@@ -94,7 +63,7 @@ describe('Fields', () => {
   describe('Delete', () => {
     it('Try to delete an existing field without token', async () => {
       try {
-      const { _id } = fieldBolbeno
+      const { _id } = field1
       const done: boolean = await noTokenApiInstance.field_deleteField({ _id })
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
@@ -102,37 +71,37 @@ describe('Fields', () => {
     })
 
      it('Delete an existing field', async () => {
-      const { _id } = fieldBolbeno
+      const { _id } = field1
       const done: boolean = await apiInstance.field_deleteField({ _id })
 
       assert.strictEqual(done, true)
       const res = await apiInstance.field_getFields({}, `{ result { _id } }`)
       const fields: Array<{_id: string}> = res.result
       assert.strictEqual(fields.length, 0)
-      fieldBolbeno._id = undefined
+      field1._id = undefined
     })
   })
 
   describe('Update', () => {
      it('Create 2 new fields', async () => {
-      const { _id, ...body } = fieldBolbeno
+      const { _id, ...body } = field1
       const fieldId1: string = await apiInstance.field_createField(body)
-      const { _id: _id2, ...body2 } = fieldTione
+      const { _id: _id2, ...body2 } = field2
       const fieldId2: string = await apiInstance.field_createField(body2)
 
       const res = await apiInstance.field_getFields({}, `{ result { _id, type } }`)
       const fields: Array<{ _id: string, type: FieldType }> = res.result
       assert.strictEqual(fields.length, 2)
       assert.strictEqual(fields[0]._id, fieldId1)
-      assert.strictEqual(fields[0].type, fieldBolbeno.type)
+      assert.strictEqual(fields[0].type, field1.type)
       assert.strictEqual(fields[1]._id, fieldId2)
-      assert.strictEqual(fields[1].type, fieldTione.type)
-      fieldBolbeno._id = fieldId1
-      fieldTione._id = fieldId2
+      assert.strictEqual(fields[1].type, field2.type)
+      field1._id = fieldId1
+      field2._id = fieldId2
     })
 
     it('Update a field price', async () => {
-      const { _id } = fieldBolbeno
+      const { _id } = field1
       const done: boolean = await apiInstance.field_updateField({
         _id,
         price: 15000
@@ -145,7 +114,7 @@ describe('Fields', () => {
     })
 
     it('Update a field\'s name', async () => {
-      const { _id } = fieldBolbeno
+      const { _id } = field1
       const newName = 'Bolbeno arena new name'
       const done: boolean = await apiInstance.field_updateField({
         _id,
@@ -159,7 +128,7 @@ describe('Fields', () => {
     })
 
     it('Try to update a deleted field\'s name', async () => {
-      const { _id } = fieldBolbeno
+      const { _id } = field1
       await apiInstance.field_deleteField({ _id })
       const res = await apiInstance.field_getFields({ ids: [_id]}, `{ result { _id } }`)
       const fields: Array<{ _id: string }> = res.result
