@@ -7,6 +7,15 @@ import express from 'express'
 const shell = require('shelljs')
 require('dotenv').config()
 
+// const fs = require('fs')
+
+// fs.readdirSync('src/Graph/', { depth: 1 }).forEach(dir => {
+//   if (/^[A-Z].*$/.test(dir)) {
+//     console.log(dir)
+
+//   }
+// })
+
 const { ApolloServer, PubSub } = require('apollo-server-express')
 
 const main = async () => {

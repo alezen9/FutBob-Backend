@@ -8,7 +8,9 @@ const ErrorMessages = Object.freeze({
   user_update_not_possible: 'user_update_not_possible',
   player_user_not_specified: 'player_user_not_specified',
   player_update_not_possible: 'player_update_not_possible',
-  field_update_not_possible: 'field_update_not_possible'
+  field_update_not_possible: 'field_update_not_possible',
+  freeAgentPlayer_missing_information: 'freeAgentPlayer_missing_information',
+  freeAgentPlayer_update_not_possible: 'freeAgentPlayer_update_not_possible'
 })
 
 export default ErrorMessages

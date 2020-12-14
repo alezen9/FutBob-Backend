@@ -4,6 +4,8 @@ export class CollectionContainer {
     user: Collection
     player: Collection
     fields: Collection
+    freeAgentPlayer: Collection
+    appointment: Collection
 }
 
 export enum Privilege {
