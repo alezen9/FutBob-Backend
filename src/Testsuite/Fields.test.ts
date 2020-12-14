@@ -64,7 +64,7 @@ describe('Fields', () => {
     it('Try to delete an existing field without token', async () => {
       try {
       const { _id } = field1
-      const done: boolean = await noTokenApiInstance.field_deleteField({ _id })
+      const done: boolean = await noTokenApiInstance.field_deleteField(_id)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
       }
@@ -72,7 +72,7 @@ describe('Fields', () => {
 
      it('Delete an existing field', async () => {
       const { _id } = field1
-      const done: boolean = await apiInstance.field_deleteField({ _id })
+      const done: boolean = await apiInstance.field_deleteField(_id)
 
       assert.strictEqual(done, true)
       const res = await apiInstance.field_getFields({}, `{ result { _id } }`)
@@ -129,7 +129,7 @@ describe('Fields', () => {
 
     it('Try to update a deleted field\'s name', async () => {
       const { _id } = field1
-      await apiInstance.field_deleteField({ _id })
+      await apiInstance.field_deleteField(_id)
       const res = await apiInstance.field_getFields({ ids: [_id]}, `{ result { _id } }`)
       const fields: Array<{ _id: string }> = res.result
       assert.strictEqual(fields.length, 0)

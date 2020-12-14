@@ -1,9 +1,8 @@
-import { UpdateUserConnectedInput, UpdateUserInput } from './inputs'
-import { TypeUser } from './types'
+import types from './types'
+import inputs from './inputs'
+import api from './api'
 
-export default `
-${TypeUser}
-
-${UpdateUserConnectedInput}
-${UpdateUserInput}
-`
+export default {
+  typesAndInputs: `${types} ${inputs}`,
+  api
+}

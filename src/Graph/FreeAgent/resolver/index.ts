@@ -1,13 +1,13 @@
-import { List } from '../../MongoDB/Entities'
-import ErrorMessages from '../../Utils/ErrorMessages'
-import { MongoDBInstance } from '../../MongoDB'
+import { List } from '../../../MongoDB/Entities'
+import ErrorMessages from '../../../Utils/ErrorMessages'
+import { MongoDBInstance } from '../../../MongoDB'
 import { ObjectId } from 'mongodb'
 import { isEmpty } from 'lodash'
 import cleanDeep from 'clean-deep'
-import { checkPrivileges } from '../../Middleware/isAuth'
+import { checkPrivileges } from '../../../Middleware/isAuth'
 import moment from 'moment'
-import { mongoFreeAgentPlayer } from '../../MongoDB/FreeAgentPlayer'
-import { FreeAgentPlayer } from '../../MongoDB/FreeAgentPlayer/Entities'
+import { mongoFreeAgentPlayer } from '../../../MongoDB/FreeAgentPlayer'
+import { FreeAgentPlayer } from '../../../MongoDB/FreeAgentPlayer/Entities'
 
 const freeAgentPlayerResolver = {
   Query: {

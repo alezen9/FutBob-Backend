@@ -1,14 +1,14 @@
-import { List } from '../../MongoDB/Entities'
-import ErrorMessages from '../../Utils/ErrorMessages'
-import { MongoDBInstance } from '../../MongoDB'
+import { List } from '../../../MongoDB/Entities'
+import ErrorMessages from '../../../Utils/ErrorMessages'
+import { MongoDBInstance } from '../../../MongoDB'
 import { ObjectId } from 'mongodb'
 import { isEmpty, get, set } from 'lodash'
 import cleanDeep from 'clean-deep'
-import { checkPrivileges } from '../../Middleware/isAuth'
+import { checkPrivileges } from '../../../Middleware/isAuth'
 import moment from 'moment'
-import { mongoFields } from '../../MongoDB/Fields'
-import { Field } from '../../MongoDB/Fields/Entities'
-import { GeoPoint } from '../../MongoDB/Entities'
+import { mongoFields } from '../../../MongoDB/Fields'
+import { Field } from '../../../MongoDB/Fields/Entities'
+import { GeoPoint } from '../../../MongoDB/Entities'
 
 const fieldsResolver = {
   Query: {
@@ -57,9 +57,8 @@ const fieldsResolver = {
       if (modifiedCount === 0) throw new Error(ErrorMessages.field_update_not_possible)
       return true
     },
-    deleteField: async (_, { deleteFieldInput }, { req }) => {
+    deleteField: async (_, { _id }, { req }) => {
       if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const { _id } = deleteFieldInput
       // to add check if there is at least a match done on this field then NO delete
       await MongoDBInstance.collection.fields.deleteOne({ _id: new ObjectId(_id) })
 

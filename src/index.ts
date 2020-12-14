@@ -1,20 +1,10 @@
 import { MongoDBInstance } from './MongoDB'
-import typeDefs from './Graph/schema'
-import resolvers from './Graph/resolvers'
+import graph from './Graph'
 import isAuth from './Middleware/isAuth'
 import http from 'http'
 import express from 'express'
 const shell = require('shelljs')
 require('dotenv').config()
-
-// const fs = require('fs')
-
-// fs.readdirSync('src/Graph/', { depth: 1 }).forEach(dir => {
-//   if (/^[A-Z].*$/.test(dir)) {
-//     console.log(dir)
-
-//   }
-// })
 
 const { ApolloServer, PubSub } = require('apollo-server-express')
 
@@ -28,8 +18,8 @@ const main = async () => {
     app.use(isAuth)
     const pubsub = new PubSub()
     const server = new ApolloServer({
-      typeDefs,
-      resolvers,
+      typeDefs: graph.typeDefs,
+      resolvers: graph.resolvers,
       context: ({ req, res }) => ({ req, res, pubsub }),
       ...process.env.NODE_ENV === 'development' && {
         introspection: true,

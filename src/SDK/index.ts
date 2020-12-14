@@ -156,10 +156,10 @@ export class FutBobServer {
     return this.API({ query, name: 'updateField' })
   }
 
-  async field_deleteField(deleteFieldInput: { _id: string }): Promise<any> {
+  async field_deleteField(_id: string): Promise<any> {
     const query = `
     mutation {
-        deleteField(deleteFieldInput: ${paramsToString(deleteFieldInput)})
+        deleteField(deleteFieldInput: ${paramsToString(_id)})
     }`
     return this.API({ query, name: 'deleteField' })
   }
