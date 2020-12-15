@@ -61,7 +61,6 @@ export default `
         _id: String!
         positions: [Int]!,
         type: Int!,
-        matches: [Match],
         state: Int,
         user: User!,
         score: PlayerScore!

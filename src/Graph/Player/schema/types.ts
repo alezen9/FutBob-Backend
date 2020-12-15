@@ -29,7 +29,7 @@ export default `
         balance: Int!,
         reactions: Int!,
         ballControl: Int!,
-        dribbling: Int!,s
+        dribbling: Int!,
         composure: Int!
     }
 
@@ -61,7 +61,6 @@ export default `
         _id: String!
         positions: [Int]!,
         type: Int!,
-        matches: [Match],
         state: Int,
         user: User!,
         score: PlayerScore!

@@ -113,4 +113,6 @@ const userResolver = {
   }
 }
 
+console.log(userResolver)
+
 export default userResolver

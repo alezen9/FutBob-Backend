@@ -11,8 +11,7 @@ import genericTypes from './genericTypes'
 import genericInputs from './genericInputs'
 /** */
 import { gql } from 'apollo-server'
-
-
+import cleanDeep from 'clean-deep'
 
 export type graph_File = {
   resolver: {
@@ -75,9 +74,15 @@ export default {
     ${genericTypes}
     ${genericInputs}
     ${typeDefsString}
-    type Query { ${typeQuery} }
-    type Mutation { ${typeMutation} }
-    type Subscription { ${typeSubscription} }
+    ${!!typeQuery.trim()
+      ? `type Query { ${typeQuery} }`
+      : ''}
+    ${!!typeMutation.trim()
+      ? `type Mutation { ${typeMutation} }`
+      : ''}
+    ${!!typeSubscription.trim()
+      ? `type Subscription { ${typeSubscription} }`
+      : ''}
   `),
-  resolvers
+  resolvers: cleanDeep(resolvers)
 }

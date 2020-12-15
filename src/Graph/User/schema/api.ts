@@ -5,7 +5,7 @@ export default {
   Mutation: `
     changePassword (oldPassword: String!, newPassword: String!): Boolean!
     changeUsername (newUsername: String!): Boolean!
-    updateUserConnected (userInput: UpdateUserConnectedInput!): Boolean!,
+    updateUserConnected (userInput: UpdateUserConnectedInput!): Boolean!
     updateUser (userInput: UpdateUserInput!): Boolean!
    `,
   Subscription: ``
