@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken'
 import { reduce, isObject } from 'lodash'
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 export const capitalize = (str: string): string =>  {
     return `${str.substr(0, 1).toUpperCase()}${str.substr(1).toLowerCase()}`
@@ -46,7 +46,7 @@ export const paramsToString = params => {
 export const ISODates = params => reduce(params, (acc, val, key) => {
   return {
     ...acc,
-    [key]: moment(Number(val)).toISOString()
+    [key]: dayjs(Number(val)).toISOString()
   }
 }, {})
 

@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { Privilege } from '../Entities'
@@ -20,7 +20,7 @@ class MongoUser {
       const res = await this.getUser({ username: data.username })
       if(res) throw new Error(ErrorMessages.user_username_already_exists)
     }
-    const now = moment().toDate()
+    const now = dayjs().toDate()
     const userID = new ObjectId()
     const user = new User()
     user._id = userID
@@ -29,7 +29,7 @@ class MongoUser {
     user.surname = data.surname
     user.createdAt = now
     user.updatedAt = now
-    user.dateOfBirth = moment(data.dateOfBirth).toDate()
+    user.dateOfBirth = dayjs(data.dateOfBirth).toDate()
     user.sex = data.sex
     user.country = data.country
     user.phone = data.phone

@@ -136,7 +136,7 @@ describe('Fields', () => {
       try {
         await apiInstance.field_updateField({ _id, name: 'Some dumb name' })
       } catch (error) {
-        assert.strictEqual(error, ErrorMessages.field_update_not_possible)
+        assert.strictEqual(error, ErrorMessages.field_update_failed)
       }
     })
 

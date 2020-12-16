@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import { get } from 'lodash'
 import { paramsToString } from '../Utils/helpers'
-import { SigninInput, SignupInput, UserInput, CreatePlayerInputWithId, CreatePlayerInputWithUser, DeletePlayerInput, PlayerFilters, UpdatePlayerInfoInput, UpdateUserPlayerInfoInput, FieldFilters, CreateFieldInput, UpdateFieldInput } from './Entities'
+import { SigninInput, SignupInput, UserInput, CreatePlayerInputWithId, CreatePlayerInputWithUser, DeletePlayerInput, PlayerFilters, UpdatePlayerInfoInput, UpdateUserPlayerInfoInput, FieldFilters, CreateFieldInput, UpdateFieldInput, CreateFreeAgentInput, FreeAgentFilters } from './Entities'
 require('dotenv').config()
 
 export class FutBobServer {
@@ -98,6 +98,9 @@ export class FutBobServer {
     return this.API({ query, name: 'updateUser' })
   }
 
+
+
+
   /** Player */
   async player_createPlayer(createPlayerInput: CreatePlayerInputWithId | CreatePlayerInputWithUser): Promise<any> {
     const query = `
@@ -131,6 +134,9 @@ export class FutBobServer {
     return this.API({ query, name: 'getPlayers' })
   }
 
+
+
+
   /** Field */
   async field_getFields(fieldsFilters: FieldFilters, fields: string): Promise<any> {
     const query = `
@@ -162,6 +168,41 @@ export class FutBobServer {
         deleteField(_id: "${_id}")
     }`
     return this.API({ query, name: 'deleteField' })
+  }
+
+
+
+  /** Free Agent */
+  async freeAgent_createFreeAgent(createFreeAgentInput: CreateFreeAgentInput): Promise<any> {
+    const query = `
+    mutation {
+        createFreeAgent(createFreeAgentInput: ${paramsToString(createFreeAgentInput)})
+    }`
+    return this.API({ query, name: 'createFreeAgent' })
+  }
+
+  async freeAgent_updateFreeAgent(updateFreeAgentInput: Partial<CreateFreeAgentInput> & { _id: string }): Promise<any> {
+    const query = `
+    mutation {
+        updateFreeAgent(updateFreeAgentInput: ${paramsToString(updateFreeAgentInput)})
+    }`
+    return this.API({ query, name: 'updateFreeAgent' })
+  }
+
+  async freeAgent_deleteFreeAgent(_id: string): Promise<any> {
+    const query = `
+    mutation {
+        deleteFreeAgent(_id: "${_id}")
+    }`
+    return this.API({ query, name: 'deleteFreeAgent' })
+  }
+
+  async freeAgent_getFreeAgents(freeAgentFilters: FreeAgentFilters, fields: string): Promise<any> {
+    const query = `
+    query {
+        getFreeAgents(freeAgentFilters: ${paramsToString(freeAgentFilters)}) ${fields}
+    }`
+    return this.API({ query, name: 'getFreeAgents' })
   }
   
 }

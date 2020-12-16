@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { mongoUser } from '../User'
@@ -11,7 +11,7 @@ class MongoAppointment {
   
   async createAppointment (data: any, createdBy: string): Promise<string> {
     
-   //  const now = moment().toDate()
+   //  const now = dayjs().toDate()
    //  const player = new Player()
    //  player._id = new ObjectId()
    //  player.createdBy = new ObjectId(createdBy)

@@ -5,7 +5,7 @@ import { MongoDBInstance } from "../../../MongoDB"
 import ErrorMessages from "../../../Utils/ErrorMessages"
 import { mongoUser } from "../../../MongoDB/User"
 import {isEmpty} from 'lodash'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import bcrypt from 'bcrypt'
 import { gql_User, userLoader } from "./transform"
 import { checkPrivileges } from "../../../Middleware/isAuth"
@@ -53,7 +53,7 @@ const userResolver = {
         { $set: { 'credentials.username': newUsername }},
       )
 
-      if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_not_possible)
+      if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
       userLoader.clear(req.idUser)
       return true
     },
@@ -66,19 +66,19 @@ const userResolver = {
       const updatedUser = new User()
       if(name) updatedUser.name = name
       if(surname) updatedUser.surname = surname
-      if(dateOfBirth) updatedUser.dateOfBirth = moment(dateOfBirth).toDate()
+      if(dateOfBirth) updatedUser.dateOfBirth = dayjs(dateOfBirth).toDate()
       if(phone) updatedUser.phone = phone
       if(email) updatedUser.email = email
       if(sex) updatedUser.sex = sex
       if(country) updatedUser.country = country
-      updatedUser.updatedAt = moment().toDate()
+      updatedUser.updatedAt = dayjs().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
         {_id: new ObjectId(req.idUser)},
         { $set: updatedUser},
       )
 
-      if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_not_possible)
+      if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
       userLoader.clear(req.idUser)
 
       return true
@@ -93,26 +93,24 @@ const userResolver = {
       const updatedUser = new User()
       if(name) updatedUser.name = name
       if(surname) updatedUser.surname = surname
-      if(dateOfBirth) updatedUser.dateOfBirth = moment(dateOfBirth).toDate()
+      if(dateOfBirth) updatedUser.dateOfBirth = dayjs(dateOfBirth).toDate()
       if(phone) updatedUser.phone = phone
       if(email) updatedUser.email = email
       if(sex) updatedUser.sex = sex
       if(country) updatedUser.country = country
-      updatedUser.updatedAt = moment().toDate()
+      updatedUser.updatedAt = dayjs().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
         { _id: new ObjectId(_id), createdBy: new ObjectId(req.idUser) },
         { $set: updatedUser},
       )
       
-      if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_not_possible)
+      if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
       userLoader.clear(_id)
 
       return true
     }
   }
 }
-
-console.log(userResolver)
 
 export default userResolver

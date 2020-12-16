@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { facetCount } from '../helpers'
@@ -9,7 +9,7 @@ import { Field, Measurements } from './Entities'
 class MongoFields {
   
   async createField (data: Omit<Field, '_id'|'createdAt'|'updatedAt'|'createdBy'>, createdBy: string): Promise<string> {
-    const now = moment().toDate()
+    const now = dayjs().toDate()
     const field = new Field()
     field._id = new ObjectId()
     field.createdBy = new ObjectId(createdBy)

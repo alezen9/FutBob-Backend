@@ -1,11 +1,11 @@
 export default {
   Query: `
-      getPlayers (playerFilters: PlayerFilters!): ListOfPlayer!
+      getFreeAgents (freeAgentFilters: FreeAgentFilters!): ListOfFreeAgent!
    `,
   Mutation: `
-      createPlayer (createPlayerInput: CreatePlayerInput!): String!
-      updatePlayer (updatePlayerInput: UpdatePlayerInput!): Boolean!
-      deletePlayer (deletePlayerInput: DeletePlayerInput!): Boolean!
+      createFreeAgent (createFreeAgentInput: CreateFreeAgentInput!): String!
+      updateFreeAgent (updateFreeAgentInput: UpdateFreeAgentInput!): Boolean!
+      deleteFreeAgent (_id: String!): Boolean!
    `,
   Subscription: ``
 }

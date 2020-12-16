@@ -8,7 +8,7 @@ import cleanDeep from 'clean-deep'
 import { mongoUser } from '../../../MongoDB/User'
 import { checkPrivileges } from '../../../Middleware/isAuth'
 import { Player, PlayerType } from '../../../MongoDB/Player/Entities'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { gql_Player, playerLoader } from './transform'
 
 const playerResolver = {
@@ -50,14 +50,14 @@ const playerResolver = {
       if (positions && positions instanceof Array) updatedPlayer.positions = positions
       if (state !== undefined) updatedPlayer.state = state
       if(score) updatedPlayer.score = mongoPlayer.assignScoreValues({ score })
-      updatedPlayer.updatedAt = moment().toDate()
+      updatedPlayer.updatedAt = dayjs().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.player.updateOne(
         { _id: new ObjectId(_id), createdBy: new ObjectId(req.idUser) },
         { $set: updatedPlayer }
       )
       
-      if (modifiedCount === 0) throw new Error(ErrorMessages.player_update_not_possible)
+      if (modifiedCount === 0) throw new Error(ErrorMessages.player_update_failed)
       playerLoader.clear(_id)
       return true
     },

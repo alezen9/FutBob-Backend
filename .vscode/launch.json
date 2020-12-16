@@ -43,7 +43,7 @@
       "cwd": "${workspaceFolder}",
     },
     {
-      "name": "Test_Players",
+      "name": "Test_Player",
       "type": "node",
       "request": "launch",
       "console": "integratedTerminal",
@@ -59,7 +59,7 @@
       "cwd": "${workspaceFolder}",
     },
     {
-      "name": "Test_Fields",
+      "name": "Test_Field",
       "type": "node",
       "request": "launch",
       "console": "integratedTerminal",
@@ -70,7 +70,23 @@
         "--colors",
         "--exit",
         "--bail",
-        "${workspaceFolder}/dist/Testsuite/Fields.test.js",
+        "${workspaceFolder}/dist/Testsuite/Field.test.js",
+      ],
+      "cwd": "${workspaceFolder}",
+    },
+    {
+      "name": "Test_FreeAgent",
+      "type": "node",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "envFile": "${workspaceFolder}/.env",
+      "args": [
+        "--no-timeouts",
+        "--colors",
+        "--exit",
+        "--bail",
+        "${workspaceFolder}/dist/Testsuite/FreeAgent.test.js",
       ],
       "cwd": "${workspaceFolder}",
     }

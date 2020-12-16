@@ -4,7 +4,7 @@ export class CollectionContainer {
     user: Collection
     player: Collection
     fields: Collection
-    freeAgentPlayer: Collection
+    freeAgent: Collection
     appointment: Collection
 }
 

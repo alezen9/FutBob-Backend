@@ -4,7 +4,7 @@ import { FutBobServer } from '../SDK'
 import { describe, it } from 'mocha'
 import { validationErrorRegEx } from './helpers'
 import ErrorMessages from '../Utils/ErrorMessages'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { manager1, manager1Credentials } from './helpers/MockData/managers'
 
 const apiInstance = new FutBobServer()
@@ -90,7 +90,7 @@ describe('Authentication', () => {
       }`)
       assert.strictEqual(name, manager1.name)
       assert.strictEqual(surname, manager1.surname)
-      assert.strictEqual(moment(dateOfBirth).isSame(manager1.dateOfBirth), true)
+      assert.strictEqual(dayjs(dateOfBirth).isSame(manager1.dateOfBirth), true)
       assert.strictEqual(phone, manager1.phone)
       assert.strictEqual(sex, manager1.sex)
     })

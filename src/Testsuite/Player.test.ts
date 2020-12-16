@@ -188,7 +188,7 @@ describe('Player', () => {
           positions: [PlayerPosition.LeftWingBack]
         })
       } catch (error) {
-        assert.strictEqual(error, ErrorMessages.player_update_not_possible)
+        assert.strictEqual(error, ErrorMessages.player_update_failed)
       }
     })
 

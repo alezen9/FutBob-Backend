@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb'
 import { isEmpty, get, set } from 'lodash'
 import cleanDeep from 'clean-deep'
 import { checkPrivileges } from '../../../Middleware/isAuth'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { mongoFields } from '../../../MongoDB/Fields'
 import { Field } from '../../../MongoDB/Fields/Entities'
 import { GeoPoint } from '../../../MongoDB/Entities'
@@ -47,14 +47,14 @@ const fieldsResolver = {
         updatedField.location.type = 'Point'
         updatedField.location.coordinates = location.coordinates
       }
-      updatedField.updatedAt = moment().toDate()
+      updatedField.updatedAt = dayjs().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.fields.updateOne(
         { _id: new ObjectId(_id) },
         { $set: updatedField }
       )
       
-      if (modifiedCount === 0) throw new Error(ErrorMessages.field_update_not_possible)
+      if (modifiedCount === 0) throw new Error(ErrorMessages.field_update_failed)
       return true
     },
     deleteField: async (_, { _id }, { req }) => {

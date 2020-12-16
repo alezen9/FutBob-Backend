@@ -51,7 +51,7 @@ export class MongoDB {
       client.db(this.dbName).createCollection('User')
       client.db(this.dbName).createCollection('Player')
       client.db(this.dbName).createCollection('Fields')
-      client.db(this.dbName).createCollection('FreeAgentPlayer')
+      client.db(this.dbName).createCollection('FreeAgent')
       client.db(this.dbName).createCollection('Appointment')
       // create indexes
       client.db(this.dbName).collection('User').createIndex({ 'credentials.username': 1 })
@@ -69,7 +69,7 @@ export class MongoDB {
       collection.user = client.db(this.dbName).collection('User')
       collection.player = client.db(this.dbName).collection('Player')
       collection.fields = client.db(this.dbName).collection('Fields')
-      collection.freeAgentPlayer = client.db(this.dbName).collection('FreeAgentPlayer')
+      collection.freeAgent = client.db(this.dbName).collection('FreeAgent')
       collection.appointment = client.db(this.dbName).collection('Appointment')
       // make collections and client available to class
       this.client = client
@@ -80,7 +80,7 @@ export class MongoDB {
     await this.collection.user.deleteMany({})
     await this.collection.player.deleteMany({})
     await this.collection.fields.deleteMany({})
-    await this.collection.freeAgentPlayer.deleteMany({})
+    await this.collection.freeAgent.deleteMany({})
     await this.collection.appointment.deleteMany({})
   }
 

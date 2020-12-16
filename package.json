@@ -28,6 +28,7 @@
     "clean-deep": "^3.3.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
+    "dayjs": "^1.9.7",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "gql-query-builder": "^3.5.0",
@@ -35,20 +36,19 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.19",
     "mocha": "^6.2.2",
-    "moment": "^2.27.0",
     "mongodb": "^3.5.9",
     "npm": "^6.14.4",
     "shelljs": "^0.8.4",
     "yup": "^0.28.0"
   },
   "devDependencies": {
-    "typescript": "^3.7.2",
+    "@types/bcrypt": "^3.0.0",
     "@types/express": "^4.17.7",
     "@types/graphql": "^14.5.0",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^14.0.23",
-    "@types/bcrypt": "^3.0.0",
     "@types/jsonwebtoken": "^8.5.0",
-    "@types/mongodb": "^3.5.25"
+    "@types/mocha": "^5.2.7",
+    "@types/mongodb": "^3.5.25",
+    "@types/node": "^14.0.23",
+    "typescript": "^3.7.2"
   }
 }

@@ -8,6 +8,8 @@ export interface Pagination {
     limit?: number
 }
 
+
+/** User */
 export interface SignupInput {
     name: string,
     surname: string,
@@ -45,6 +47,8 @@ export interface UserInputRequired {
     country: string
 }
 
+
+/** Player */
 export interface playerData {
   positions: PlayerPosition[],
   state?: PhysicalState,
@@ -101,6 +105,8 @@ export interface PlayerFilters {
     pagination?: Pagination
 }
 
+
+/** Field */
 export interface FieldFilters {
     ids?: string[],
     type?: FieldType,
@@ -120,3 +126,16 @@ export interface UpdateFieldInput {
 }
 
 export type CreateFieldInput = Required<Omit<UpdateFieldInput, '_id'>>
+
+
+/** Free Agent */
+export interface CreateFreeAgentInput {
+    name: string,
+    surname: string
+}
+
+export interface FreeAgentFilters {
+    ids?: string[],
+    searchText?: string,
+    pagination?: Pagination
+}

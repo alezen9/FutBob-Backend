@@ -5,74 +5,58 @@ import { ObjectId } from 'mongodb'
 import { isEmpty } from 'lodash'
 import cleanDeep from 'clean-deep'
 import { checkPrivileges } from '../../../Middleware/isAuth'
-import moment from 'moment'
-import { mongoFreeAgentPlayer } from '../../../MongoDB/FreeAgentPlayer'
-import { FreeAgentPlayer } from '../../../MongoDB/FreeAgentPlayer/Entities'
+import dayjs from 'dayjs'
+import { mongoFreeAgent } from '../../../MongoDB/FreeAgent'
+import { FreeAgent } from '../../../MongoDB/FreeAgent/Entities'
 
-const freeAgentPlayerResolver = {
+const FreeAgentResolver = {
   Query: {
-    getFreeAgentPlayers: async (_, { freeAgentPlayerFilters }, { req }) => {
+    getFreeAgents: async (_, { freeAgentFilters }, { req }) => {
       if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const result: List<FreeAgentPlayer> = await mongoFreeAgentPlayer.getFreeAgentPlayers(freeAgentPlayerFilters, req.idUser)
+      const result: List<FreeAgent> = await mongoFreeAgent.getFreeAgents(freeAgentFilters, req.idUser)
       return result
     }
   },
   Mutation: {
-    createFreeAgentPlayer: async (_, { createFreeAgentPlayerInput }, { req }) => {
+    createFreeAgent: async (_, { createFreeAgentInput }, { req }) => {
       try {
         if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
         checkPrivileges(req)
-        const { name, surname } = createFreeAgentPlayerInput
-        if (!name || !surname) throw new Error(ErrorMessages.freeAgentPlayer_missing_information)
-        const freeAgentPlayerId = await mongoFreeAgentPlayer.createFreeAgentPlayer(createFreeAgentPlayerInput, req.idUser)
-        return freeAgentPlayerId
+        const { name, surname } = createFreeAgentInput
+        if (!name || !surname) throw new Error(ErrorMessages.freeAgent_missing_information)
+        const FreeAgentId = await mongoFreeAgent.createFreeAgent(createFreeAgentInput, req.idUser)
+        return FreeAgentId
       } catch (error) {
         throw error
       }
     },
-    updatePlayer: async (_, { updateFreeAgentPlayerInput }, { req }) => {
+    updateFreeAgent: async (_, { updateFreeAgentInput }, { req }) => {
       if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
       checkPrivileges(req)
-      const { _id, name, surname } = updateFreeAgentPlayerInput
+      const { _id, name, surname } = updateFreeAgentInput
 
-      if (isEmpty(cleanDeep(updateFreeAgentPlayerInput))) return true
+      if (isEmpty(cleanDeep(updateFreeAgentInput))) return true
 
-      const updatedFreeAgentPlayerInput = new FreeAgentPlayer()
-      if (name !== undefined) updatedFreeAgentPlayerInput.name = name
-      if (surname !== undefined) updatedFreeAgentPlayerInput.surname = surname
-      updatedFreeAgentPlayerInput.updatedAt = moment().toDate()
+      const updatedFreeAgent = new FreeAgent()
+      if (name !== undefined) updatedFreeAgent.name = name
+      if (surname !== undefined) updatedFreeAgent.surname = surname
+      updatedFreeAgent.updatedAt = dayjs().toDate()
 
-      const { modifiedCount } = await MongoDBInstance.collection.freeAgentPlayer.updateOne(
+      const { modifiedCount } = await MongoDBInstance.collection.freeAgent.updateOne(
         { _id: new ObjectId(_id), createdBy: new ObjectId(req.idUser) },
-        { $set: updatedFreeAgentPlayerInput }
+        { $set: updatedFreeAgent }
       )
       
-      if (modifiedCount === 0) throw new Error(ErrorMessages.freeAgentPlayer_update_not_possible)
+      if (modifiedCount === 0) throw new Error(ErrorMessages.freeAgent_update_failed)
       return true
     },
-   //  deletePlayer: async (_, { deletePlayerInput }, { req }) => {
-   //    if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-   //    checkPrivileges(req)
-   //    const { _id, idUser, type } = deletePlayerInput
-   //    const promises = []
-
-   //    // delete player from player collection
-   //    promises.push(MongoDBInstance.collection.player.deleteOne({ _id: new ObjectId(_id), user: new ObjectId(idUser), createdBy: new ObjectId(req.idUser) }))
-   //    // delete player from user collection
-   //    promises.push(MongoDBInstance.collection.user.updateOne(
-   //      { _id: new ObjectId(idUser), createdBy: new ObjectId(req.idUser) },
-   //      { $set: { ...type === PlayerType.Football
-   //        ? { footballPlayer: null }
-   //        : { futsalPlayer: null }
-   //      } }
-   //    ))
-
-   //    await Promise.all(promises)
-   //    playerLoader.clear(_id)
-
-   //    return true
-   //  }
+    deleteFreeAgent: async (_, { _id }, { req }) => {
+      if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
+      checkPrivileges(req)
+      MongoDBInstance.collection.freeAgent.deleteOne({ _id: new ObjectId(_id) })
+      return true
+    }
   }
 }
 
-export default freeAgentPlayerResolver
+export default FreeAgentResolver

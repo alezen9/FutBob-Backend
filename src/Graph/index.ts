@@ -6,6 +6,8 @@ import graph_Player from './Player/schema'
 import resolver_Player from './Player/resolver'
 import graph_Field from './Field/schema'
 import resolver_Field from './Field/resolver'
+import graph_FreeAgent from './FreeAgent/schema'
+import resolver_FreeAgent from './FreeAgent/resolver'
 /** */
 import genericTypes from './genericTypes'
 import genericInputs from './genericInputs'
@@ -35,6 +37,7 @@ const filesToCompute: graph_File[] = [
   { resolver: resolver_User, schema: graph_User },
   { resolver: resolver_Player, schema: graph_Player },
   { resolver: resolver_Field, schema: graph_Field },
+  { resolver: resolver_FreeAgent, schema: graph_FreeAgent }
 ]
 
 const { typeDefsString, typeQuery, typeMutation, typeSubscription, resolvers } = filesToCompute.reduce((acc, value) => {
