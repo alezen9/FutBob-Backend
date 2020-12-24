@@ -1,4 +1,4 @@
-import { FutBobServer } from '../../SDK'
+import { ZenServer } from '../../SDK'
 import { fields } from './MockData/fields'
 import { manager1, manager2 } from './MockData/managers'
 import { players } from './MockData/players'
@@ -25,11 +25,11 @@ export enum TestsuiteSetupStep {
     WithFields
 }
 
-export const setupTestsuite = async (step: TestsuiteSetupStep, apiInstance: FutBobServer): Promise<any> => {
+export const setupTestsuite = async (step: TestsuiteSetupStep, apiInstance: ZenServer): Promise<any> => {
     // register manager
-    const { token } = await apiInstance.user_signUp(manager1, authDataFields)
-    await apiInstance.user_signUp(manager2, authDataFields)
-    apiInstance.setToken(token)
+    const { token } = await apiInstance.auth.signUp(manager1, authDataFields)
+    await apiInstance.auth.signUp(manager2, authDataFields)
+    apiInstance.auth.setToken(token)
     if(step === TestsuiteSetupStep.WithManager) {
         return {
             token,
@@ -39,7 +39,7 @@ export const setupTestsuite = async (step: TestsuiteSetupStep, apiInstance: FutB
 
     // create some players
     const createPlayerPromises = players.map(({_id, idUser, ...body}, i) => 
-        apiInstance.player_createPlayer(body)
+        apiInstance.player.create(body)
             .then(_id => {
                 players[i]._id = _id
             })
@@ -56,7 +56,7 @@ export const setupTestsuite = async (step: TestsuiteSetupStep, apiInstance: FutB
 
     // create some fields
     const createFieldsPromises = fields.map(({_id, ...body}, i) => 
-        apiInstance.field_createField(body)
+        apiInstance.field.create(body)
             .then(_id => {
                 fields[i]._id = _id
             })
