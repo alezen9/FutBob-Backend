@@ -11,21 +11,23 @@ export class Credentials {
     password: string
 }
 
-export class User {
-    _id: ObjectId
-    createdBy: ObjectId
+export class Registry {
     name: string
     surname: string
     dateOfBirth: Date
     sex: Sex
     country: string
-    createdAt: Date
-    updatedAt: Date
-    privileges: Privilege[]
-    futsalPlayer?: ObjectId
-    footballPlayer?: ObjectId
-    avatar?: string
-    credentials: Credentials
     email?: string
     phone: string
+}
+
+export class User {
+    _id: ObjectId
+    createdBy: ObjectId
+    createdAt: Date
+    updatedAt: Date
+    registry: Registry
+    credentials: Credentials
+    privileges: Privilege[]
+    player?: ObjectId
 }

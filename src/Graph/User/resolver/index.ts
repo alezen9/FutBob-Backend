@@ -1,5 +1,5 @@
 import cleanDeep from "clean-deep"
-import { User } from "../../../MongoDB/User/Entities"
+import { Registry, User } from "../../../MongoDB/User/Entities"
 import { ObjectId } from "mongodb"
 import { MongoDBInstance } from "../../../MongoDB"
 import ErrorMessages from "../../../Utils/ErrorMessages"
@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import bcrypt from 'bcrypt'
 import { gql_User, userLoader } from "./transform"
 import { checkPrivileges } from "../../../Middleware/isAuth"
+import { normalizeUpdateObject } from "../../../Utils/helpers"
 
 const userResolver = {
   Query: {
@@ -37,8 +38,7 @@ const userResolver = {
       const encryptedNewPassword = await mongoUser.encryptPassword(newPassword)
       await MongoDBInstance.collection.user.updateOne(
         {_id: new ObjectId(req.idUser)},
-        { $set: { 'credentials.password': encryptedNewPassword }},
-        { upsert: true }
+        { $set: { 'credentials.password': encryptedNewPassword }}
       )
       return true
     },
@@ -64,18 +64,20 @@ const userResolver = {
       if(isEmpty(cleanDeep(userInput))) return true
 
       const updatedUser = new User()
-      if(name) updatedUser.name = name
-      if(surname) updatedUser.surname = surname
-      if(dateOfBirth) updatedUser.dateOfBirth = dayjs(dateOfBirth).toDate()
-      if(phone) updatedUser.phone = phone
-      if(email) updatedUser.email = email
-      if(sex) updatedUser.sex = sex
-      if(country) updatedUser.country = country
+      const registry = new Registry()
+      if(name) registry.name = name
+      if(surname) registry.surname = surname
+      if(dateOfBirth) registry.dateOfBirth = dayjs(dateOfBirth).toDate()
+      if(phone) registry.phone = phone
+      if(email) registry.email = email
+      if(sex) registry.sex = sex
+      if(country) registry.country = country
+      updatedUser.registry = registry
       updatedUser.updatedAt = dayjs().toDate()
 
       const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
-        {_id: new ObjectId(req.idUser)},
-        { $set: updatedUser},
+        { _id: new ObjectId(req.idUser) },
+        { $set: normalizeUpdateObject(updatedUser) }
       )
 
       if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
@@ -91,21 +93,23 @@ const userResolver = {
       if(isEmpty(cleanDeep(userInput))) return true
 
       const updatedUser = new User()
-      if(name) updatedUser.name = name
-      if(surname) updatedUser.surname = surname
-      if(dateOfBirth) updatedUser.dateOfBirth = dayjs(dateOfBirth).toDate()
-      if(phone) updatedUser.phone = phone
-      if(email) updatedUser.email = email
-      if(sex) updatedUser.sex = sex
-      if(country) updatedUser.country = country
+      const registry = new Registry()
+      if(name) registry.name = name
+      if(surname) registry.surname = surname
+      if(dateOfBirth) registry.dateOfBirth = dayjs(dateOfBirth).toDate()
+      if(phone) registry.phone = phone
+      if(email) registry.email = email
+      if(sex) registry.sex = sex
+      if(country) registry.country = country
+      updatedUser.registry = registry
       updatedUser.updatedAt = dayjs().toDate()
 
-      const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
+      const { result } = await MongoDBInstance.collection.user.updateOne(
         { _id: new ObjectId(_id), createdBy: new ObjectId(req.idUser) },
-        { $set: updatedUser},
+        { $set: normalizeUpdateObject(updatedUser) }
       )
       
-      if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
+      if (!result.ok) throw new Error(ErrorMessages.user_update_failed)
       userLoader.clear(_id)
 
       return true

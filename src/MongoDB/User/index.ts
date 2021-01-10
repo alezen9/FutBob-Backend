@@ -6,13 +6,13 @@ import { ObjectId } from 'mongodb'
 import { Privilege } from '../Entities'
 import ErrorMessages from '../../Utils/ErrorMessages'
 import { ISODates } from '../../Utils/helpers'
-import { Credentials, User } from './Entities'
+import { Credentials, Registry, User } from './Entities'
 
 class MongoUser {
-  tokenExpiration:string
+  tokenExpiration: string
 
-  constructor() {
-    this.tokenExpiration = '3h'
+  constructor(){
+    this.tokenExpiration = 'Never'
   }
   
   async createUser (data: any, createdBy?: string): Promise<string> {
@@ -25,16 +25,18 @@ class MongoUser {
     const user = new User()
     user._id = userID
     user.createdBy = createdBy ? new ObjectId(createdBy) : userID
-    user.name = data.name
-    user.surname = data.surname
     user.createdAt = now
     user.updatedAt = now
-    user.dateOfBirth = dayjs(data.dateOfBirth).toDate()
-    user.sex = data.sex
-    user.country = data.country
-    user.phone = data.phone
+    const registry = new Registry()
+    registry.name = data.name
+    registry.surname = data.surname
+    registry.dateOfBirth = dayjs(data.dateOfBirth).toDate()
+    registry.sex = data.sex
+    registry.country = data.country
+    registry.phone = data.phone
+    if (data.email) registry.email = data.email
+    user.registry = registry
     user.privileges = [data.privilege || Privilege.Manager]
-    if (data.email) user.email = data.email
     if(data.username && data.password){
       const credentials = new Credentials()
       credentials.username = data.username
@@ -54,13 +56,14 @@ class MongoUser {
     return user
   }
 
-  async assignPlayer (params: {idUser: string, footballPlayer?: string, futsalPlayer?: string}): Promise<boolean> {
+  async linkPlayerToUser (idUser: string, idPlayer?: string): Promise<boolean> {
     const updateUser = new User()
-    if(params.footballPlayer) updateUser.footballPlayer = new ObjectId(params.footballPlayer)
-    if(params.futsalPlayer) updateUser.futsalPlayer = new ObjectId(params.futsalPlayer)
+    updateUser.player = idPlayer
+      ? new ObjectId(idPlayer)
+      : null
 
     await MongoDBInstance.collection.user.updateOne(
-      { _id: new ObjectId(params.idUser) },
+      { _id: new ObjectId(idUser) },
       { $set: updateUser },
       { upsert: true }
     )
@@ -74,23 +77,25 @@ class MongoUser {
   }
 
   getTypeUserFields (user: User):any {
-    const { credentials, _id, futsalPlayer, footballPlayer, dateOfBirth, createdAt, updatedAt, createdBy, ...rest } = user
+    const { credentials, _id, registry, player, createdAt, updatedAt, createdBy, ...rest } = user
     return {
       ...rest,
       _id: _id.toHexString(),
       createdBy: createdBy.toHexString(),
+      registry: {
+        ...registry,
+        ...ISODates({ dateOfBirth: registry.dateOfBirth }),
+      },
       ...credentials && credentials.username && { username: credentials.username },
-      ...ISODates({ dateOfBirth, createdAt, updatedAt }),
-      ...futsalPlayer && { futsalPlayer: futsalPlayer.toHexString() },
-      ...footballPlayer && { footballPlayer: footballPlayer.toHexString() }
+      ...ISODates({ createdAt, updatedAt }),
+      ...player && { player: player.toHexString() }
     }
   }
 
   generateJWT(data: any): string {
     const token = jwt.sign(
         { ...data },
-        process.env.SECRET,
-        // { expiresIn: this.tokenExpiration }
+        process.env.SECRET
     )
     return token
   }

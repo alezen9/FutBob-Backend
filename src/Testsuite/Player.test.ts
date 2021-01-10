@@ -5,7 +5,7 @@ import { describe, it } from 'mocha'
 import { validationErrorRegEx, setupTestsuite, TestsuiteSetupStep } from './helpers'
 import { User } from '../MongoDB/User/Entities'
 import ErrorMessages from '../Utils/ErrorMessages'
-import { PlayerPosition, PlayerType, PlayerScore } from '../MongoDB/Player/Entities'
+import { PlayerPosition, PlayerScore } from '../MongoDB/Player/Entities'
 import { isEqual }from 'lodash'
 import { player1, player2, players } from './helpers/MockData/players'
 
@@ -33,11 +33,10 @@ describe('Player', () => {
       const { _id, idUser, ...body } = player1
       const playerId: string = await apiInstance.player.create(body)
       player1._id = playerId
-      const res = await apiInstance.player.getList({}, `{ result { _id, user { _id }, type } }`)
-      const players: Array<{ _id: string, user: User, type: PlayerType }> = res.result
+      const res = await apiInstance.player.getList({}, `{ result { _id, user { _id } } }`)
+      const players: Array<{ _id: string, user: User }> = res.result
       assert.strictEqual(players.length, 1)
       assert.strictEqual(players[0]._id, playerId)
-      assert.strictEqual(players[0].type, player1.playerData.type)
       player1.idUser = players[0].user._id
     })
 
@@ -75,24 +74,16 @@ describe('Player', () => {
   describe('Delete', () => {
     it('Try to delete an existing player without token', async () => {
       try {
-      const { _id, idUser, playerData: { type } } = player1
-      const done: boolean = await noTokenApiInstance.player.delete({
-        _id,
-        idUser,
-        type
-      })
+      const { _id, idUser } = player1
+      const done: boolean = await noTokenApiInstance.player.delete({ _id, idUser })
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
       }
     })
 
      it('Delete an existing player', async () => {
-      const { _id, idUser, playerData: { type } } = player1
-      const done: boolean = await apiInstance.player.delete({
-        _id,
-        idUser,
-        type
-      })
+      const { _id, idUser } = player1
+      const done: boolean = await apiInstance.player.delete({ _id, idUser })
 
       assert.strictEqual(done, true)
       const res = await apiInstance.player.getList({}, `{ result { _id } }`)
@@ -110,13 +101,11 @@ describe('Player', () => {
       const { _id: _id2, idUser: idUser2, ...body2 } = player2
       const playerId2: string = await apiInstance.player.create(body2)
 
-      const res = await apiInstance.player.getList({}, `{ result { _id, user { _id }, type } }`)
-      const players: Array<{ _id: string, user: User, type: PlayerType }> = res.result
+      const res = await apiInstance.player.getList({}, `{ result { _id, user { _id } } }`)
+      const players: Array<{ _id: string, user: User }> = res.result
       assert.strictEqual(players.length, 2)
       assert.strictEqual(players[0]._id, playerId)
-      assert.strictEqual(players[0].type, player1.playerData.type)
       assert.strictEqual(players[1]._id, playerId2)
-      assert.strictEqual(players[1].type, player2.playerData.type)
       player1._id = playerId
       player2._id = playerId2
       player1.idUser = players[0].user._id
@@ -127,13 +116,13 @@ describe('Player', () => {
       const { _id } = player1
       const done: boolean = await apiInstance.player.update({
         _id,
-        positions: [PlayerPosition.Striker]
+        positions: [PlayerPosition.FutsalGoalKeeper]
       })
 
       const res = await apiInstance.player.getList({ ids: [_id]}, `{ result { _id, positions } }`)
-      const players: Array<{ _id: string, type: PlayerType, positions: PlayerPosition[] }> = res.result
+      const players: Array<{ _id: string, positions: PlayerPosition[] }> = res.result
       assert.strictEqual(players.length, 1)
-      assert.strictEqual(isEqual(players[0].positions, [PlayerPosition.Striker]), true)
+      assert.strictEqual(isEqual(players[0].positions, [PlayerPosition.FutsalGoalKeeper]), true)
     })
 
     it('Update a player score values', async () => {
@@ -141,8 +130,8 @@ describe('Player', () => {
       const newScoreValues = {
         ...score,
         pace: {
-          acceleration: 100,
-          sprintSpeed: 100
+          speed: 100,
+          stamina: 100
         }
       }
       const done: boolean = await apiInstance.player.update({
@@ -150,11 +139,11 @@ describe('Player', () => {
         score: newScoreValues
       })
 
-      const res = await apiInstance.player.getList({ ids: [_id]}, `{ result { _id, score { pace { acceleration, sprintSpeed } } } }`)
-      const players: Array<{ _id: string, type: PlayerType, score: PlayerScore }> = res.result
+      const res = await apiInstance.player.getList({ ids: [_id]}, `{ result { _id, score { pace { speed, stamina } } } }`)
+      const players: Array<{ _id: string, score: PlayerScore }> = res.result
       assert.strictEqual(players.length, 1)
-      assert.strictEqual(players[0].score.pace.acceleration, newScoreValues.pace.acceleration)
-      assert.strictEqual(players[0].score.pace.sprintSpeed, newScoreValues.pace.sprintSpeed)
+      assert.strictEqual(players[0].score.pace.speed, newScoreValues.pace.speed)
+      assert.strictEqual(players[0].score.pace.stamina, newScoreValues.pace.stamina)
     })
 
     it('Update a player info', async () => {
@@ -165,27 +154,23 @@ describe('Player', () => {
         name: newName
       })
 
-      const res = await apiInstance.player.getList({ ids: [_id]}, `{ result { _id, user { _id, name } } }`)
-      const players: Array<{ _id: string, user: User, type: PlayerType, positions: PlayerPosition[] }> = res.result
+      const res = await apiInstance.player.getList({ ids: [_id]}, `{ result { _id, user { _id, registry { name } } } }`)
+      const players: Array<{ _id: string, user: User, positions: PlayerPosition[] }> = res.result
       assert.strictEqual(players.length, 1)
       assert.strictEqual(players[0].user._id, idUser)
-      assert.strictEqual(players[0].user.name, newName)
+      assert.strictEqual(players[0].user.registry.name, newName)
     })
 
     it('Try to update a deleted player position', async () => {
-      const { _id, idUser, playerData: { type } } = player1
-      await apiInstance.player.delete({
-        _id,
-        idUser,
-        type
-      })
+      const { _id, idUser } = player1
+      await apiInstance.player.delete({ _id, idUser })
       const res = await apiInstance.player.getList({ ids: [_id]}, `{ result { _id } }`)
       const players: Array<{ _id: string }> = res.result
       assert.strictEqual(players.length, 0)
       try {
         await apiInstance.player.update({
           _id,
-          positions: [PlayerPosition.LeftWingBack]
+          positions: [PlayerPosition.FutsalLeftWing]
         })
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.player_update_failed)
@@ -204,7 +189,7 @@ describe('Player', () => {
 
     // only for testing
     it.skip('Get players pagination', async () => {
-      const res = await apiInstance.player.getList({ pagination: { skip: 0, limit: 18 } }, `{ result { _id, user { _id }, type } }`)
+      const res = await apiInstance.player.getList({ pagination: { skip: 0, limit: 18 } }, `{ result { _id, user { _id } } }`)
       const players: any[] = res.result
       assert.strictEqual(players.length, 18)
     })

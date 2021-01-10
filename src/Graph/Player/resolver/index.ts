@@ -7,9 +7,10 @@ import { isEmpty } from 'lodash'
 import cleanDeep from 'clean-deep'
 import { mongoUser } from '../../../MongoDB/User'
 import { checkPrivileges } from '../../../Middleware/isAuth'
-import { Player, PlayerType } from '../../../MongoDB/Player/Entities'
+import { Player } from '../../../MongoDB/Player/Entities'
 import dayjs from 'dayjs'
 import { gql_Player, playerLoader } from './transform'
+import { normalizeUpdateObject } from '../../../Utils/helpers'
 
 const playerResolver = {
   Query: {
@@ -42,29 +43,29 @@ const playerResolver = {
     updatePlayer: async (_, { updatePlayerInput }, { req }) => {
       if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
       checkPrivileges(req)
-      const { _id, positions, state, score } = updatePlayerInput
+      const { _id, positions = [], state, score } = updatePlayerInput
 
       if (isEmpty(cleanDeep(updatePlayerInput))) return true
 
       const updatedPlayer = new Player()
-      if (positions && positions instanceof Array) updatedPlayer.positions = positions
+      if (positions.length) updatedPlayer.positions = positions
       if (state !== undefined) updatedPlayer.state = state
       if(score) updatedPlayer.score = mongoPlayer.assignScoreValues({ score })
       updatedPlayer.updatedAt = dayjs().toDate()
 
-      const { modifiedCount } = await MongoDBInstance.collection.player.updateOne(
+      const { result } = await MongoDBInstance.collection.player.updateOne(
         { _id: new ObjectId(_id), createdBy: new ObjectId(req.idUser) },
-        { $set: updatedPlayer }
+        { $set: normalizeUpdateObject(updatedPlayer) }
       )
       
-      if (modifiedCount === 0) throw new Error(ErrorMessages.player_update_failed)
+      if (!result.ok) throw new Error(ErrorMessages.player_update_failed)
       playerLoader.clear(_id)
       return true
     },
     deletePlayer: async (_, { deletePlayerInput }, { req }) => {
       if (!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
       checkPrivileges(req)
-      const { _id, idUser, type } = deletePlayerInput
+      const { _id, idUser } = deletePlayerInput
       const promises = []
 
       // delete player from player collection
@@ -72,10 +73,7 @@ const playerResolver = {
       // delete player from user collection
       promises.push(MongoDBInstance.collection.user.updateOne(
         { _id: new ObjectId(idUser), createdBy: new ObjectId(req.idUser) },
-        { $set: { ...type === PlayerType.Football
-          ? { footballPlayer: null }
-          : { futsalPlayer: null }
-        } }
+        { $set: { player: null } }
       ))
 
       await Promise.all(promises)

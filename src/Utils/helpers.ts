@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken'
-import { reduce, isObject } from 'lodash'
+import { reduce, isObject, isArray } from 'lodash'
 import dayjs from 'dayjs'
 
 export const capitalize = (str: string): string =>  {
@@ -54,3 +54,16 @@ export const asyncTimeout = async (milliseconds: number, log: boolean = false): 
   if(log) console.log(`Attendo ${milliseconds/1000} secondi...`)
   setTimeout(() => resolve(), milliseconds);
 })
+
+export const normalizeUpdateObject = (obj: any, _key: string = '') => {
+  let res = {}
+  for(const [key, value] of Object.entries(obj)){
+    if(isObject(value) && !isArray(value)) {
+      res = {
+        ...res,
+        ...normalizeUpdateObject(value, `${_key}${key}.`)
+      }
+  } else res[`${_key}${key}`] = value
+  }
+  return res
+}

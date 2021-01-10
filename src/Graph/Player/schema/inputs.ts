@@ -1,56 +1,42 @@
 export default `
   input PlayerScorePaceInput {
-    acceleration: Int!,
-    sprintSpeed: Int!
+    speed: Int!,
+    stamina: Int!
   }
 
   input PlayerScoreShootingInput {
-    positioning: Int!,
     finishing: Int!,
     shotPower: Int!,
-    longShots: Int!,
-    volleys: Int!,
-    penalties: Int!
+    longShots: Int!
   }
 
   input PlayerScorePassingInput {
     vision: Int!,
-    crossing: Int!,
-    freeKick: Int!,
     shortPassing: Int!,
-    longPassing: Int!,
-    curve: Int!
+    longPassing: Int!
   }
 
-  input PlayerScoreDribblingInput {
+  input PlayerScoreTechniqueInput {
     agility: Int!,
-    balance: Int!,
-    reactions: Int!,
     ballControl: Int!,
-    dribbling: Int!,
-    composure: Int!
+    dribbling: Int!
   }
 
   input PlayerScoreDefenseInput {
-    interceptions: Int!,
-    heading: Int!,
     defensiveAwareness: Int!,
-    standingTackle: Int!,
-    slidingTackle: Int!
+    interception: Int!,
+    versus: Int!
   }
 
   input PlayerScorePhysicalInput {
-    jumping: Int!,
-    stamina: Int!,
-    strength: Int!,
-    aggression: Int!
+    strength: Int!
   }
 
   input PlayerScoreDataInput {
     pace: PlayerScorePaceInput!,
     shooting: PlayerScoreShootingInput!,
     passing: PlayerScorePassingInput!,
-    dribbling: PlayerScoreDribblingInput!,
+    technique: PlayerScoreTechniqueInput!,
     defense: PlayerScoreDefenseInput!,
     physical: PlayerScorePhysicalInput!
   }
@@ -58,7 +44,6 @@ export default `
   input playerData {
     positions: [Int!]!,
     state: Int,
-    type: Int!,
     score: PlayerScoreDataInput!
   }
 
@@ -81,8 +66,6 @@ export default `
   input PlayerFilters {
     ids: [String],
     positions: [Int],
-    type: Int,
-    matchIds: [String],
     states: [Int],
     countries: [String],
     searchText: String,
@@ -98,7 +81,6 @@ export default `
 
   input DeletePlayerInput {
     _id: String!,
-    idUser: String!,
-    type: Int!
+    idUser: String!
   }
 `

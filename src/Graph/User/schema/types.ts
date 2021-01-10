@@ -1,6 +1,5 @@
 export default `
-    type User {
-        _id: String!,
+    type Registry {
         name: String!,
         surname: String!,
         dateOfBirth: String!,
@@ -8,9 +7,12 @@ export default `
         email: String,
         sex: Int!,
         country: String!,
+    }
+    
+    type User {
+        _id: String!,
+        registry: Registry!
         username: String!,
-        futsalPlayer: Player,
-        footballPlayer: Player,
-        avatar: String
+        player: Player
     }
 `

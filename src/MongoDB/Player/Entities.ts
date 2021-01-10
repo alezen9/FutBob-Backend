@@ -5,83 +5,49 @@ export enum PlayerPosition {
     FutsalBack,
     FutsalLeftWing,
     FutsalRightWing,
-    FutsalForward,
-    Goalkeeper,
-    Sweeper,
-    CentreBack,
-    LeftFullBack,
-    RightFullBack,
-    LeftWingBack,
-    RightWingBack,
-    DefensiveMidfielder,
-    CentralMidfielder,
-    LeftMidfielder,
-    RightMidfielder,
-    AttackingMidfielder,
-    CenterForward,
-    Striker,
-    SecondStriker
+    FutsalForward
 }
 
 export class Pace {
-    acceleration: number
-    sprintSpeed: number
+    speed: number
+    stamina: number
 }
 
 export class Shooting {
-    positioning: number
     finishing: number
     shotPower: number
     longShots: number
-    volleys: number
-    penalties: number
 }
 
 export class Passing {
     vision: number
-    crossing: number
-    freeKick: number
     shortPassing: number
     longPassing: number
-    curve: number
 }
 
-export class Dribbling {
+export class Technique {
     agility: number
-    balance: number
-    reactions: number
     ballControl: number
     dribbling: number
-    composure: number
 }
 
 export class Defense {
-    interceptions: number
-    heading: number
+    interception: number
     defensiveAwareness: number
-    standingTackle: number
-    slidingTackle: number
+    versus: number // 1>1
 }
 
 export class Physical {
-    jumping: number
-    stamina: number
     strength: number
-    aggression: number
 }
 
 export class PlayerScore {
     pace: Pace
     shooting: Shooting
     passing: Passing
-    dribbling: Dribbling
+    technique: Technique
     defense: Defense
     physical: Physical
-}
-
-export enum PlayerType {
-    Football,
-    Futsal
 }
 
 export enum PhysicalState {
@@ -95,12 +61,10 @@ export enum PhysicalState {
 export class Player {
     _id: ObjectId
     createdBy: ObjectId
-    user: ObjectId
-    positions: PlayerPosition[]
-    type: PlayerType
-    matches?: ObjectId[]
-    state?: PhysicalState
     createdAt: Date
     updatedAt: Date
+    user: ObjectId
+    positions: PlayerPosition[]
+    state?: PhysicalState
     score: PlayerScore
 }

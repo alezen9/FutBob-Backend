@@ -24,14 +24,11 @@ export const userLoader = new DataLoader(userIds => {
 /** GQL */
 
 export const gql_User = (user: User) => {
-  const { futsalPlayer, footballPlayer, ...rest } = mongoUser.getTypeUserFields(user)
+  const { player, ...rest } = mongoUser.getTypeUserFields(user)
   return {
     ...rest,
-    futsalPlayer: futsalPlayer
-      ? () => playerLoader.load(futsalPlayer)
-      : null,
-    footballPlayer: footballPlayer
-      ? () => playerLoader.load(footballPlayer)
+    player: player
+      ? () => playerLoader.load(player)
       : null
   }
 }

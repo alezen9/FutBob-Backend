@@ -1,4 +1,4 @@
-import { PhysicalState, PlayerPosition, PlayerScore, PlayerType } from "../../../MongoDB/Player/Entities";
+import { PhysicalState, PlayerPosition, PlayerScore } from "../../../MongoDB/Player/Entities";
 import { Sex } from "../../../MongoDB/User/Entities";
 import { Pagination } from "../generic_types";
 import { UserInputRequired } from "../User/types";
@@ -7,7 +7,6 @@ import { UserInputRequired } from "../User/types";
 export type playerData = {
   positions: PlayerPosition[],
   state?: PhysicalState,
-  type: PlayerType,
   score: PlayerScore
 }
 
@@ -46,14 +45,11 @@ export type UpdateUserPlayerInfoInput = {
 export type DeletePlayerInput = {
     _id: string,
     idUser: string,
-    type: PlayerType
 }
 
 export type PlayerFilters = {
     ids?: string[],
     positions?: PlayerPosition[],
-    type?: PlayerType,
-    matchIds?: string[],
     states?: PhysicalState[],
     countries?: string[],
     searchText?: string,

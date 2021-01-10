@@ -2,13 +2,21 @@
   "version": "0.2.0",
   "configurations": [
     {
-    "name": "FutBob",
+    "name": "FutBob+Mongo",
     "type": "node",
     "request": "launch",
     "console": "integratedTerminal",
     "program": "${workspaceFolder}/dist/index.js",
     "envFile": "${workspaceFolder}/.env",
     "preLaunchTask": "start_mongo"
+    },
+    {
+    "name": "FutBob",
+    "type": "node",
+    "request": "launch",
+    "console": "integratedTerminal",
+    "program": "${workspaceFolder}/dist/index.js",
+    "envFile": "${workspaceFolder}/.env",
     },
     {
       "name": "TEST_ALL",

@@ -81,12 +81,14 @@ describe('Authentication', () => {
 
   describe('Get user data', () => {
     it('Get user connected data', async () => {
-      const { name, surname, dateOfBirth, phone, sex } = await apiInstance.user.getMe(`{
-        name,
-        surname,
-        dateOfBirth,
-        phone,
-        sex
+      const { registry: { name, surname, dateOfBirth, phone, sex } } = await apiInstance.user.getMe(`{
+        registry {
+          name,
+          surname,
+          dateOfBirth,
+          phone,
+          sex
+        }
       }`)
       assert.strictEqual(name, manager1.name)
       assert.strictEqual(surname, manager1.surname)
@@ -98,11 +100,13 @@ describe('Authentication', () => {
     it('Try to get user data without token', async () => {
       try {
         await noTokenApiInstance.user.getMe(`{
-        name,
-        surname,
-        dateOfBirth,
-        phone,
-        sex
+        registry {
+          name,
+          surname,
+          dateOfBirth,
+          phone,
+          sex
+        }
       }`)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
@@ -132,9 +136,11 @@ describe('Authentication', () => {
       }
       const ok = await apiInstance.user.updateMe(newUserData)
       assert.strictEqual(ok, true)
-      const { name, surname } = await apiInstance.user.getMe(`{
-        name,
-        surname
+      const { registry: { name, surname } } = await apiInstance.user.getMe(`{
+        registry {
+          name,
+          surname
+        }
       }`)
       assert.strictEqual(name, newUserData.name)
       assert.strictEqual(surname, newUserData.surname)

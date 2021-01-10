@@ -2,57 +2,43 @@ import { TypeListOf } from '../../genericTypes'
 
 export default `
     type PlayerScorePace {
-        acceleration: Int!,
-        sprintSpeed: Int!
+        speed: Int!,
+        stamina: Int!
     }
 
     type PlayerScoreShooting {
-        positioning: Int!,
         finishing: Int!,
         shotPower: Int!,
-        longShots: Int!,
-        volleys: Int!,
-        penalties: Int!
+        longShots: Int!
     }
 
     type PlayerScorePassing {
         vision: Int!,
-        crossing: Int!,
-        freeKick: Int!,
         shortPassing: Int!,
         longPassing: Int!,
-        curve: Int!
     }
 
-    type PlayerScoreDribbling {
+    type PlayerScoreTechnique {
         agility: Int!,
-        balance: Int!,
-        reactions: Int!,
         ballControl: Int!,
         dribbling: Int!,
-        composure: Int!
     }
 
     type PlayerScoreDefense {
-        interceptions: Int!,
-        heading: Int!,
+        interception: Int!,
         defensiveAwareness: Int!,
-        standingTackle: Int!,
-        slidingTackle: Int!
+        versus: Int!
     }
 
     type PlayerScorePhysical {
-        jumping: Int!,
-        stamina: Int!,
-        strength: Int!,
-        aggression: Int!
+        strength: Int!
     }
 
     type PlayerScore {
         pace: PlayerScorePace!,
         shooting: PlayerScoreShooting!,
         passing: PlayerScorePassing!,
-        dribbling: PlayerScoreDribbling!,
+        technique: PlayerScoreTechnique!,
         defense: PlayerScoreDefense!,
         physical: PlayerScorePhysical!
     }
