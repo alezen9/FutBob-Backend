@@ -2,15 +2,34 @@ import { Field, InputType, Int } from "type-graphql"
 import { Sex } from "../../MongoDB/User/Entities"
 
 @InputType()
-export class LoginInput {
+export class ChangePasswordInput {
    @Field()
-   username: string
+   oldPassword: string
    @Field()
-   password: string
+   newPassword: string
+}
+@InputType()
+export class UpdateRegistryInput {
+   @Field()
+   _id: string
+   @Field({ nullable: true })
+   name?: string
+   @Field({ nullable: true })
+   surname?: string
+   @Field(() => String, { nullable: true })
+   dateOfBirth?: Date
+   @Field(() => Int, { nullable: true })
+   sex?: Sex
+   @Field({ nullable: true })
+   country?: string
+   @Field({ nullable: true })
+   email?: string
+   @Field({ nullable: true })
+   phone?: string
 }
 
 @InputType()
-export class RegisterInput {
+export class CreateUserInput {
    @Field()
    name: string
    @Field()
@@ -25,8 +44,4 @@ export class RegisterInput {
    email?: string
    @Field()
    phone: string
-   @Field()
-   username: string
-   @Field()
-   password: string
 }

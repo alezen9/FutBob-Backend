@@ -12,7 +12,7 @@ export class AuthResolver {
    @Query(() => AuthData)
    async login(@Arg('body') body: LoginInput): Promise<AuthData> {
       const { username, password } = body
-      const user: User = await mongoUser.getUser({ username })
+      const user: User = await mongoUser.getUserByUsername(username)
       if (!user) throw new Error(ErrorMessages.user_user_not_exists)
       const isEqual = await bcrypt.compare(password, user.credentials.password)
       if (!isEqual) throw new Error(ErrorMessages.user_password_not_correct)
@@ -29,7 +29,7 @@ export class AuthResolver {
 
    @Mutation(() => AuthData)
    async register(@Arg('body') body: RegisterInput): Promise<AuthData> {
-      const idUser = await mongoUser.createUser(body)
+      const idUser = await mongoUser.create(body)
       const tokenData = {
          idUser,
          privileges: [Privilege.Manager]
@@ -40,5 +40,4 @@ export class AuthResolver {
          expiresIn: mongoUser.tokenExpiration
       }
    }
-   
 }

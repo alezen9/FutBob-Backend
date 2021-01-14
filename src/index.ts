@@ -1,20 +1,31 @@
 import 'reflect-metadata'
 import { MongoDBInstance } from './MongoDB'
-import graph from './Graph'
+// import graph from './Graph'
 import isAuth from './Middleware/isAuth'
 import http from 'http'
-import express from 'express'
+import express, { Request, Response } from 'express'
 import { buildSchema } from 'type-graphql'
 /** start resolvers */
 import { AuthResolver } from './Graph/Auth'
-import { UserResolver, UserFieldResolver } from './Graph/User'
-import { PlayerResolver. PlayerFieldResolver } from './Graph/Player'
+import { UserResolver, PlayerFieldResolver } from './Graph/User'
+import { PlayerResolver, UserFieldResolver } from './Graph/Player'
 /** end resolvers */
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer, PubSub } from 'apollo-server-express'
+import { Privilege } from './MongoDB/Entities'
+import { authChecker } from './Middleware/Authorization'
 const shell = require('shelljs')
 require('dotenv').config()
 
-const { PubSub } = require('apollo-server-express')
+interface ReqWithisAuth extends Request {
+  isAuth?: boolean,
+  idUser?: string,
+  privileges?: Privilege[]
+}
+export interface MyContext {
+  req: ReqWithisAuth,
+  res: Response,
+  pubsub: PubSub
+}
 
 const main = async () => {
   try {
@@ -25,25 +36,14 @@ const main = async () => {
     const app = express()
     app.use(isAuth)
     const pubsub = new PubSub()
-    // const server = new ApolloServer({
-    //   typeDefs: graph.typeDefs,
-    //   resolvers: graph.resolvers,
-    //   context: ({ req, res }) => ({ req, res, pubsub }),
-    //   ...process.env.NODE_ENV === 'development' && {
-    //     introspection: true,
-    //     playground: {
-    //       settings: {
-    //         'editor.theme': 'dark'
-    //       }
-    //     }
-    //   }
-    // })
     const schema = await buildSchema({
       resolvers: [
         AuthResolver,
-        UserResolver, UserFieldResolver,
-        PlayerResolver, PlayerFieldResolver
-      ]
+        UserResolver, PlayerFieldResolver,
+        PlayerResolver, UserFieldResolver
+      ],
+      dateScalarMode: 'isoDate',
+      authChecker
     })
     const server = new ApolloServer({
       schema,

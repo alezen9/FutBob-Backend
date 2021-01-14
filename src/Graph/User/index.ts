@@ -1,37 +1,57 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { mongoUser } from "../../MongoDB/User";
-import { AuthData, User } from "../../MongoDB/User/Entities";
+import { User } from "../../MongoDB/User/Entities";
 import ErrorMessages from "../../Utils/ErrorMessages";
-import { LoginInput, RegisterInput } from "./inputs";
-import bcrypt from 'bcrypt'
 import { Privilege } from "../../MongoDB/Entities";
-
+import { MyContext } from "../..";
+import { userLoader } from "./Loader";
+import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput }  from './inputs'
 @Resolver()
 export class UserResolver {
 
+   @Mutation(() => String)
+   async createUser(@Ctx() ctx: MyContext, @Arg('body') body: CreateUserInput): Promise<String> {
+      const { idUser } = ctx.req
+      const _id = await mongoUser.create(body, idUser)
+      return _id
+   }
+
    @Query(() => User)
-   async getMe(@Ctx() ctx): Promise<User> {
-      const { req } = ctx
-      if(!req.isAuth) throw new Error(ErrorMessages.user_unauthenticated)
-      const user: User = await mongoUser.getUser({ _id: req.idUser })
+   @Authorized(Privilege.Manager)
+   async getMe(@Ctx() ctx: MyContext): Promise<User> {
+      const { idUser } = ctx.req
+      const user: User = await mongoUser.getUserById(idUser)
       if (!user) throw new Error(ErrorMessages.user_user_not_exists)
       return user
    }
 
-   // @Mutation(() => AuthData)
-   // async register(@Arg('body') body: RegisterInput): Promise<AuthData> {
-   //    const idUser = await mongoUser.createUser(body)
-   //    const tokenData = {
-   //       idUser,
-   //       privileges: [Privilege.Manager]
-   //    }
-   //    const token = mongoUser.generateJWT(tokenData)
-   //    return {
-   //       token,
-   //       expiresIn: mongoUser.tokenExpiration
-   //    }
-   // }
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async updateRegistry(@Ctx() ctx: MyContext, @Arg('body') data: UpdateRegistryInput): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoUser.update(data, idUser)
+      if(done) userLoader.clear(idUser)
+      return done
+   }
+
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async changeUsername(@Ctx() ctx: MyContext, @Arg('newUsername') newUsername: string): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoUser.changeUsername(newUsername, idUser)
+      if(done) userLoader.clear(idUser)
+      return done
+   }
+
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async changePassword(@Ctx() ctx: MyContext, @Arg('body') data: ChangePasswordInput): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoUser.changePassword(data, idUser)
+      if(done) userLoader.clear(idUser)
+      return done
+   }
    
 }
 
-export { UserFieldResolver } from './UserFieldResolver'
+export { PlayerFieldResolver } from './FieldResolvers/player'

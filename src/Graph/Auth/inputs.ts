@@ -26,7 +26,7 @@ export class RegisterInput {
    @Field()
    phone: string
    @Field()
-   username: string
+   username?: string
    @Field()
-   password: string
+   password?: string
 }

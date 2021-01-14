@@ -7,9 +7,28 @@ import { playerToUserLookupStage, unsetUserDataLookup } from './helpers'
 import { facetCount } from '../helpers'
 import { get } from 'lodash'
 import { List } from '../Entities'
+import { CreatePlayerInput } from '../../Graph/Player/inputs'
 
 class MongoPlayer {
+
+  async create (data: CreatePlayerInput, _createdBy: string){
+    const now = dayjs().toDate()
+    const _id = new ObjectId()
+    const createdBy = new ObjectId(_createdBy)
+    const player = new Player({ 
+      ...data, 
+      user: new ObjectId(data.user),
+      _id,
+      createdBy,
+      createdAt: now,
+      updatedAt: now
+    })
+    await MongoDBInstance.collection.player.insertOne(player)
+    await mongoUser.setPlayer(data.user, _id.toHexString())
+    return _id.toHexString()
+  }
   
+  /** @deprecated */
   async createPlayer (data: any, createdBy: string): Promise<string> {
     const now = dayjs().toDate()
     const player = new Player()
@@ -23,7 +42,7 @@ class MongoPlayer {
     player.score = this.assignScoreValues(data)
 
     await MongoDBInstance.collection.player.insertOne(player)
-    await mongoUser.linkPlayerToUser(data.idUser, player._id.toHexString())
+    await mongoUser.setPlayer(data.idUser, player._id.toHexString())
     return player._id.toHexString()
   }
 
@@ -82,6 +101,7 @@ class MongoPlayer {
     return result
   }
 
+  /** @deprecated */
   assignScoreValues (data):PlayerScore {
     const score = new PlayerScore()
     
@@ -122,6 +142,7 @@ class MongoPlayer {
     return player
   }
 
+  /** @deprecated */
   getTypePlayerFields (player: Player):any {
     const { _id, user, createdBy, ...rest } = player
     return {
