@@ -6,19 +6,39 @@ import { Privilege } from "../../MongoDB/Entities";
 import { MyContext } from "../..";
 import { userLoader } from "./Loader";
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput }  from './inputs'
+import { playerLoader } from "../Player/Loader";
 @Resolver()
 export class UserResolver {
 
    @Mutation(() => String)
-   async createUser(@Ctx() ctx: MyContext, @Arg('body') body: CreateUserInput): Promise<String> {
+   async User_create(@Ctx() ctx: MyContext, @Arg('body') body: CreateUserInput): Promise<String> {
       const { idUser } = ctx.req
       const _id = await mongoUser.create(body, idUser)
       return _id
    }
 
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async User_update(@Ctx() ctx: MyContext, @Arg('body') body: UpdateRegistryInput): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoUser.update(body, idUser)
+      if(done) userLoader.clear(idUser)
+      return done
+   }
+
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async User_delete(@Ctx() ctx: MyContext, @Arg('_id') _id: string): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const { user, player } = await mongoUser.delete(_id, idUser)
+      if(user) userLoader.clear(user)
+      if(player) playerLoader.clear(player)
+      return true
+   }
+
    @Query(() => User)
    @Authorized(Privilege.Manager)
-   async getMe(@Ctx() ctx: MyContext): Promise<User> {
+   async User_getMe(@Ctx() ctx: MyContext): Promise<User> {
       const { idUser } = ctx.req
       const user: User = await mongoUser.getUserById(idUser)
       if (!user) throw new Error(ErrorMessages.user_user_not_exists)
@@ -27,16 +47,7 @@ export class UserResolver {
 
    @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
-   async updateRegistry(@Ctx() ctx: MyContext, @Arg('body') data: UpdateRegistryInput): Promise<Boolean> {
-      const { idUser } = ctx.req
-      const done = await mongoUser.update(data, idUser)
-      if(done) userLoader.clear(idUser)
-      return done
-   }
-
-   @Mutation(() => Boolean)
-   @Authorized(Privilege.Manager)
-   async changeUsername(@Ctx() ctx: MyContext, @Arg('newUsername') newUsername: string): Promise<Boolean> {
+   async User_changeUsername(@Ctx() ctx: MyContext, @Arg('newUsername') newUsername: string): Promise<Boolean> {
       const { idUser } = ctx.req
       const done = await mongoUser.changeUsername(newUsername, idUser)
       if(done) userLoader.clear(idUser)
@@ -45,9 +56,9 @@ export class UserResolver {
 
    @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
-   async changePassword(@Ctx() ctx: MyContext, @Arg('body') data: ChangePasswordInput): Promise<Boolean> {
+   async User_changePassword(@Ctx() ctx: MyContext, @Arg('body') body: ChangePasswordInput): Promise<Boolean> {
       const { idUser } = ctx.req
-      const done = await mongoUser.changePassword(data, idUser)
+      const done = await mongoUser.changePassword(body, idUser)
       if(done) userLoader.clear(idUser)
       return done
    }

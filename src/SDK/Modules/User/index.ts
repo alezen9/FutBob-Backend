@@ -1,7 +1,6 @@
 import { ZenServer } from "../../"
+import { CreateUserInput, UpdateRegistryInput } from "../../../Graph/User/inputs"
 import { paramsToString } from "../../helpers"
-import { UpdateUserPlayerInfoInput } from "../Player/types"
-import { UserInput } from "./types"
 
 class UserServer {
    private _server: ZenServer
@@ -10,44 +9,52 @@ class UserServer {
       this._server = server
    }
 
+   async create (body: CreateUserInput) {
+      const query = `
+      mutation {
+         User_create(userInput: ${paramsToString(body)})
+      }`
+      return this._server.API({ query, name: 'User_create' })
+   }
+
+   async update (body: UpdateRegistryInput) {
+      const query = `
+      mutation {
+         User_create(userInput: ${paramsToString(body)})
+      }`
+      return this._server.API({ query, name: 'User_create' })
+   }
+
    async getMe (fields: string) {
       const query = `
       query {
-         getUserConnected ${fields}
+         User_getMe ${fields}
       }`
-      return this._server.API({ query, name: 'getUserConnected' })
+      return this._server.API({ query, name: 'User_getMe' })
    }
 
-   async changeMyUsername (newUsername: string) {
+   async changeUsername (newUsername: string) {
       const query = `
       mutation {
-         changeUsername(newUsername: "${newUsername}")
+         User_changeUsername(newUsername: "${newUsername}")
       }`
-      return this._server.API({ query, name: 'changeUsername' })
+      return this._server.API({ query, name: 'User_changeUsername' })
    }
 
-   async changeMyPassword (oldPassword: string, newPassword: string) {
+   async changePassword (oldPassword: string, newPassword: string) {
       const query = `
       mutation {
-         changePassword(oldPassword: "${oldPassword}", newPassword: "${newPassword}")
+         User_changePassword(oldPassword: "${oldPassword}", newPassword: "${newPassword}")
       }`
-      return this._server.API({ query, name: 'changePassword' })
+      return this._server.API({ query, name: 'User_changePassword' })
    }
 
-   async updateMe (userInput: UserInput) {
+   async delete (_id: string) {
       const query = `
       mutation {
-         updateUserConnected(userInput: ${paramsToString(userInput)})
+         User_delete(_id: "${_id}")
       }`
-      return this._server.API({ query, name: 'updateUserConnected' })
-   }
-
-   async update (userInput: UpdateUserPlayerInfoInput) {
-      const query = `
-      mutation {
-         updateUser(userInput: ${paramsToString(userInput)})
-      }`
-      return this._server.API({ query, name: 'updateUser' })
+      return this._server.API({ query, name: 'User_delete' })
    }
 }
 

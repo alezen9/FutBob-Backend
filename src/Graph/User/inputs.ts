@@ -8,6 +8,24 @@ export class ChangePasswordInput {
    @Field()
    newPassword: string
 }
+
+@InputType()
+export class CreateUserInput {
+   @Field()
+   name: string
+   @Field()
+   surname: string
+   @Field(() => String)
+   dateOfBirth: Date
+   @Field(() => Int)
+   sex: Sex
+   @Field()
+   country: string
+   @Field({ nullable: true })
+   email?: string
+   @Field()
+   phone: string
+}
 @InputType()
 export class UpdateRegistryInput {
    @Field()
@@ -26,22 +44,4 @@ export class UpdateRegistryInput {
    email?: string
    @Field({ nullable: true })
    phone?: string
-}
-
-@InputType()
-export class CreateUserInput {
-   @Field()
-   name: string
-   @Field()
-   surname: string
-   @Field(() => String)
-   dateOfBirth: Date
-   @Field(() => Int)
-   sex: Sex
-   @Field()
-   country: string
-   @Field({ nullable: true })
-   email?: string
-   @Field()
-   phone: string
 }

@@ -67,3 +67,8 @@ export const normalizeUpdateObject = (obj: any, _key: string = '') => {
   }
   return res
 }
+
+export const escapeStringForRegExp = (str: string): string => {
+  if(!str) return null
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}

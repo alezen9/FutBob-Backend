@@ -9,7 +9,7 @@ const getUserById = async (id: string|ObjectId) => {
       ? id.toHexString()
       : id
   try {
-    return await mongoUser.getUser({ _id })
+    return await mongoUser.getUserById(_id)
   } catch (err) {
     throw err
   }

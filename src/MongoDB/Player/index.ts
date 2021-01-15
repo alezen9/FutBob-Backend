@@ -2,16 +2,18 @@ import dayjs from 'dayjs'
 import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { mongoUser } from '../User'
-import { Player, PhysicalState, PlayerScore, Pace, Shooting, Passing, Defense, Physical, Technique } from './Entities'
-import { playerToUserLookupStage, unsetUserDataLookup } from './helpers'
+import { Player } from './Entities'
+import { StageLookupUserForPlayer, StageUnsetLookupUserForPlayer } from './helpers'
 import { facetCount } from '../helpers'
 import { get } from 'lodash'
-import { List } from '../Entities'
-import { CreatePlayerInput } from '../../Graph/Player/inputs'
+import { List, Pagination } from '../Entities'
+import { CreatePlayerInput, FiltersPlayer, UpdatePlayerInput } from '../../Graph/Player/inputs'
+import ErrorMessages from '../../Utils/ErrorMessages'
+import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helpers'
 
 class MongoPlayer {
 
-  async create (data: CreatePlayerInput, _createdBy: string){
+  async create (data: CreatePlayerInput, _createdBy: string): Promise<string> {
     const now = dayjs().toDate()
     const _id = new ObjectId()
     const createdBy = new ObjectId(_createdBy)
@@ -27,72 +29,80 @@ class MongoPlayer {
     await mongoUser.setPlayer(data.user, _id.toHexString())
     return _id.toHexString()
   }
-  
-  /** @deprecated */
-  async createPlayer (data: any, createdBy: string): Promise<string> {
-    const now = dayjs().toDate()
-    const player = new Player()
-    player._id = new ObjectId()
-    player.createdBy = new ObjectId(createdBy)
-    player.user = new ObjectId(data.idUser)
-    player.positions = data.positions
-    player.state = data.state || PhysicalState.Top
-    player.createdAt = now
-    player.updatedAt = now
-    player.score = this.assignScoreValues(data)
 
-    await MongoDBInstance.collection.player.insertOne(player)
-    await mongoUser.setPlayer(data.idUser, player._id.toHexString())
-    return player._id.toHexString()
+  async update (data: UpdatePlayerInput, createdBy: string): Promise<boolean> {
+    const { _id, ...rest } = data
+    const player = new Player({ 
+      ...rest,
+      updatedAt: dayjs().toDate()
+    })
+    await MongoDBInstance.collection.player.updateOne(
+      { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
+      { $set: normalizeUpdateObject(player) }
+    )
+    return true
   }
 
-  async getPlayers (filters: any, createdBy: string): Promise<List<Player>> {
+  async delete (_id: string, createdBy: string): Promise<boolean> {
+    const player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+    if(!player) throw new Error(ErrorMessages.system_permission_denied)
+    await MongoDBInstance.collection.player.deleteOne({ _id: new ObjectId(_id) })
+    await MongoDBInstance.collection.user.updateOne(
+      { _id: new ObjectId(player.user), createdBy: new ObjectId(createdBy) },
+      { $set: { player: null } }
+    )
+    return true
+  }
+
+  async getList (filters: FiltersPlayer, pagination: Pagination, createdBy: string): Promise<List<Player>> {
     const { 
       ids = [],
       positions = [],
-      type,
-      matchIds = [],
       states = [],
       countries = [],
-      searchText,
-      pagination = {}
+      searchText
     } = filters
+
     const { skip = 0, limit } = pagination
+    // set limit to max 100
     const _limit = !limit || limit < 0 || limit > 100
       ? 100
       : limit
-    let query = []
+      
+    const query = []
     let lookupAdded = false
+
+    // make sure that i can access it
     query.push({ $match: { createdBy: new ObjectId(createdBy) } })
-    if(ids.length) query.push({ $match: { _id: { $in: ids.map(ObjectId) } } })
-    if(type !== undefined) query.push({ type })
+    // filter by id
+    if(ids.length) query.push({ $match: { _id: { $in: ids.map(id => new ObjectId(id)) } } })
+    // filter by state
     if(states.length) query.push({ $match: { state: { $in: states } } })
+    // filter by position
     if(positions.length) query.push({ $match: { positions: { $in: positions } }})
-    if(matchIds.length) query.push({ $match: { positions: { $in: matchIds } }})
+    /**  USER DATA IS LOCATED IN THE "userData" FIELD IF LOOKUP HAS BEEN ADDED */
+    // filter by country
     if(countries.length) {
-      query = [
-        ...query,
-        ...playerToUserLookupStage,
-        { $match: { 'userData.country': { $in: countries } }}
-      ]
+      query.push(StageLookupUserForPlayer)
+      query.push({ $match: { 'userData.country': { $in: countries } }})
       lookupAdded = true
     }
+    // filter by searchText
     if(searchText) {
-      query = [
-        ...query,
-        ...!lookupAdded ? playerToUserLookupStage : [],
-        {
-          $addFields: {
-              "fullName": { $concat: [ "$userData.surname", ' ', "$userData.name" ] }
-          }
-        },
-        { $match: { fullName: new RegExp(searchText, 'i') } },
-        { $unset: "fullName" }
-      ]
+      if(!lookupAdded) query.push(StageLookupUserForPlayer)
+      const createFullNameField = { $addFields: { "fullName": { $concat: [ "$userData.surname", ' ', "$userData.name" ] } } }
+      const searchInFullName = { $match: { fullName: new RegExp(escapeStringForRegExp(searchText), 'i') } }
+      const deleteFullNameField = { $unset: "fullName" }
+      query.push(createFullNameField)
+      query.push(searchInFullName)
+      query.push(deleteFullNameField)
       lookupAdded = true
     }
-    if(lookupAdded) query.push(unsetUserDataLookup)
+    // remove lookup stuff if it was added
+    if(lookupAdded) query.push(StageUnsetLookupUserForPlayer)
+    // paginate
     query.push(facetCount({ skip, limit: _limit }))
+
     const res: Player[] = await MongoDBInstance.collection.player.aggregate(query).toArray()
     const result = {
       totalCount: get(res, '[0].totalCount[0].count', 0) as number,
@@ -101,56 +111,9 @@ class MongoPlayer {
     return result
   }
 
-  /** @deprecated */
-  assignScoreValues (data):PlayerScore {
-    const score = new PlayerScore()
-    
-    const pace = new Pace()
-    pace.speed = data.score.pace.speed
-    pace.stamina = data.score.pace.stamina
-    const shooting = new Shooting()
-    shooting.finishing = data.score.shooting.finishing
-    shooting.longShots = data.score.shooting.longShots
-    shooting.shotPower = data.score.shooting.shotPower
-    const passing = new Passing()
-    passing.longPassing = data.score.passing.longPassing
-    passing.shortPassing = data.score.passing.shortPassing
-    passing.vision = data.score.passing.vision
-    const technique = new Technique()
-    technique.agility = data.score.technique.agility
-    technique.ballControl = data.score.technique.ballControl
-    technique.dribbling = data.score.technique.dribbling
-    const defense = new Defense()
-    defense.defensiveAwareness = data.score.defense.defensiveAwareness
-    defense.interception = data.score.defense.interception
-    defense.versus = data.score.defense.versus
-    const physical = new Physical()
-    physical.strength = data.score.physical.strength
-
-    score.pace = pace
-    score.shooting = shooting
-    score.passing = passing
-    score.technique = technique
-    score.defense = defense
-    score.physical = physical
-
-    return score
-  }
-
   async getPlayerById (_id: string): Promise<Player> {
     const player: Player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id) })
     return player
-  }
-
-  /** @deprecated */
-  getTypePlayerFields (player: Player):any {
-    const { _id, user, createdBy, ...rest } = player
-    return {
-      ...rest,
-      _id: _id.toHexString(),
-      createdBy: createdBy.toHexString(),
-      user: user.toHexString()
-    }
   }
 }
 

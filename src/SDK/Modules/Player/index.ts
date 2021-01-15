@@ -1,6 +1,7 @@
 import { ZenServer } from "../../"
+import { CreatePlayerInput, FiltersPlayer, UpdatePlayerInput } from "../../../Graph/Player/inputs"
+import { Pagination } from "../../../MongoDB/Entities"
 import { paramsToString } from "../../helpers"
-import { CreatePlayerInputWithUser, CreatePlayerInputWithId, DeletePlayerInput, PlayerFilters, UpdatePlayerInfoInput } from "./types"
 
 class PlayerServer {
    private _server: ZenServer
@@ -9,38 +10,38 @@ class PlayerServer {
       this._server = server
    }
 
-   async create (createPlayerInput: CreatePlayerInputWithUser|CreatePlayerInputWithId) {
+   async create (body: CreatePlayerInput) {
       const query = `
       mutation {
-         createPlayer(createPlayerInput: ${paramsToString(createPlayerInput)})
+         Player_create(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'createPlayer' })
+      return this._server.API({ query, name: 'Player_create' })
    }
 
-   async update (updatePlayerInput: UpdatePlayerInfoInput) {
+   async update (body: UpdatePlayerInput) {
       const query = `
       mutation {
-         updatePlayer(updatePlayerInput: ${paramsToString(updatePlayerInput)})
+         Player_update(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'updatePlayer' })
-   }
-
-
-   async delete (deletePlayerInput: DeletePlayerInput) {
-      const query = `
-      mutation {
-         deletePlayer(deletePlayerInput: ${paramsToString(deletePlayerInput)})
-      }`
-      return this._server.API({ query, name: 'deletePlayer' })
+      return this._server.API({ query, name: 'Player_update' })
    }
 
 
-   async getList (playerFilters: PlayerFilters, fields: string) {
+   async delete (_id: string) {
+      const query = `
+      mutation {
+         Player_delete(_id: "${_id}")
+      }`
+      return this._server.API({ query, name: 'Player_delete' })
+   }
+
+
+   async getList (filters: FiltersPlayer, pagination: Pagination, fields: string) {
       const query = `
       query {
-         getPlayers(playerFilters: ${paramsToString(playerFilters)}) ${fields}
+         Player_getList(filters: ${paramsToString(filters)}, pagination: ${paramsToString(pagination)}) ${fields}
       }`
-      return this._server.API({ query, name: 'getPlayers' })
+      return this._server.API({ query, name: 'Player_getList' })
    }
 }
 

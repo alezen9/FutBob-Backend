@@ -67,7 +67,7 @@ export class MongoDB {
       // populate colletion class
       collection.user = client.db(this.dbName).collection('User')
       collection.player = client.db(this.dbName).collection('Player')
-      collection.fields = client.db(this.dbName).collection('Fields')
+      collection.field = client.db(this.dbName).collection('Fields') // to make singular
       collection.freeAgent = client.db(this.dbName).collection('FreeAgent')
       collection.appointment = client.db(this.dbName).collection('Appointment')
       // make collections and client available to class
@@ -78,7 +78,7 @@ export class MongoDB {
   async clearDb () {
     await this.collection.user.deleteMany({})
     await this.collection.player.deleteMany({})
-    await this.collection.fields.deleteMany({})
+    await this.collection.field.deleteMany({})
     await this.collection.freeAgent.deleteMany({})
     await this.collection.appointment.deleteMany({})
   }

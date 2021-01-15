@@ -1,6 +1,7 @@
 import { ZenServer } from "../../"
+import { CreateFieldInput, FiltersField, UpdateFieldInput } from "../../../Graph/Field/inputs"
+import { Pagination } from "../../../MongoDB/Entities"
 import { paramsToString } from "../../helpers"
-import { CreateFieldInput, FieldFilters, UpdateFieldInput } from "./types"
 
 class FieldServer {
    private _server: ZenServer
@@ -9,36 +10,36 @@ class FieldServer {
       this._server = server
    }
 
-   async create(createFieldInput: CreateFieldInput): Promise<any> {
+   async create(body: CreateFieldInput): Promise<any> {
       const query = `
       mutation {
-         createField(createFieldInput: ${paramsToString(createFieldInput)})
+         Field_create(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'createField' })
+      return this._server.API({ query, name: 'Field_create' })
    }
 
-   async update(updateFieldInput: UpdateFieldInput): Promise<any> {
+   async update(body: UpdateFieldInput): Promise<any> {
       const query = `
       mutation {
-         updateField(updateFieldInput: ${paramsToString(updateFieldInput)})
+         Field_update(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'updateField' })
+      return this._server.API({ query, name: 'Field_update' })
    }
 
    async delete(_id: string): Promise<any> {
       const query = `
       mutation {
-         deleteField(_id: "${_id}")
+         Field_delete(_id: "${_id}")
       }`
-      return this._server.API({ query, name: 'deleteField' })
+      return this._server.API({ query, name: 'Field_delete' })
    }
 
-   async getList(fieldsFilters: FieldFilters, fields: string): Promise<any> {
+   async getList(filters: FiltersField, pagination: Pagination, fields: string): Promise<any> {
       const query = `
       query {
-         getFields(fieldsFilters: ${paramsToString(fieldsFilters)}) ${fields}
+         Field_getList(filters: ${paramsToString(filters)}, pagination: ${paramsToString(pagination)}) ${fields}
       }`
-      return this._server.API({ query, name: 'getFields' })
+      return this._server.API({ query, name: 'Field_getList' })
    }
 }
 

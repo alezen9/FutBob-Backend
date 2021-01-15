@@ -3,53 +3,79 @@ import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { facetCount } from '../helpers'
 import { get } from 'lodash'
-import { GeoPoint, List } from '../Entities'
-import { Field, Measurements } from './Entities'
+import { List, Pagination } from '../Entities'
+import { Field } from './Entities'
+import { CreateFieldInput, FiltersField, UpdateFieldInput } from '../../Graph/Field/inputs'
+import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helpers'
 
-class MongoFields {
-  
-  async createField (data: Omit<Field, '_id'|'createdAt'|'updatedAt'|'createdBy'>, createdBy: string): Promise<string> {
+class MongoField {
+
+  async create (data: CreateFieldInput, createdBy: string): Promise<string> {
     const now = dayjs().toDate()
-    const field = new Field()
-    field._id = new ObjectId()
-    field.createdBy = new ObjectId(createdBy)
-    field.createdAt = now
-    field.updatedAt = now
-    field.price = data.price
-    field.location = new GeoPoint()
-    field.location.type = 'Point'
-    field.location.coordinates = data.location.coordinates
-    field.measurements = new Measurements()
-    field.measurements.height = data.measurements.height
-    field.measurements.width = data.measurements.width
-    field.name = data.name
-    field.state = data.state
-    field.type = data.type    
-
-    await MongoDBInstance.collection.fields.insertOne(field)
-    return field._id.toHexString()
+    const _id = new ObjectId()
+    const field = new Field({
+      _id,
+      createdBy,
+      createdAt: now,
+      updatedAt: now,
+      ...data
+    })
+    await MongoDBInstance.collection.field.insertOne(field)
+    return _id.toHexString()
   }
 
-  async getFields (filters: any, createdBy: string): Promise<List<Field>> {
+  async update (data: UpdateFieldInput, createdBy: string): Promise<boolean> {
+    const { _id, ...rest } = data
+    const now = dayjs().toDate()
+    const field = new Field({
+      ...rest,
+      updatedAt: now
+    })
+    await MongoDBInstance.collection.field.updateOne(
+      { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
+      { $set: normalizeUpdateObject(field) }
+    )
+    return true
+  }
+
+  async delete (_id: string, createdBy: string): Promise<boolean> {
+    await MongoDBInstance.collection.field.deleteOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+    return true
+  }
+
+  async getList (filters: FiltersField, pagination: Pagination, createdBy: string): Promise<List<Field>> {
     const { 
       ids = [],
-      searchText,
       type,
       states = [],
-      pagination = {}
+      searchText
     } = filters
+
     const { skip = 0, limit } = pagination
+    // set limit to max 100
     const _limit = !limit || limit < 0 || limit > 100
       ? 100
       : limit
-    let query = []
+      
+    const query = []
+
+    // make sure that i can access it
     query.push({ $match: { createdBy: new ObjectId(createdBy) } })
-    if(ids.length) query.push({ $match: { _id: { $in: ids.map(ObjectId) } } })
-    if(type !== undefined) query.push({ $match: { type } })
+    // filter by id
+    if(ids.length) query.push({ $match: { _id: { $in: ids.map(id => new ObjectId(id)) } } })
+    // filter by state
     if(states.length) query.push({ $match: { state: { $in: states } } })
-    if(searchText) query.push({ $match: { name: new RegExp(searchText, 'i') } })
+    // filter by type
+    if(type) query.push({ $match: { type }})
+    // filter by searchText
+    if(searchText) {
+      const searchInName = { $match: { name: new RegExp(escapeStringForRegExp(searchText), 'i') } }
+      query.push(searchInName)
+    }
+    // paginate
     query.push(facetCount({ skip, limit: _limit }))
-    const res: Field[] = await MongoDBInstance.collection.fields.aggregate(query).toArray()
+
+    const res: Field[] = await MongoDBInstance.collection.field.aggregate(query).toArray()
     const result = {
       totalCount: get(res, '[0].totalCount[0].count', 0) as number,
       result: get(res, '[0].result', []) as Field[]
@@ -58,18 +84,9 @@ class MongoFields {
   }
 
   async getFieldById (_id: string, createdBy: string): Promise<Field> {
-    const field: Field = await MongoDBInstance.collection.fields.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+    const field: Field = await MongoDBInstance.collection.field.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
     return field
-  }
-
-  getTypeFieldFields (field: Field):any {
-    const { _id, createdBy, ...rest } = field
-    return {
-      ...rest,
-      _id: _id.toHexString(),
-      createdBy: createdBy.toHexString()
-    }
   }
 }
 
-export const mongoFields = new MongoFields()
+export const mongoField = new MongoField()

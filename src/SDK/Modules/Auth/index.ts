@@ -1,7 +1,7 @@
 import { get } from 'lodash'
 import { ZenServer } from "../../"
+import { LoginInput, RegisterInput } from '../../../Graph/Auth/inputs'
 import { paramsToString } from '../../helpers'
-import { SigninInput, SignupInput } from "./types"
 
 class AuthServer {
    private _server: ZenServer
@@ -18,20 +18,20 @@ class AuthServer {
       }
    }
 
-   async signUp(signupInput: SignupInput, fields: string): Promise<any> {
+   async register(body: RegisterInput, fields: string): Promise<any> {
       const query = `
       mutation {
-         signup(signupInput: ${paramsToString(signupInput)})${fields}
+         Auth_register(body: ${paramsToString(body)})${fields}
       }`
       return this._server.API({ query, name: 'signup' })
    }
 
-   async login(signinInput: SigninInput, fields: string): Promise<any> {
+   async login(body: LoginInput, fields: string): Promise<any> {
       const query = `
       query {
-         login(signinInput: ${paramsToString(signinInput)})${fields}
+         Auth_login(body: ${paramsToString(body)})${fields}
       }`
-      return this._server.API({ query, name: 'login' })
+      return this._server.API({ query, name: 'Auth_login' })
    }
 }
 

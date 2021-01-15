@@ -1,4 +1,4 @@
-export const playerToUserLookupStage = [
+export const StageLookupUserForPlayer = [
   {
     $lookup: {
       from: 'User',
@@ -15,4 +15,4 @@ export const playerToUserLookupStage = [
   }
 ]
 
-export const unsetUserDataLookup = Object.freeze({ $unset: 'userData' })
+export const StageUnsetLookupUserForPlayer = Object.freeze({ $unset: 'userData' })

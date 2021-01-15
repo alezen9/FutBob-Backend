@@ -24,3 +24,17 @@ export class UpdatePlayerInput {
    @Field(() => PlayerScore, { nullable: true })
    score?: PlayerScore
 }
+
+@InputType()
+export class FiltersPlayer {
+   @Field(() => [String], { nullable: true })
+   ids?: string[]
+   @Field(() => [Int], { nullable: true })
+   positions?: number[]
+   @Field(() => [Int], { nullable: true })
+   states?: number[]
+   @Field(() => [String], { nullable: true })
+   countries?: string[]
+   @Field({ nullable: true })
+   searchText?: string
+}

@@ -1,6 +1,7 @@
 import { ZenServer } from "../../"
+import { CreateFreeAgentInput, FiltersFreeAgent, UpdateFreeAgentInput } from "../../../Graph/FreeAgent/inputs"
+import { Pagination } from "../../../MongoDB/Entities"
 import { paramsToString } from "../../helpers"
-import { CreateFreeAgentInput, FreeAgentFilters, UpdateFreeAgentInput } from "./types"
 
 class FreeAgentServer {
    private _server: ZenServer
@@ -9,36 +10,36 @@ class FreeAgentServer {
       this._server = server
    }
 
-   async create(createFreeAgentInput: CreateFreeAgentInput): Promise<any> {
+   async create(body: CreateFreeAgentInput): Promise<any> {
       const query = `
       mutation {
-         createFreeAgent(createFreeAgentInput: ${paramsToString(createFreeAgentInput)})
+         FreeAgent_create(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'createFreeAgent' })
+      return this._server.API({ query, name: 'FreeAgent_create' })
    }
 
-   async update(updateFreeAgentInput: UpdateFreeAgentInput): Promise<any> {
+   async update(body: UpdateFreeAgentInput): Promise<any> {
       const query = `
       mutation {
-         updateFreeAgent(updateFreeAgentInput: ${paramsToString(updateFreeAgentInput)})
+         FreeAgent_update(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'updateFreeAgent' })
+      return this._server.API({ query, name: 'FreeAgent_update' })
    }
 
    async delete(_id: string): Promise<any> {
       const query = `
       mutation {
-         deleteFreeAgent(_id: "${_id}")
+         FreeAgent_delete(_id: "${_id}")
       }`
-      return this._server.API({ query, name: 'deleteFreeAgent' })
+      return this._server.API({ query, name: 'FreeAgent_delete' })
    }
 
-  async getList(freeAgentFilters: FreeAgentFilters, fields: string): Promise<any> {
+  async getList(filters: FiltersFreeAgent, pagination: Pagination, fields: string): Promise<any> {
       const query = `
          query {
-            getFreeAgents(freeAgentFilters: ${paramsToString(freeAgentFilters)}) ${fields}
+            FreeAgent_getList(filters: ${paramsToString(filters)}, pagination: ${paramsToString(pagination)}) ${fields}
          }`
-      return this._server.API({ query, name: 'getFreeAgents' })
+      return this._server.API({ query, name: 'FreeAgent_getList' })
    }
 }
 

@@ -10,7 +10,7 @@ import { Privilege } from "../../MongoDB/Entities";
 export class AuthResolver {
 
    @Query(() => AuthData)
-   async login(@Arg('body') body: LoginInput): Promise<AuthData> {
+   async Auth_login(@Arg('body') body: LoginInput): Promise<AuthData> {
       const { username, password } = body
       const user: User = await mongoUser.getUserByUsername(username)
       if (!user) throw new Error(ErrorMessages.user_user_not_exists)
@@ -28,7 +28,7 @@ export class AuthResolver {
    }
 
    @Mutation(() => AuthData)
-   async register(@Arg('body') body: RegisterInput): Promise<AuthData> {
+   async Auth_register(@Arg('body') body: RegisterInput): Promise<AuthData> {
       const idUser = await mongoUser.create(body)
       const tokenData = {
          idUser,

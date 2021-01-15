@@ -9,6 +9,8 @@ import { buildSchema } from 'type-graphql'
 import { AuthResolver } from './Graph/Auth'
 import { UserResolver, PlayerFieldResolver } from './Graph/User'
 import { PlayerResolver, UserFieldResolver } from './Graph/Player'
+import { FreeAgentResolver } from './Graph/FreeAgent'
+import { FieldResolver } from './Graph/Field'
 /** end resolvers */
 import { ApolloServer, PubSub } from 'apollo-server-express'
 import { Privilege } from './MongoDB/Entities'
@@ -40,7 +42,9 @@ const main = async () => {
       resolvers: [
         AuthResolver,
         UserResolver, PlayerFieldResolver,
-        PlayerResolver, UserFieldResolver
+        PlayerResolver, UserFieldResolver,
+        FreeAgentResolver,
+        FieldResolver
       ],
       dateScalarMode: 'isoDate',
       authChecker
