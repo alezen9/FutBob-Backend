@@ -29,7 +29,7 @@ class MongoUser {
     if(data.username && data.password){
       credentials = new Credentials()
       credentials.username = username
-      credentials.password = password
+      credentials.password = await this.encryptPassword(password)
       privileges.push(Privilege.Manager)
     }
     if(!privileges.length) privileges.push(Privilege.User)
@@ -38,6 +38,7 @@ class MongoUser {
       ? new ObjectId(_createdBy)
       : _id
     const user = new User(cleanDeep({ 
+      _id,
       registry, 
       credentials, 
       createdAt: now, 

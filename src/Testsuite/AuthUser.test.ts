@@ -10,12 +10,8 @@ import { ZenServer } from '../SDK'
 const apiInstance = new ZenServer()
 const noTokenApiInstance = new ZenServer()
 
-const authDataFields = `{
-  token,
-  expiresIn
-}`
-
 describe('Authentication', () => {
+  let ID
   describe('Clear database', () => {
     it('Should clear database', async () => {
       if (MongoDBInstance.state === MongoState.Disconnected) {
@@ -27,14 +23,13 @@ describe('Authentication', () => {
 
   describe('Signup', () => {
     it('Register a new manager', async () => {
-      const { token, expiresIn } = await apiInstance.auth.signUp(manager1, authDataFields)
+      const { token } = await apiInstance.auth.register(manager1, '{ token }')
       assert.strictEqual(typeof token, 'string')
-      assert.strictEqual(typeof expiresIn, 'string')
     })
 
     it('Try to register a manager with another user\'s username', async () => {
       try {
-        await noTokenApiInstance.auth.signUp(manager1, authDataFields)
+        await noTokenApiInstance.auth.register(manager1, '{ token }')
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_username_already_exists)
       }
@@ -44,7 +39,7 @@ describe('Authentication', () => {
       try {
         const { name, ...rest } = manager1
         // @ts-ignore
-        await noTokenApiInstance.auth.signUp(rest, authDataFields)
+        await noTokenApiInstance.auth.register(rest, '{ token }')
       } catch (error) {
         assert.strictEqual(typeof error, 'string')
         assert.strictEqual(validationErrorRegEx.test(error), true)
@@ -54,7 +49,7 @@ describe('Authentication', () => {
 
   describe('Login', () => {
     it('Login manager', async () => {
-      const { token, expiresIn } = await apiInstance.auth.login(manager1Credentials, authDataFields)
+      const { token, expiresIn } = await apiInstance.auth.login(manager1Credentials, '{ token }')
       assert.strictEqual(typeof token, 'string')
       assert.strictEqual(typeof expiresIn, 'string')
       apiInstance.auth.setToken(token)
@@ -63,7 +58,7 @@ describe('Authentication', () => {
     it('Try to login with wrong password', async () => {
       try {
         const { username } = manager1Credentials
-        await noTokenApiInstance.auth.login({ username, password: 'wrongPassword' }, authDataFields)
+        await noTokenApiInstance.auth.login({ username, password: 'wrongPassword' }, '{ token }')
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_password_not_correct)
       }
@@ -72,7 +67,7 @@ describe('Authentication', () => {
     it('Try to login with non existing username', async () => {
       try {
         const { password } = manager1Credentials
-        await noTokenApiInstance.auth.login({ username: 'eminem72', password }, authDataFields)
+        await noTokenApiInstance.auth.login({ username: 'eminem72', password }, '{ token }')
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_user_not_exists)
       }
@@ -81,7 +76,8 @@ describe('Authentication', () => {
 
   describe('Get user data', () => {
     it('Get user connected data', async () => {
-      const { registry: { name, surname, dateOfBirth, phone, sex } } = await apiInstance.user.getMe(`{
+      const { _id, registry: { name, surname, dateOfBirth, phone, sex } } = await apiInstance.user.getMe(`{
+        _id,
         registry {
           name,
           surname,
@@ -90,6 +86,7 @@ describe('Authentication', () => {
           sex
         }
       }`)
+      ID = _id
       assert.strictEqual(name, manager1.name)
       assert.strictEqual(surname, manager1.surname)
       assert.strictEqual(dayjs(dateOfBirth).isSame(manager1.dateOfBirth), true)
@@ -131,10 +128,11 @@ describe('Authentication', () => {
 
     it('Update some user info', async () => {
       const newUserData = {
+        _id: ID,
         name: 'Boban',
         surname: 'Cvetanoski'
       }
-      const ok = await apiInstance.user.updateMe(newUserData)
+      const ok = await apiInstance.user.update(newUserData)
       assert.strictEqual(ok, true)
       const { registry: { name, surname } } = await apiInstance.user.getMe(`{
         registry {
@@ -181,10 +179,11 @@ describe('Authentication', () => {
     it('Try to update some user info without token', async () => {
       try {
         const newUserData = {
+          _id: ID,
           name: 'Boban',
           surname: 'Cvetanoski'
         }
-        await noTokenApiInstance.user.updateMe(newUserData)
+        await noTokenApiInstance.user.update(newUserData)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
       }

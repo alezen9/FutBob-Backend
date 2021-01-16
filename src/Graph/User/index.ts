@@ -47,7 +47,7 @@ export class UserResolver {
 
    @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
-   async User_changeUsername(@Ctx() ctx: MyContext, @Arg('newUsername') newUsername: string): Promise<Boolean> {
+   async User_changeMyUsername(@Ctx() ctx: MyContext, @Arg('newUsername') newUsername: string): Promise<Boolean> {
       const { idUser } = ctx.req
       const done = await mongoUser.changeUsername(newUsername, idUser)
       if(done) userLoader.clear(idUser)
@@ -56,7 +56,7 @@ export class UserResolver {
 
    @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
-   async User_changePassword(@Ctx() ctx: MyContext, @Arg('body') body: ChangePasswordInput): Promise<Boolean> {
+   async User_changeMyPassword(@Ctx() ctx: MyContext, @Arg('body') body: ChangePasswordInput): Promise<Boolean> {
       const { idUser } = ctx.req
       const done = await mongoUser.changePassword(body, idUser)
       if(done) userLoader.clear(idUser)

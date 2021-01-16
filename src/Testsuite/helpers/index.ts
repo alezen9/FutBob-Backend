@@ -1,6 +1,7 @@
 import { ZenServer } from '../../SDK'
 import { fields } from './MockData/fields'
-import { manager1, manager2 } from './MockData/managers'
+import { freeAgents } from './MockData/freeAgents'
+import { manager1 } from './MockData/managers'
 import { players } from './MockData/players'
 
 const ResetColor = '\x1b[0m'
@@ -19,56 +20,55 @@ const authDataFields = `{
 
 
 
-export enum TestsuiteSetupStep {
-    WithManager,
-    WithPlayers,
-    WithFields
+export enum TestsuiteSetupOperation {
+    Manager = 'Manager',
+    Players = 'Players',
+    FreeAgents = 'FreeAgents',
+    Fields = 'Fields',
+    // Appointments = 'Appointments'
 }
 
-export const setupTestsuite = async (step: TestsuiteSetupStep, apiInstance: ZenServer): Promise<any> => {
-    // register manager
-    const { token } = await apiInstance.auth.signUp(manager1, authDataFields)
-    await apiInstance.auth.signUp(manager2, authDataFields)
-    apiInstance.auth.setToken(token)
-    if(step === TestsuiteSetupStep.WithManager) {
-        return {
-            token,
-            manager1
-        }
-    }
+type SetupConfig = Partial<Record<TestsuiteSetupOperation, boolean>>
 
-    // create some players
-    const createPlayerPromises = players.map(({_id, idUser, ...body}, i) => 
-        apiInstance.player.create(body)
-            .then(_id => {
-                players[i]._id = _id
-            })
-    )
-    
-    await Promise.all(createPlayerPromises)
-    if(step === TestsuiteSetupStep.WithPlayers) {
-        return {
-            token,
-            manager1,
-            players
-        }
-    }
+export const setupTestsuite = async (config: SetupConfig, apiInstance: ZenServer): Promise<any> => {
+	if(!config) return {}
 
-    // create some fields
-    const createFieldsPromises = fields.map(({_id, ...body}, i) => 
-        apiInstance.field.create(body)
-            .then(_id => {
-                fields[i]._id = _id
-            })
-    )
-    
-    await Promise.all(createFieldsPromises)
-    if(step === TestsuiteSetupStep.WithFields) {
-        return {
-            token,
-            manager1,
-            players,
-            fields
-        }
-    }
+	if(config.Manager){
+		const { token } = await apiInstance.auth.register(manager1, authDataFields)
+		apiInstance.auth.setToken(token)
+	}
+
+	if(config.Players){
+		const promises = players.map(({ _id, user, ...body }, i) => {
+			return apiInstance.user.create(user.registry)
+				.then(_idUser => {
+					if(_idUser) return apiInstance.player.create({ ...body, user: _idUser })
+						.then(_idPlayer => {
+							players[i]._id = _idPlayer
+							players[i].user._id = _idUser
+						})
+				})
+		})
+		await Promise.all(promises)
+	}
+
+	if(config.FreeAgents){
+		const promises = freeAgents.map(({ _id, ...body }, i) => {
+			return apiInstance.freeAgent.create(body)
+				.then(_id => {
+					freeAgents[i]._id = _id
+				})
+		})
+		await Promise.all(promises)
+	}
+
+	if(config.Fields){
+		const promises = fields.map(({ _id, ...body }, i) => {
+			return apiInstance.field.create(body)
+				.then(_id => {
+					fields[i]._id = _id
+				})
+		})
+		await Promise.all(promises)
+	}
 }

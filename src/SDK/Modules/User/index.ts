@@ -33,20 +33,20 @@ class UserServer {
       return this._server.API({ query, name: 'User_getMe' })
    }
 
-   async changeUsername (newUsername: string) {
+   async changeMyUsername (newUsername: string) {
       const query = `
       mutation {
-         User_changeUsername(newUsername: "${newUsername}")
+         User_changeMyUsername(newUsername: "${newUsername}")
       }`
-      return this._server.API({ query, name: 'User_changeUsername' })
+      return this._server.API({ query, name: 'User_changeMyUsername' })
    }
 
-   async changePassword (oldPassword: string, newPassword: string) {
+   async changeMyPassword (oldPassword: string, newPassword: string) {
       const query = `
       mutation {
-         User_changePassword(oldPassword: "${oldPassword}", newPassword: "${newPassword}")
+         User_changeMyPassword(oldPassword: "${oldPassword}", newPassword: "${newPassword}")
       }`
-      return this._server.API({ query, name: 'User_changePassword' })
+      return this._server.API({ query, name: 'User_changeMyPassword' })
    }
 
    async delete (_id: string) {

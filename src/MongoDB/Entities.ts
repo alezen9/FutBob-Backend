@@ -35,5 +35,5 @@ export class Pagination {
    skip: number
    @Field(() => Int, { nullable: true })
    @Max(100)
-   limit: number
+   limit?: number
 }
