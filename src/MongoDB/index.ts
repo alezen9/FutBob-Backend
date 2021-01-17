@@ -25,7 +25,8 @@ export class MongoDB {
     return {
       dbUri: process.env.NODE_ENV === 'production'
         ? process.env.MONGO_DB_URI
-        : 'mongodb://localhost:27017/',
+        // : 'mongodb://localhost:27017/',
+        : 'mongodb://mongo/',
       dbName: process.env.NODE_ENV === 'production'
         ? 'main'
         : 'test'

@@ -15,6 +15,7 @@ import { FieldResolver } from './Graph/Field'
 import { ApolloServer, PubSub } from 'apollo-server-express'
 import { Privilege } from './MongoDB/Entities'
 import { authChecker } from './Middleware/Authorization'
+import { asyncTimeout } from './Utils/helpers'
 const shell = require('shelljs')
 require('dotenv').config()
 
@@ -31,7 +32,23 @@ export interface MyContext {
 
 const main = async () => {
   try {
-    await MongoDBInstance.startConnection()
+    // await MongoDBInstance.startConnection()
+
+    let retries = 5
+    while (retries) {
+      try {
+        console.log('')
+        console.log('retry n.',6 - retries)
+        console.log('')
+        await MongoDBInstance.startConnection()
+        break
+      } catch (error) {
+        console.log(error)
+        await asyncTimeout(5000)
+        retries -= 1
+        if(retries === 0) throw error
+      }
+    }
 
     const port = process.env.PORT || 7000
 
@@ -77,7 +94,7 @@ process.on('SIGINT', async () => {
   console.log('\nGracefully shutting down and cleaning mess...')
   if (process.env.NODE_ENV !== 'production') {
     await MongoDBInstance.closeConnection()
-    shell.exec('lsof -ti tcp:27017 | xargs kill')
+    // shell.exec('lsof -ti tcp:27017 | xargs kill')
   }
   process.exit()
 })
