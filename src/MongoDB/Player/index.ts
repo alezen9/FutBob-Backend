@@ -14,7 +14,7 @@ import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helper
 class MongoPlayer {
 
   async create (data: CreatePlayerInput, _createdBy: string): Promise<string> {
-    const now = dayjs().toDate()
+    const now = dayjs().toISOString()
     const _id = new ObjectId()
     const createdBy = new ObjectId(_createdBy)
     const player = new Player({ 
@@ -34,7 +34,7 @@ class MongoPlayer {
     const { _id, ...rest } = data
     const player = new Player({ 
       ...rest,
-      updatedAt: dayjs().toDate()
+      updatedAt: dayjs().toISOString()
     })
     await MongoDBInstance.collection.player.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },

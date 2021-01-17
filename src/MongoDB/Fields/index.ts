@@ -11,7 +11,7 @@ import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helper
 class MongoField {
 
   async create (data: CreateFieldInput, createdBy: string): Promise<string> {
-    const now = dayjs().toDate()
+    const now = dayjs().toISOString()
     const _id = new ObjectId()
     const field = new Field({
       _id,
@@ -26,7 +26,7 @@ class MongoField {
 
   async update (data: UpdateFieldInput, createdBy: string): Promise<boolean> {
     const { _id, ...rest } = data
-    const now = dayjs().toDate()
+    const now = dayjs().toISOString()
     const field = new Field({
       ...rest,
       updatedAt: now

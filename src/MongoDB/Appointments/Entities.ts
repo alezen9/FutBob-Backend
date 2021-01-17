@@ -28,9 +28,9 @@ export enum AppointmentState {
 export class Appointment {
     _id: ObjectId
     createdBy: ObjectId
-    createdAt: Date
-    updatedAt: Date
-    timeAndDate: Date
+    createdAt: Date|string
+    updatedAt: Date|string
+    timeAndDate: Date|string
     location: GeoPoint
     state: AppointmentState
     invitedPlayers: ObjectId[]

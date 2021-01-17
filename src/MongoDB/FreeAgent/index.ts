@@ -11,7 +11,7 @@ import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helper
 class MongoFreeAgent {
 
   async create (data: CreateFreeAgentInput, createdBy: string): Promise<string> {
-    const now = dayjs().toDate()
+    const now = dayjs().toISOString()
     const _id = new ObjectId()
     const freeAgent = new FreeAgent({
       _id,
@@ -27,7 +27,7 @@ class MongoFreeAgent {
   async update (data: UpdateFreeAgentInput, createdBy: string): Promise<boolean> {
     const { _id, ...rest } = data
     const freeAgent = new FreeAgent({
-      updatedAt: dayjs().toDate(),
+      updatedAt: dayjs().toISOString(),
       ...rest
     })
     await MongoDBInstance.collection.freeAgent.updateOne(

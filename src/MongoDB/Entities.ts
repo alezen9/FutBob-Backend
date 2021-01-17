@@ -19,6 +19,7 @@ export enum Privilege {
 @ObjectType()
 @InputType('geoPoint')
 export class GeoPoint {
+    @Field()
     type: string
     @Field(() => [Float!]!)
     coordinates: number[]

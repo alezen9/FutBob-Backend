@@ -5,10 +5,10 @@ import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { Privilege } from '../Entities'
 import ErrorMessages from '../../Utils/ErrorMessages'
-import { normalizeUpdateObject } from '../../Utils/helpers'
+import { encodePrivileges, normalizeUpdateObject } from '../../Utils/helpers'
 import { Credentials, User } from './Entities'
 import { ChangePasswordInput, UpdateRegistryInput } from '../../Graph/User/inputs'
-import { isEmpty } from 'lodash'
+import { isEmpty, get } from 'lodash'
 import cleanDeep from 'clean-deep'
 import { RegisterInput } from '../../Graph/Auth/inputs'
 
@@ -21,9 +21,11 @@ class MongoUser {
 
   async create (data: RegisterInput, _createdBy?: string){
     const { username, password, ...registry } = data
-    const existingUser = await MongoDBInstance.collection.user.findOne({ "credentials.username": username })
-    if(existingUser) throw new Error(ErrorMessages.user_username_already_exists)
-    const now = dayjs().toDate()
+    if(username){
+      const existingUser = await MongoDBInstance.collection.user.findOne({ "credentials.username": username })
+      if(existingUser) throw new Error(ErrorMessages.user_username_already_exists)
+    }
+    const now = dayjs().toISOString()
     let credentials = null
     const privileges = []
     if(data.username && data.password){
@@ -42,7 +44,8 @@ class MongoUser {
       registry, 
       credentials, 
       createdAt: now, 
-      updatedAt: now, 
+      updatedAt: now,
+      privileges,
       createdBy
     }))
     await MongoDBInstance.collection.user.insertOne(user)
@@ -52,7 +55,7 @@ class MongoUser {
   async update (data: UpdateRegistryInput, createdBy: string) {
     const { _id, ...registry } = data
     if(isEmpty(cleanDeep(registry))) return true
-    const updatedUser = new User({ registry, updatedAt: dayjs().toDate() })
+    const updatedUser = new User({ registry, updatedAt: dayjs().toISOString() })
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
       { $set: normalizeUpdateObject(updatedUser) }
@@ -130,8 +133,10 @@ class MongoUser {
   }
 
   generateJWT(data: any): string {
+    const privileges = encodePrivileges(get(data, 'privileges', []))
+    const _data = { ...data, privileges }
     const token = jwt.sign(
-        { ...data },
+        _data,
         process.env.SECRET
     )
     return token

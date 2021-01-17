@@ -124,8 +124,8 @@ export enum PhysicalState {
 type CreateOrUpdatePlayerType = {
     _id?: ObjectId
     createdBy?: ObjectId
-    createdAt?: Date
-    updatedAt?: Date
+    createdAt?: Date|string
+    updatedAt?: Date|string
     user?: ObjectId
     positions?: PlayerPosition[]
     state?: PhysicalState
@@ -136,8 +136,8 @@ export class Player {
     @Field(() => ID)
     _id: ObjectId
     createdBy: ObjectId
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Date|string
+    updatedAt: Date|string
     @Field(() => User)
     user: ObjectId
     @Field(() => [Int]!)
@@ -151,11 +151,11 @@ export class Player {
         if(!data) return
         if(data._id) this._id = new ObjectId(data._id)
         if(data.createdBy) this.createdBy = new ObjectId(data.createdBy)
-        if(data.createdAt) this.createdAt = dayjs(data.createdAt).toDate()
-        if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toDate()
+        if(data.createdAt) this.createdAt = dayjs(data.createdAt).toISOString()
+        if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toISOString()
         if(data.user) this.user = new ObjectId(data.user)
         if(data.positions) this.positions = data.positions
-        if(data.state) this.state = data.state
+        if(![null, undefined].includes(data.state)) this.state = data.state
         if(data.score) this.score = new PlayerScore(data.score)
     }
 }

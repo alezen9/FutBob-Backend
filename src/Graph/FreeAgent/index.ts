@@ -25,7 +25,7 @@ export class FreeAgentResolver {
       return _id
    }
 
-   @Mutation(() => String)
+   @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
    async FreeAgent_update(@Ctx() ctx: MyContext, @Arg('body') body: UpdateFreeAgentInput): Promise<Boolean> {
       const { idUser } = ctx.req
@@ -33,7 +33,7 @@ export class FreeAgentResolver {
       return done
    }
 
-   @Mutation(() => String)
+   @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
    async FreeAgent_delete(@Ctx() ctx: MyContext, @Arg('_id') _id: string): Promise<Boolean> {
       const { idUser } = ctx.req

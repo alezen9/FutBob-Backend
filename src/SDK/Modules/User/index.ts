@@ -1,5 +1,5 @@
 import { ZenServer } from "../../"
-import { CreateUserInput, UpdateRegistryInput } from "../../../Graph/User/inputs"
+import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput } from "../../../Graph/User/inputs"
 import { paramsToString } from "../../helpers"
 
 class UserServer {
@@ -12,7 +12,7 @@ class UserServer {
    async create (body: CreateUserInput) {
       const query = `
       mutation {
-         User_create(userInput: ${paramsToString(body)})
+         User_create(body: ${paramsToString(body)})
       }`
       return this._server.API({ query, name: 'User_create' })
    }
@@ -20,9 +20,9 @@ class UserServer {
    async update (body: UpdateRegistryInput) {
       const query = `
       mutation {
-         User_create(userInput: ${paramsToString(body)})
+         User_update(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'User_create' })
+      return this._server.API({ query, name: 'User_update' })
    }
 
    async getMe (fields: string) {
@@ -41,10 +41,10 @@ class UserServer {
       return this._server.API({ query, name: 'User_changeMyUsername' })
    }
 
-   async changeMyPassword (oldPassword: string, newPassword: string) {
+   async changeMyPassword (body: ChangePasswordInput) {
       const query = `
       mutation {
-         User_changeMyPassword(oldPassword: "${oldPassword}", newPassword: "${newPassword}")
+         User_changeMyPassword(body: ${paramsToString(body)})
       }`
       return this._server.API({ query, name: 'User_changeMyPassword' })
    }

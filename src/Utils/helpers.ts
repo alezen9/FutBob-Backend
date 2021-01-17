@@ -1,6 +1,7 @@
 import * as jwt from 'jsonwebtoken'
 import { reduce, isObject, isArray } from 'lodash'
 import dayjs from 'dayjs'
+import { Privilege } from '../MongoDB/Entities'
 
 export const capitalize = (str: string): string =>  {
     return `${str.substr(0, 1).toUpperCase()}${str.substr(1).toLowerCase()}`
@@ -71,4 +72,14 @@ export const normalizeUpdateObject = (obj: any, _key: string = '') => {
 export const escapeStringForRegExp = (str: string): string => {
   if(!str) return null
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+export const encodePrivileges = (privileges: Privilege[] = []): Partial<Record<Privilege, boolean>> => {
+  return privileges.reduce((acc, val) => {
+    return { ...acc, [val]: true }
+  }, {})
+}
+
+export const decodePrivileges = (encodedPrivileges: Partial<Record<Privilege, boolean>> = {}): Privilege[] => {
+  return Object.keys(encodedPrivileges).map(Number) as Privilege[]
 }

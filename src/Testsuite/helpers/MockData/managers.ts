@@ -9,7 +9,7 @@ export const manager1Credentials = {
 export const manager1 = {
   name: 'Aleksandar',
   surname: 'Gjroeski',
-  dateOfBirth: dayjs('1993-07-02T22:00:00.000Z').toDate(),
+  dateOfBirth: dayjs('1993-07-02T22:00:00.000Z').toISOString(),
   phone: '+39 1234567890',
   sex: Sex.Male,
   country: 'MK',
@@ -24,7 +24,7 @@ export const manager2Credentials = {
 export const manager2 = {
   name: 'Naumche',
   surname: 'Gjroeski',
-  dateOfBirth: dayjs('1985-07-02T22:00:00.000Z').toDate(),
+  dateOfBirth: dayjs('1985-07-02T22:00:00.000Z').toISOString(),
   phone: '+39 1234567890',
   sex: Sex.Male,
   country: 'MK',

@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import assert from 'assert'
 import { MongoDBInstance, MongoState } from '../MongoDB'
 import { describe, it } from 'mocha'
@@ -49,9 +50,8 @@ describe('Authentication', () => {
 
   describe('Login', () => {
     it('Login manager', async () => {
-      const { token, expiresIn } = await apiInstance.auth.login(manager1Credentials, '{ token }')
+      const { token } = await apiInstance.auth.login(manager1Credentials, '{ token }')
       assert.strictEqual(typeof token, 'string')
-      assert.strictEqual(typeof expiresIn, 'string')
       apiInstance.auth.setToken(token)
     })
 
@@ -121,7 +121,11 @@ describe('Authentication', () => {
 
     it('Change password', async () => {
       const newPassword = 'alezen7'
-      const ok = await apiInstance.user.changeMyPassword(manager1Credentials.password, newPassword)
+      const body = {
+        oldPassword: manager1Credentials.password,
+        newPassword
+      }
+      const ok = await apiInstance.user.changeMyPassword(body)
       assert.strictEqual(ok, true)
       manager1Credentials.password = newPassword
     })
@@ -154,7 +158,10 @@ describe('Authentication', () => {
 
     it('Try to change password without token', async () => {
       try {
-        await noTokenApiInstance.user.changeMyPassword(manager1Credentials.password, 'test')
+        await noTokenApiInstance.user.changeMyPassword({
+          oldPassword: manager1Credentials.password,
+          newPassword: 'test'
+        })
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
       }
@@ -162,7 +169,10 @@ describe('Authentication', () => {
 
     it('Try to change password with wrong old password', async () => {
       try {
-        await apiInstance.user.changeMyPassword('wrongOldPassword', 'test')
+        await apiInstance.user.changeMyPassword({
+          oldPassword: 'wrongOldPassword',
+          newPassword: 'test'
+        })
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_password_not_correct)
       }
@@ -170,7 +180,10 @@ describe('Authentication', () => {
 
     it('Try to set new password equal to new password', async () => {
       try {
-        await apiInstance.user.changeMyPassword(manager1Credentials.password, manager1Credentials.password)
+        await apiInstance.user.changeMyPassword({
+          oldPassword: manager1Credentials.password,
+          newPassword: manager1Credentials.password
+        })
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_new_old_password_equal)
       }

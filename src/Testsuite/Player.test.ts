@@ -1,12 +1,14 @@
+import 'reflect-metadata'
 import assert from 'assert'
 import { MongoDBInstance, MongoState } from '../MongoDB'
 import { ZenServer } from '../SDK'
-import { describe, it } from 'mocha'
+import { describe, it, before } from 'mocha'
 import { validationErrorRegEx, setupTestsuite, TestsuiteSetupOperation } from './helpers'
 import ErrorMessages from '../Utils/ErrorMessages'
 import { PlayerPosition } from '../MongoDB/Player/Entities'
 import { isEqual } from 'lodash'
 import { player1, player2 } from './helpers/MockData/players'
+import { asyncTimeout } from '../Utils/helpers'
 
 const apiInstance = new ZenServer()
 const noTokenApiInstance = new ZenServer()
@@ -59,7 +61,7 @@ describe('Player', () => {
         // @ts-expect-error
         await apiInstance.player.create(body)
       } catch (error) {
-        assert.strictEqual(error, ErrorMessages.player_user_not_specified)
+        assert.strictEqual(!!error, true)
       }
     })
 
@@ -78,14 +80,14 @@ describe('Player', () => {
   describe('Delete', () => {
     it('Try to delete an existing player without token', async () => {
       try {
-        await noTokenApiInstance.player.delete(player1._id)
+        await noTokenApiInstance.user.delete(player1.user._id)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_unauthenticated)
       }
     })
 
     it('Delete an existing player', async () => {
-      const done = await apiInstance.player.delete(player1._id)
+      const done = await apiInstance.user.delete(player1.user._id)
       assert.strictEqual(done, true)
       const { result } = await apiInstance.player.getList({}, { skip: 0 }, `{ result { _id } }`)
       assert.strictEqual(result.length, 0)
@@ -106,7 +108,7 @@ describe('Player', () => {
       const userId2 = await apiInstance.user.create(registry2)
       player2.user._id = userId2
       const playerId2 = await apiInstance.player.create({ ...body2, user: userId2 })
-      player1._id = playerId2
+      player2._id = playerId2
 
       const { result } = await apiInstance.player.getList({}, { skip: 0 }, `{ result { _id, user { _id } } }`)
       assert.strictEqual(result.length, 2)
@@ -150,7 +152,7 @@ describe('Player', () => {
 
     it('Update a player info', async () => {
       const { _id, user } = player1
-      const newName = 'Ace'
+      const newName = 'Thor'
       await apiInstance.user.update({
         _id: user._id,
         name: newName
@@ -158,13 +160,14 @@ describe('Player', () => {
 
       const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, `{ result { _id, user { _id, registry { name } } } }`)
       assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0]._id, _id)
       assert.strictEqual(result[0].user._id, user._id)
       assert.strictEqual(result[0].user.registry.name, newName)
     })
 
     it('Try to update a deleted player position', async () => {
-      const { _id } = player1
-      await apiInstance.player.delete(_id)
+      const { user: { _id } } = player1
+      await apiInstance.user.delete(_id)
       const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, `{ result { _id } }`)
       assert.strictEqual(result.length, 0)
       try {

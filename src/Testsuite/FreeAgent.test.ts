@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import assert from 'assert'
 import { MongoDBInstance, MongoState } from '../MongoDB'
 import { describe, it } from 'mocha'

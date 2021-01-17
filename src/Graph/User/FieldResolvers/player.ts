@@ -7,6 +7,7 @@ import { playerLoader } from "../../Player/Loader";
 export class PlayerFieldResolver implements ResolverInterface<User> {
 
    @FieldResolver(() => Player)
+   // @ts-ignore
    async player(@Root() root: User): Promise<Player|null> {
       return root.player
          ? playerLoader.load(root.player)

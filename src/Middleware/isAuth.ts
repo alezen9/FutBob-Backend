@@ -1,5 +1,6 @@
 import { Privilege } from "../MongoDB/Entities"
 import ErrorMessages from "../Utils/ErrorMessages"
+import { decodePrivileges } from "../Utils/helpers"
 
 const jwt = require('jsonwebtoken')
 
@@ -32,7 +33,7 @@ const isAuthMiddleware = (req: any, res: any, next: any) => {
   }
   req.isAuth = true
   req.idUser = decodedToken.idUser
-  req.privileges = decodedToken.privileges
+  req.privileges = decodePrivileges(decodedToken.privileges)
   return next()
 }
 

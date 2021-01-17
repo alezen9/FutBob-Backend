@@ -19,20 +19,16 @@ export enum FieldState {
 @InputType('measurements')
 export class Measurements { // in centimeters
    @FieldTG(() => Int)
-   @Min(5)
-   @Max(200)
    width: number
    @FieldTG(() => Int)
-   @Min(5)
-   @Max(200)
    height: number
 }
 
 type CreateOrUpdateField = {
    _id?: ObjectId|string
    createdBy?: ObjectId|string
-   createdAt?: Date
-   updatedAt?: Date
+   createdAt?: Date|string
+   updatedAt?: Date|string
    type?: FieldType
    name?: string
    measurements?: Measurements
@@ -46,8 +42,8 @@ export class Field {
    @FieldTG(() => ID)
    _id: ObjectId
    createdBy: ObjectId
-   createdAt: Date
-   updatedAt: Date
+   createdAt: Date|string
+   updatedAt: Date|string
    @FieldTG(() => Int)
    @Min(0)
    @Max(1)
@@ -66,12 +62,12 @@ export class Field {
    constructor(data?: CreateOrUpdateField) {
       if(data._id) this._id = new ObjectId(data._id)
       if(data.createdBy) this.createdBy = new ObjectId(data.createdBy)
-      if(data.createdAt) this.createdAt = dayjs(data.createdAt).toDate()
-      if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toDate()
-      if(data.type) this.type = data.type
+      if(data.createdAt) this.createdAt = dayjs(data.createdAt).toISOString()
+      if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toISOString()
+      if(![null, undefined].includes(data.type)) this.type = data.type
       if(data.name) this.name = data.name
-      if(data.state) this.state = data.state
-      if(data.price) this.type = data.price
+      if(![null, undefined].includes(data.state)) this.state = data.state
+      if(![null, undefined].includes(data.price)) this.price = data.price
       if(data.measurements) {
          const _measurements = new Measurements()
          _measurements.width = data.measurements.width

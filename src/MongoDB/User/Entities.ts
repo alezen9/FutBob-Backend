@@ -27,7 +27,7 @@ export class Credentials {
 type CreateOrUpdateRegistryType = {
     name?: string
     surname?: string
-    dateOfBirth?: Date
+    dateOfBirth?: Date|string
     sex?: Sex
     country?: string
     email?: string
@@ -40,7 +40,7 @@ export class Registry {
     @Field()
     surname: string
     @Field(() => String)
-    dateOfBirth: Date
+    dateOfBirth: Date|string
     @Field(() => Int)
     sex: Sex
     @Field()
@@ -54,8 +54,8 @@ export class Registry {
         if(!data) return
         if(data.name) this.name = data.name
         if(data.surname) this.surname = data.surname
-        if(data.dateOfBirth) this.dateOfBirth = dayjs(data.dateOfBirth).toDate()
-        if(data.sex) this.sex = data.sex
+        if(data.dateOfBirth) this.dateOfBirth = dayjs(data.dateOfBirth).toISOString()
+        if(![null, undefined].includes(data.sex)) this.sex = data.sex
         if(data.country) this.country = data.country
         if(data.email) this.email = data.email
         if(data.phone) this.phone = data.phone
@@ -65,8 +65,8 @@ export class Registry {
 type CreateOrUpdateUserType = {
     _id?: ObjectId
     createdBy?: ObjectId
-    createdAt?: Date
-    updatedAt?: Date
+    createdAt?: Date|string
+    updatedAt?: Date|string
     registry?: CreateOrUpdateRegistryType
     credentials?: Credentials
     privileges?: Privilege[]
@@ -77,8 +77,8 @@ export class User {
     @Field(() => ID)
     _id: ObjectId
     createdBy: ObjectId
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Date|string
+    updatedAt: Date|string
     @Field(() => Registry)
     registry: Registry
     @Field(() => Credentials, { nullable: true })
@@ -91,11 +91,11 @@ export class User {
         if(!data) return
         if(data._id) this._id = new ObjectId(data._id)
         if(data.createdBy) this.createdBy = new ObjectId(data.createdBy)
-        if(data.createdAt) this.createdAt = dayjs(data.createdAt).toDate()
-        if(data.createdBy) this.updatedAt = dayjs(data.updatedAt).toDate()
-        if(data.createdBy) this.registry = new Registry(data.registry)
+        if(data.createdAt) this.createdAt = dayjs(data.createdAt).toISOString()
+        if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toISOString()
+        if(data.registry) this.registry = new Registry(data.registry)
         if(data.credentials) this.credentials = data.credentials
-        if(data.createdBy) this.privileges = data.privileges
+        if(data.privileges) this.privileges = data.privileges
         if(data.player) this.player = new ObjectId(data.player)
     }
 }

@@ -11,6 +11,7 @@ import { playerLoader } from "../Player/Loader";
 export class UserResolver {
 
    @Mutation(() => String)
+   @Authorized(Privilege.Manager)
    async User_create(@Ctx() ctx: MyContext, @Arg('body') body: CreateUserInput): Promise<String> {
       const { idUser } = ctx.req
       const _id = await mongoUser.create(body, idUser)

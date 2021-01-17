@@ -23,7 +23,7 @@ class AuthServer {
       mutation {
          Auth_register(body: ${paramsToString(body)})${fields}
       }`
-      return this._server.API({ query, name: 'signup' })
+      return this._server.API({ query, name: 'Auth_register' })
    }
 
    async login(body: LoginInput, fields: string): Promise<any> {

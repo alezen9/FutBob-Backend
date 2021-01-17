@@ -16,7 +16,7 @@ export class RegisterInput {
    @Field()
    surname: string
    @Field(() => String)
-   dateOfBirth: Date
+   dateOfBirth: string|Date
    @Field(() => Int)
    sex: Sex
    @Field()

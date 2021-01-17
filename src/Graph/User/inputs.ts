@@ -16,7 +16,7 @@ export class CreateUserInput {
    @Field()
    surname: string
    @Field(() => String)
-   dateOfBirth: Date
+   dateOfBirth: string|Date
    @Field(() => Int)
    sex: Sex
    @Field()
@@ -35,7 +35,7 @@ export class UpdateRegistryInput {
    @Field({ nullable: true })
    surname?: string
    @Field(() => String, { nullable: true })
-   dateOfBirth?: Date
+   dateOfBirth?: string|Date
    @Field(() => Int, { nullable: true })
    sex?: Sex
    @Field({ nullable: true })

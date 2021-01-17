@@ -31,7 +31,6 @@ export class UpdateFieldInput {
    state?: FieldState
    @Field(() => Int, { nullable: true })
    @Min(1)
-   @Max(300)
    price?: number
    @Field(() => Measurements, { nullable: true })
    measurements?: Measurements

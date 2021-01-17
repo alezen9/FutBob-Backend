@@ -9,7 +9,7 @@ export const player1 = {
     registry: {
       name: 'Boban',
       surname: 'Cvetanoski',
-      dateOfBirth: dayjs('1997-08-17T22:00:00.000Z').toDate(),
+      dateOfBirth: dayjs('1997-08-17T22:00:00.000Z').toISOString(),
       phone: '+39 7686787874',
       sex: Sex.Male,
       country: 'MK'
@@ -60,7 +60,7 @@ export const player2 = {
     registry: {
       name: 'Aleksandar',
       surname: 'Gjoreski',
-      dateOfBirth: dayjs('1993-03-06T23:00:00.000Z').toDate(),
+      dateOfBirth: dayjs('1993-03-06T23:00:00.000Z').toISOString(),
       phone: '+39 3408947641',
       sex: Sex.Male,
       country: 'MK'

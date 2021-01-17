@@ -7,8 +7,8 @@ type CreateOrUpdateFreeAgent = {
     name?: string
     surname?: string
     createdBy?: ObjectId|string
-    createdAt?: Date
-    updatedAt?: Date
+    createdAt?: Date|string
+    updatedAt?: Date|string
 }
 @ObjectType()
 export class FreeAgent {
@@ -20,15 +20,15 @@ export class FreeAgent {
     surname: string
     @Field(() => ID)
     createdBy: ObjectId
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Date|string
+    updatedAt: Date|string
 
     constructor (data?: CreateOrUpdateFreeAgent) {
         if(data._id) this._id = new ObjectId(data._id)
         if(data.name) this.name = data.name
         if(data.surname) this.surname = data.surname
         if(data.createdBy) this.createdBy = new ObjectId(data.createdBy)
-        if(data.createdAt) this.createdAt = dayjs(data.createdAt).toDate()
-        if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toDate()
+        if(data.createdAt) this.createdAt = dayjs(data.createdAt).toISOString()
+        if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toISOString()
     }
 }

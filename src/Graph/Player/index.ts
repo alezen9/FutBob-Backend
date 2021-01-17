@@ -25,7 +25,7 @@ export class PlayerResolver {
       return _id
    }
 
-   @Mutation(() => String)
+   @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
    async Player_update(@Ctx() ctx: MyContext, @Arg('body') body: UpdatePlayerInput): Promise<Boolean> {
       const { idUser } = ctx.req
@@ -33,7 +33,7 @@ export class PlayerResolver {
       return done
    }
 
-   @Mutation(() => String)
+   @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
    async Player_delete(@Ctx() ctx: MyContext, @Arg('_id') _id: string): Promise<Boolean> {
       const { idUser } = ctx.req
