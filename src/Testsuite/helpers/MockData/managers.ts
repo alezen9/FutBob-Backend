@@ -10,7 +10,7 @@ export const manager1 = {
   name: 'Aleksandar',
   surname: 'Gjroeski',
   dateOfBirth: dayjs('1993-07-02T22:00:00.000Z').toISOString(),
-  phone: '+39 1234567890',
+  phone: '+39 3333333333',
   sex: Sex.Male,
   country: 'MK',
   ...manager1Credentials
@@ -25,7 +25,7 @@ export const manager2 = {
   name: 'Naumche',
   surname: 'Gjroeski',
   dateOfBirth: dayjs('1985-07-02T22:00:00.000Z').toISOString(),
-  phone: '+39 1234567890',
+  phone: '+39 3414125674',
   sex: Sex.Male,
   country: 'MK',
   ...manager2Credentials

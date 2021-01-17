@@ -2,13 +2,12 @@ import 'reflect-metadata'
 import assert from 'assert'
 import { MongoDBInstance, MongoState } from '../MongoDB'
 import { ZenServer } from '../SDK'
-import { describe, it, before } from 'mocha'
+import { describe, it } from 'mocha'
 import { validationErrorRegEx, setupTestsuite, TestsuiteSetupOperation } from './helpers'
 import ErrorMessages from '../Utils/ErrorMessages'
 import { PlayerPosition } from '../MongoDB/Player/Entities'
 import { isEqual } from 'lodash'
 import { player1, player2 } from './helpers/MockData/players'
-import { asyncTimeout } from '../Utils/helpers'
 
 const apiInstance = new ZenServer()
 const noTokenApiInstance = new ZenServer()

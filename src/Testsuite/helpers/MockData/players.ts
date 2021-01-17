@@ -10,7 +10,7 @@ export const player1 = {
       name: 'Boban',
       surname: 'Cvetanoski',
       dateOfBirth: dayjs('1997-08-17T22:00:00.000Z').toISOString(),
-      phone: '+39 7686787874',
+      phone: '+39 3354567896',
       sex: Sex.Male,
       country: 'MK'
     }

@@ -19,8 +19,12 @@ export enum FieldState {
 @InputType('measurements')
 export class Measurements { // in centimeters
    @FieldTG(() => Int)
+   @Min(500) // 5m
+   @Max(15000) // 150m
    width: number
    @FieldTG(() => Int)
+   @Min(500) // 5m
+   @Max(15000) // 150m
    height: number
 }
 

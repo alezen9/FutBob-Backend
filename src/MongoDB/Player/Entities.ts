@@ -1,3 +1,4 @@
+import { Max, Min, ValidateNested } from "class-validator"
 import dayjs from "dayjs"
 import { ObjectId } from "mongodb"
 import { Field, ID, InputType, Int, ObjectType } from "type-graphql"
@@ -14,48 +15,76 @@ export enum PlayerPosition {
 @InputType('pace')
 export class Pace {
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     speed: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     stamina: number
 }
 @ObjectType()
 @InputType('shooting')
 export class Shooting {
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     finishing: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     shotPower: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     longShots: number
 }
 @ObjectType()
 @InputType('passing')
 export class Passing {
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     vision: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     shortPassing: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     longPassing: number
 }
 @ObjectType()
 @InputType('technique')
 export class Technique {
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     agility: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     ballControl: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     dribbling: number
 }
 @ObjectType()
 @InputType('defense')
 export class Defense {
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     interception: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     defensiveAwareness: number
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     versus: number // 1>1
 }
 
@@ -63,6 +92,8 @@ export class Defense {
 @InputType('physical')
 export class Physical {
     @Field(() => Int)
+    @Min(0)
+    @Max(100)
     strength: number
 }
 @ObjectType()
