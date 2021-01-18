@@ -6,7 +6,7 @@ import { MinAge } from "../../Utils/customValidators/MinAge"
 @InputType()
 export class LoginInput {
    @Field()
-   username: string
+   email: string
    @Field()
    password: string
 }
@@ -29,16 +29,13 @@ export class RegisterInput {
    @Field()
    @MaxLength(4)
    country: string
-   @Field({ nullable: true })
-   @MaxLength(50)
-   @IsEmail()
-   email?: string
    @Field()
    @IsPhoneNumber('IT')
    phone: string
    @Field()
    @MaxLength(50)
-   username?: string
+   @IsEmail()
+   email?: string
    @Field()
    @MinLength(4)
    @MaxLength(50)

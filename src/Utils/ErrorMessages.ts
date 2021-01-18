@@ -1,7 +1,10 @@
 const ErrorMessages = Object.freeze({
   system_permission_denied: 'system_permission_denied',
+  system_content_required_for_email: 'system_content_required_for_email',
+  system_html_or_text_only_for_email: 'system_html_or_text_only_for_email',
   user_unauthenticated: 'user_unauthenticated',
   user_username_already_exists: 'user_username_already_exists',
+  user_email_already_exists: 'user_email_already_exists',
   user_user_not_exists: 'user_user_not_exists',
   user_password_not_correct: 'user_password_not_correct',
   user_new_old_password_equal: 'user_new_old_password_equal',

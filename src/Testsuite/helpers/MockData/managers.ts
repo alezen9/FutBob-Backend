@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { Sex } from '../../../MongoDB/User/Entities'
 
 export const manager1Credentials = {
-  username: 'alezen9',
+  email: 'aj0715@live.com',
   password: 'alezen9'
 }
 
@@ -17,7 +17,7 @@ export const manager1 = {
 }
 
 export const manager2Credentials = {
-  username: 'alezen7',
+  email: 'agjoreski@gmail.com',
   password: 'alezen7'
 }
 
