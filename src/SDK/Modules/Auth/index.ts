@@ -18,12 +18,20 @@ class AuthServer {
       }
    }
 
-   async register(body: RegisterInput, fields: string): Promise<any> {
+   async register(body: RegisterInput): Promise<any> {
       const query = `
       mutation {
-         Auth_register(body: ${paramsToString(body)})${fields}
+         Auth_register(body: ${paramsToString(body)})
       }`
       return this._server.API({ query, name: 'Auth_register' })
+   }
+
+   async confirm(code: string, fields: string): Promise<any> {
+      const query = `
+      query {
+         Auth_confirm(code: "${code}")${fields}
+      }`
+      return this._server.API({ query, name: 'Auth_confirm' })
    }
 
    async login(body: LoginInput, fields: string): Promise<any> {

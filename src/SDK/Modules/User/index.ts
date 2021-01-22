@@ -33,13 +33,13 @@ class UserServer {
       return this._server.API({ query, name: 'User_getMe' })
    }
 
-   async changeMyUsername (newUsername: string) {
-      const query = `
-      mutation {
-         User_changeMyUsername(newUsername: "${newUsername}")
-      }`
-      return this._server.API({ query, name: 'User_changeMyUsername' })
-   }
+   // async changeMyUsername (newUsername: string) {
+   //    const query = `
+   //    mutation {
+   //       User_changeMyUsername(newUsername: "${newUsername}")
+   //    }`
+   //    return this._server.API({ query, name: 'User_changeMyUsername' })
+   // }
 
    async changeMyPassword (body: ChangePasswordInput) {
       const query = `

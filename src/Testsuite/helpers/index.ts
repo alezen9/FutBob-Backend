@@ -1,4 +1,6 @@
+import { MongoDBInstance } from '../../MongoDB'
 import { ZenServer } from '../../SDK'
+import ErrorMessages from '../../Utils/ErrorMessages'
 import { fields } from './MockData/fields'
 import { freeAgents } from './MockData/freeAgents'
 import { manager1 } from './MockData/managers'
@@ -12,11 +14,6 @@ export const ShouldSucceed = `${FgGreen}Should succeed ⇩${ResetColor}`
 export const ShouldFail = `${FgRed}Should fail ⇩${ResetColor}`
 
 export const validationErrorRegEx = /^Field.*required.*was\snot\sprovided\.$/
-
-const authDataFields = `{
-  token,
-  expiresIn
-}`
 
 
 
@@ -34,7 +31,13 @@ export const setupTestsuite = async (config: SetupConfig, apiInstance: ZenServer
 	if(!config) return {}
 
 	if(config.Manager){
-		const { token } = await apiInstance.auth.register(manager1, authDataFields)
+		// send email
+		const emailSent = await apiInstance.auth.register(manager1)
+		if(!emailSent) throw new Error(ErrorMessages.system_confirmation_email_not_sent)
+		// get confirmation code from db
+		const user = await MongoDBInstance.collection.user.findOne({ "credentials.email": manager1.email })
+		if(!user) throw new Error(ErrorMessages.user_user_not_exists)
+		const { token } = await apiInstance.auth.confirm(user.credentials.confirmation.code.value, '{ token }')
 		apiInstance.auth.setToken(token)
 	}
 

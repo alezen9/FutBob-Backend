@@ -24,15 +24,22 @@ describe('Authentication', () => {
 
   describe('Signup', () => {
     it('Register a new manager', async () => {
-      const { token } = await apiInstance.auth.register(manager1, '{ token }')
+      // send email
+      const emailSent = await apiInstance.auth.register(manager1)
+      if (!emailSent) throw new Error(ErrorMessages.system_confirmation_email_not_sent)
+      // get confirmation code from db
+      const user = await MongoDBInstance.collection.user.findOne({ 'credentials.email': manager1.email })
+      if (!user) throw new Error(ErrorMessages.user_user_not_exists)
+      const { token } = await apiInstance.auth.confirm(user.credentials.confirmation.code.value, '{ token }')
+      apiInstance.auth.setToken(token)
       assert.strictEqual(typeof token, 'string')
     })
 
-    it('Try to register a manager with another user\'s username', async () => {
+    it('Try to register a manager with another user\'s email', async () => {
       try {
-        await noTokenApiInstance.auth.register(manager1, '{ token }')
+        await noTokenApiInstance.auth.register(manager1)
       } catch (error) {
-        assert.strictEqual(error, ErrorMessages.user_username_already_exists)
+        assert.strictEqual(error, ErrorMessages.user_email_already_exists)
       }
     })
 
@@ -40,7 +47,7 @@ describe('Authentication', () => {
       try {
         const { name, ...rest } = manager1
         // @ts-ignore
-        await noTokenApiInstance.auth.register(rest, '{ token }')
+        await noTokenApiInstance.auth.register(rest)
       } catch (error) {
         assert.strictEqual(typeof error, 'string')
         assert.strictEqual(validationErrorRegEx.test(error), true)
@@ -57,17 +64,17 @@ describe('Authentication', () => {
 
     it('Try to login with wrong password', async () => {
       try {
-        const { username } = manager1Credentials
-        await noTokenApiInstance.auth.login({ username, password: 'wrongPassword' }, '{ token }')
+        const { email } = manager1Credentials
+        await noTokenApiInstance.auth.login({ email, password: 'wrongPassword' }, '{ token }')
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_password_not_correct)
       }
     })
 
-    it('Try to login with non existing username', async () => {
+    it('Try to login with non existing email', async () => {
       try {
         const { password } = manager1Credentials
-        await noTokenApiInstance.auth.login({ username: 'eminem72', password }, '{ token }')
+        await noTokenApiInstance.auth.login({ email: 'test@email.com', password }, '{ token }')
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_user_not_exists)
       }
@@ -112,12 +119,12 @@ describe('Authentication', () => {
   })
 
   describe('Update user data', () => {
-    it('Change username ', async () => {
-      const newUsername = 'alezen7'
-      const ok = await apiInstance.user.changeMyUsername(newUsername)
-      assert.strictEqual(ok, true)
-      manager1Credentials.username = newUsername
-    })
+    // it('Change username ', async () => {
+    //   const newUsername = 'alezen7'
+    //   const ok = await apiInstance.user.changeMyUsername(newUsername)
+    //   assert.strictEqual(ok, true)
+    //   manager1Credentials.username = newUsername
+    // })
 
     it('Change password', async () => {
       const newPassword = 'alezen7'
@@ -148,13 +155,13 @@ describe('Authentication', () => {
       assert.strictEqual(surname, newUserData.surname)
     })
 
-    it('Try to change username without token', async () => {
-      try {
-        await noTokenApiInstance.user.changeMyUsername('test')
-      } catch (error) {
-        assert.strictEqual(error, ErrorMessages.user_unauthenticated)
-      }
-    })
+    // it('Try to change username without token', async () => {
+    //   try {
+    //     await noTokenApiInstance.user.changeMyUsername('test')
+    //   } catch (error) {
+    //     assert.strictEqual(error, ErrorMessages.user_unauthenticated)
+    //   }
+    // })
 
     it('Try to change password without token', async () => {
       try {

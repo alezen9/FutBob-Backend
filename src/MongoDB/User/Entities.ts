@@ -18,13 +18,33 @@ export enum Sex {
     Female
 }
 
+export class Code {
+    value: string
+    createdAt: Date|string
+}
+export class Confirmation {
+    confirmed: boolean
+    code?: Code
+
+    constructor(code: string, confirmed?: boolean){
+        if(confirmed) {
+            this.confirmed = confirmed
+            return
+        }
+        this.code = new Code()
+        this.code.value = code
+        this.code.createdAt = dayjs().toISOString()
+        
+    }
+}
+
 @ObjectType()
 export class Credentials {
     @Field()
     @IsEmail()
     email: string
-    confirmed: boolean
     password: string
+    confirmation?: Confirmation
 }
 
 type CreateOrUpdateRegistryType = {

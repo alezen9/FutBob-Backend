@@ -15,6 +15,7 @@ import { FieldResolver } from './Graph/Field'
 import { ApolloServer, PubSub } from 'apollo-server-express'
 import { Privilege } from './MongoDB/Entities'
 import { authChecker } from './Middleware/Authorization'
+import { nodemailerInstance } from './Utils/NodeMailer'
 const shell = require('shelljs')
 require('dotenv').config()
 
@@ -69,6 +70,7 @@ const main = async () => {
     console.log(`connected to DB, listening on port ${port}`)
   } catch (error) {
     console.log(error)
+    nodemailerInstance.cleanUp()
     await MongoDBInstance.closeConnection()
   }
 }
@@ -76,6 +78,7 @@ const main = async () => {
 process.on('SIGINT', async () => {
   console.log('\nGracefully shutting down and cleaning mess...')
   if (process.env.NODE_ENV !== 'production') {
+    nodemailerInstance.cleanUp()
     await MongoDBInstance.closeConnection()
     shell.exec('lsof -ti tcp:27017 | xargs kill')
   }

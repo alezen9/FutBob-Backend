@@ -6,39 +6,45 @@ import { ObjectId } from 'mongodb'
 import { Privilege } from '../Entities'
 import ErrorMessages from '../../Utils/ErrorMessages'
 import { encodePrivileges, normalizeUpdateObject } from '../../Utils/helpers'
-import { AuthData, Credentials, User } from './Entities'
+import { AuthData, Confirmation, Credentials, User } from './Entities'
 import { ChangePasswordInput, UpdateRegistryInput } from '../../Graph/User/inputs'
 import { isEmpty, get } from 'lodash'
 import cleanDeep from 'clean-deep'
 import { LoginInput, RegisterInput } from '../../Graph/Auth/inputs'
 import { nodemailerInstance } from '../../Utils/NodeMailer'
+import { v4 as uuidv4 } from 'uuid'
 require('dotenv').config()
 
 class MongoUser {
   tokenExpiration: string
+  private codeExpirationInHours: number
 
   constructor(){
     this.tokenExpiration = 'Never'
+    this.codeExpirationInHours = 6
   }
 
   async register (data: RegisterInput): Promise<boolean> {
     await mongoUser.checkEmailExistance(data.email)
-    const idUser = await mongoUser.create(data)
-    const link = await this.createConfirmationLink(idUser)
+    const code = this.createConfirmationCode()
+    const confirmation = new Confirmation(code, false)
+    await mongoUser.create({ ...data, confirmation })
+    const link = await this.createConfirmationLink(code)
     this.sendConfirmationEmail(link, data.email)
     return true
   }
 
-  async confirm (_id: string): Promise<AuthData> {
-    const user = await MongoDBInstance.collection.user.findOne({ _id: new ObjectId(_id) })
+  async confirm (code: string): Promise<AuthData> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.confirmation.code.value": code })
     if(!user) throw new Error(ErrorMessages.user_user_not_exists)
+    this.checkConfirmationCode(user)
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
-      { _id: new ObjectId(_id), createdBy: new ObjectId(_id) },
-      { $set: { "credentials.confirmed": true } }
+      { _id: new ObjectId(user._id), createdBy: new ObjectId(user.createdBy) },
+      { $set: { "credentials.confirmation.confirmed": true } }
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const tokenData = {
-         idUser: _id,
+         idUser: user._id.toHexString(),
          privileges: user.privileges
       }
       const token = mongoUser.generateJWT(tokenData)
@@ -65,7 +71,7 @@ class MongoUser {
       }
   }
 
-  async create (data: RegisterInput, _createdBy?: string){
+  async create (data: RegisterInput & { confirmation?: Confirmation }, _createdBy?: string){
     const { password, ...registry } = data
     const now = dayjs().toISOString()
     let credentials = null
@@ -74,7 +80,7 @@ class MongoUser {
       credentials = new Credentials()
       credentials.email = data.email
       credentials.password = await this.encryptPassword(password)
-      credentials.confirmed = false
+      credentials.confirmation = data.confirmation
       privileges.push(Privilege.Manager)
     }
     if(!privileges.length) privileges.push(Privilege.User)
@@ -180,8 +186,18 @@ class MongoUser {
       return hashedPassword
   }
 
-  private async createConfirmationLink(_id: string): Promise<string> {
-    const link = `${process.env.BASE_FRONTEND_URL}/confirm/${_id}`
+  private createConfirmationCode () {
+    return uuidv4()
+  }
+
+  private checkConfirmationCode (user: User) {
+    const codeCreatedAt = user.credentials.confirmation.code.createdAt
+    const isExpired = dayjs(codeCreatedAt).add(this.codeExpirationInHours, 'hour').isBefore(dayjs())
+    if(isExpired) throw new Error(ErrorMessages.system_confirmation_code_expired)
+  }
+
+  private async createConfirmationLink(code: string): Promise<string> {
+    const link = `${process.env.BASE_FRONTEND_URL}/confirm/${code}`
     return link
   }
 
