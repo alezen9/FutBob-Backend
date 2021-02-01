@@ -89,7 +89,6 @@ type CreateOrUpdateUserType = {
     registry?: CreateOrUpdateRegistryType
     credentials?: Credentials
     privileges?: Privilege[]
-    confirmed?: boolean
     player?: ObjectId
 }
 @ObjectType()
@@ -104,8 +103,6 @@ export class User {
     @Field(() => Credentials, { nullable: true })
     credentials?: Credentials
     privileges: Privilege[]
-    @Field({ nullable: true })
-    confirmed?: boolean
     @Field(() => Player, { nullable: true })
     player?: ObjectId
 

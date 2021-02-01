@@ -13,6 +13,7 @@ import cleanDeep from 'clean-deep'
 import { LoginInput, RegisterInput } from '../../Graph/Auth/inputs'
 import { nodemailerInstance } from '../../Utils/NodeMailer'
 import { v4 as uuidv4 } from 'uuid'
+import { TemplateID, TemplateLib } from '../../Utils/NodeMailer/Templates/conifg'
 require('dotenv').config()
 
 class MongoUser {
@@ -30,7 +31,7 @@ class MongoUser {
     const confirmation = new Confirmation(code, false)
     await mongoUser.create({ ...data, confirmation })
     const link = await this.createConfirmationLink(code)
-    this.sendConfirmationEmail(link, data.email)
+    await this.sendConfirmationEmail(link, data.email)
     return true
   }
 
@@ -201,10 +202,11 @@ class MongoUser {
     return link
   }
 
-  private sendConfirmationEmail(link: string, email: string): void {
+  private async sendConfirmationEmail(link: string, email: string): Promise<void> {
+    const html = await TemplateLib[TemplateID.CONFIRM_REGISTRATION].compile(link)
     nodemailerInstance.sendEmailSync({
       to: email,
-      text: link
+      html
     })
   }
 

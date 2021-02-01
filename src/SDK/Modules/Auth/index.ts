@@ -18,6 +18,14 @@ class AuthServer {
       }
    }
 
+   async isTokenValid(token: string): Promise<any> {
+      const query = `
+      query {
+         Auth_isTokenValid(token: "${token}")
+      }`
+      return this._server.API({ query, name: 'Auth_isTokenValid' })
+   }
+
    async register(body: RegisterInput): Promise<any> {
       const query = `
       mutation {

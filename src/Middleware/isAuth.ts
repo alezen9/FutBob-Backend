@@ -1,8 +1,7 @@
 import { Privilege } from "../MongoDB/Entities"
 import ErrorMessages from "../Utils/ErrorMessages"
 import { decodePrivileges } from "../Utils/helpers"
-
-const jwt = require('jsonwebtoken')
+import jwt from 'jsonwebtoken'
 
 const isAuthMiddleware = (req: any, res: any, next: any) => {
   const authHeader = req.get('Authorization')

@@ -16,7 +16,8 @@ import { ApolloServer, PubSub } from 'apollo-server-express'
 import { Privilege } from './MongoDB/Entities'
 import { authChecker } from './Middleware/Authorization'
 import { nodemailerInstance } from './Utils/NodeMailer'
-const shell = require('shelljs')
+import shell from 'shelljs'
+import path from 'path'
 require('dotenv').config()
 
 interface ReqWithisAuth extends Request {
@@ -38,6 +39,8 @@ const main = async () => {
 
     const app = express()
     app.use(isAuth)
+    const staticPath = path.join(__dirname, '/../public')
+    app.use('/public', express.static(staticPath))
     const pubsub = new PubSub()
     const schema = await buildSchema({
       resolvers: [
@@ -71,7 +74,11 @@ const main = async () => {
   } catch (error) {
     console.log(error)
     nodemailerInstance.cleanUp()
-    await MongoDBInstance.closeConnection()
+    try {
+      await MongoDBInstance.closeConnection()
+    } catch (error) {
+      console.error('Error shutting donw mongo!')
+    }
   }
 }
 
@@ -79,7 +86,11 @@ process.on('SIGINT', async () => {
   console.log('\nGracefully shutting down and cleaning mess...')
   if (process.env.NODE_ENV !== 'production') {
     nodemailerInstance.cleanUp()
-    await MongoDBInstance.closeConnection()
+    try {
+      await MongoDBInstance.closeConnection()
+    } catch (error) {
+      console.error('Error shutting donw mongo!')
+    }
     shell.exec('lsof -ti tcp:27017 | xargs kill')
   }
   process.exit()

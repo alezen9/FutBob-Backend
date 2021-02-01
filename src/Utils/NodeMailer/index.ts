@@ -2,15 +2,16 @@ import nodemailer from 'nodemailer'
 import Mail from 'nodemailer/lib/mailer'
 import ErrorMessages from '../ErrorMessages'
 import { SendEmailOptions } from './types'
-import { google } from 'googleapis'
+// import { google } from 'googleapis'
 require('dotenv').config()
 
-const OAUTH_PLAYGROUND = 'https://developers.google.com/oauthplayground'
+// const OAUTH_PLAYGROUND = 'https://developers.google.com/oauthplayground'
 
 const {
   MAILING_SERVICE_CLIENT_ID,
   MAILING_SERVICE_CLIENT_SECRET,
   MAILING_SERVICE_REFRESH_TOKEN,
+  MAILING_SERVICE_ACCESS_TOKEN,
   SENDER_EMAIL_ADDRESS
 } = process.env
 
@@ -29,20 +30,11 @@ class FutBobNodeMailer {
    private mailOptions: Partial<Mail.Options>
 
    constructor() {
-      const oauth2Client = new google.auth.OAuth2(
-         MAILING_SERVICE_CLIENT_ID,
-         MAILING_SERVICE_CLIENT_SECRET,
-         OAUTH_PLAYGROUND
-      )
-      oauth2Client.setCredentials({
-         refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
-      })
-      const accessToken = oauth2Client.getAccessToken()
-      this.smtpTransport = this.createTransporter(accessToken)
+      this.smtpTransport = this.createTransporter()
       this.mailOptions = this.setMainOptions()
    }
 
-   private createTransporter(accessToken: any): Mail {
+   private createTransporter(): Mail {
       return nodemailer.createTransport({
          service: 'gmail',
          auth: {
@@ -51,7 +43,8 @@ class FutBobNodeMailer {
             clientId: MAILING_SERVICE_CLIENT_ID,
             clientSecret: MAILING_SERVICE_CLIENT_SECRET,
             refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-            accessToken
+            accessToken: MAILING_SERVICE_ACCESS_TOKEN,
+            expires: 1484314697598
          },
       })
    }
@@ -63,7 +56,7 @@ class FutBobNodeMailer {
    private setMainOptions(): Partial<Mail.Options> {
       return {
          from: SENDER_EMAIL_ADDRESS,
-         subject: 'Confirm your email for FutBob'
+         subject: 'Verify your email for FutBob'
       }
    }
 

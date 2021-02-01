@@ -5,5 +5,9 @@ lsof -ti tcp:27017 | xargs kill
 mongod --fork --port=27017 --logpath ./data/mongod.log --dbpath=./data
 # compile typescript
 tsc
+# copy ejs templates
+rsync -avum --include='*.ejs' --include='*/' --exclude='*' './src/' './dist/src'
+# copy public dir
+rsync -avum --include='*' './public/' './dist/public'
 # start server with nodemon
-nodemon dist/index.js
+nodemon dist/src/index.js
