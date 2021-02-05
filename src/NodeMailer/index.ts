@@ -24,11 +24,16 @@ export class ZenNodeMailer {
    emails: EmailModules
    assetsPath: string
    templatesPath: string
+   from: Mail.Address
 
    constructor() {
       this.smtpTransport = this.createTransporter()
       this.assetsPath = path.join(__dirname, '/../..', '/public/assets')
       this.templatesPath = path.join(__dirname, '/../..', '/public/templates')
+      this.from = {
+         name: 'FutBob',
+         address: SENDER_EMAIL_ADDRESS
+      }
       /** start modules */
       this.emails = {
          accountVerification: new AccountVerification(this),

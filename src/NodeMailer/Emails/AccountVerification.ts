@@ -4,7 +4,6 @@ import ejs from "ejs"
 import Mail from "nodemailer/lib/mailer"
 import ErrorMessages from "../../Utils/ErrorMessages"
 import dayjs from "dayjs"
-require('dotenv').config()
 
 type Locals = {
    link: string
@@ -22,7 +21,7 @@ class AccountVerification {
    compileAndSend = async (to: string, locals: Locals) => {
       const html = await ejs.renderFile(`${this.template}`, { ...locals, year: dayjs().year()})
       const mail: Mail.Options = {
-         from: process.env.SENDER_EMAIL_ADDRESS,
+         from: this._nodemailer.from,
          subject: 'Account verification',
          to,
          html,
