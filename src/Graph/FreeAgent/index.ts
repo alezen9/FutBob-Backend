@@ -1,7 +1,7 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { List, Pagination, Privilege } from "../../MongoDB/Entities";
 import { CreateFreeAgentInput, UpdateFreeAgentInput, FiltersFreeAgent } from "./inputs";
-import { MyContext } from "../..";
+import { MyContext } from "../../../index";
 import { PaginatedFreeAgentResponse } from "./types";
 import { mongoFreeAgent } from "../../MongoDB/FreeAgent";
 import { FreeAgent } from "../../MongoDB/FreeAgent/Entities";

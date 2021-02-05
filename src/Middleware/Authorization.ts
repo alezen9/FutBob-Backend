@@ -1,5 +1,5 @@
 import { AuthChecker } from "type-graphql";
-import { MyContext } from "..";
+import { MyContext } from "../../index";
 import { Privilege } from "../MongoDB/Entities";
 import ErrorMessages from "../Utils/ErrorMessages";
 

@@ -1,7 +1,7 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { List, Pagination, Privilege } from "../../MongoDB/Entities";
 import { CreatePlayerInput, UpdatePlayerInput, FiltersPlayer } from "./inputs";
-import { MyContext } from "../..";
+import { MyContext } from "../../../index";
 import { mongoPlayer } from "../../MongoDB/Player";
 import { Player } from "../../MongoDB/Player/Entities"
 import { PaginatedPlayerResponse } from "./types";

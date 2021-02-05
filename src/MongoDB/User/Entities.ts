@@ -45,6 +45,7 @@ export class Credentials {
     email: string
     password: string
     confirmation?: Confirmation
+    resetPassword?: Confirmation
 }
 
 type CreateOrUpdateRegistryType = {

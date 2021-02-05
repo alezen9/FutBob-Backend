@@ -8,8 +8,8 @@
       "moduleResolution": "node",
       "lib": ["es6", "esnext.asynciterable"],
       "sourceMap": true,
-      "outDir": "dist/src",
+      "outDir": "dist",
     },
-    "include": ["src"],
+    "include": ["src", "index.ts"],
     "exclude": ["dist", "node_modules"]
 }

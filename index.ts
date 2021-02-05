@@ -1,21 +1,21 @@
 import 'reflect-metadata'
-import { MongoDBInstance } from './MongoDB'
+import { MongoDBInstance } from './src/MongoDB'
 // import graph from './Graph'
-import isAuth from './Middleware/isAuth'
+import isAuth from './src/Middleware/isAuth'
 import http from 'http'
 import express, { Request, Response } from 'express'
 import { buildSchema } from 'type-graphql'
 /** start resolvers */
-import { AuthResolver } from './Graph/Auth'
-import { UserResolver, PlayerFieldResolver } from './Graph/User'
-import { PlayerResolver, UserFieldResolver } from './Graph/Player'
-import { FreeAgentResolver } from './Graph/FreeAgent'
-import { FieldResolver } from './Graph/Field'
+import { AuthResolver } from './src/Graph/Auth'
+import { UserResolver, PlayerFieldResolver } from './src/Graph/User'
+import { PlayerResolver, UserFieldResolver } from './src/Graph/Player'
+import { FreeAgentResolver } from './src/Graph/FreeAgent'
+import { FieldResolver } from './src/Graph/Field'
 /** end resolvers */
 import { ApolloServer, PubSub } from 'apollo-server-express'
-import { Privilege } from './MongoDB/Entities'
-import { authChecker } from './Middleware/Authorization'
-import { nodemailerInstance } from './Utils/NodeMailer'
+import { Privilege } from './src/MongoDB/Entities'
+import { authChecker } from './src/Middleware/Authorization'
+import { nodemailerInstance } from './src/NodeMailer'
 import shell from 'shelljs'
 import path from 'path'
 require('dotenv').config()
@@ -39,7 +39,7 @@ const main = async () => {
 
     const app = express()
     app.use(isAuth)
-    const staticPath = path.join(__dirname, '/../public')
+    const staticPath = path.join(__dirname, '/public')
     app.use('/public', express.static(staticPath))
     const pubsub = new PubSub()
     const schema = await buildSchema({

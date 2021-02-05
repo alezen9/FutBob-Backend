@@ -3,10 +3,11 @@ import { mongoUser } from "../../MongoDB/User";
 import { User } from "../../MongoDB/User/Entities";
 import ErrorMessages from "../../Utils/ErrorMessages";
 import { Privilege } from "../../MongoDB/Entities";
-import { MyContext } from "../..";
+import { MyContext } from "../../../index";
 import { userLoader } from "./Loader";
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput }  from './inputs'
 import { playerLoader } from "../Player/Loader";
+import { nodemailerInstance } from "../../NodeMailer";
 @Resolver()
 export class UserResolver {
 
@@ -55,6 +56,11 @@ export class UserResolver {
       return done
    }
    
+   @Query(() => Boolean)
+   async User_testEmail(@Ctx() ctx: MyContext): Promise<Boolean> {
+      await nodemailerInstance.emails.resetPassword.compileAndSend('aj0715@live.com', { link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstleyVEVO' })
+      return true
+   }
 }
 
 export { PlayerFieldResolver } from './FieldResolvers/player'
