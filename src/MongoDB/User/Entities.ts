@@ -26,11 +26,8 @@ export class Confirmation {
     confirmed: boolean
     code?: Code
 
-    constructor(code: string, confirmed?: boolean){
-        if(confirmed) {
-            this.confirmed = confirmed
-            return
-        }
+    constructor(code: string, confirmed: boolean){
+        this.confirmed = confirmed
         this.code = new Code()
         this.code.value = code
         this.code.createdAt = dayjs().toISOString()
@@ -44,7 +41,7 @@ export class Credentials {
     @IsEmail()
     email: string
     password: string
-    confirmation?: Confirmation
+    verifyAccount?: Confirmation
     resetPassword?: Confirmation
 }
 

@@ -10,7 +10,7 @@ import { AuthData, Confirmation, Credentials, User } from './Entities'
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput } from '../../Graph/User/inputs'
 import { isEmpty, get } from 'lodash'
 import cleanDeep from 'clean-deep'
-import { FinalizeRegistrationInput, LoginInput, RegisterInput } from '../../Graph/Auth/inputs'
+import { FinalizeRegistrationInput, LoginInput, RegisterInput, RequestResendInput } from '../../Graph/Auth/inputs'
 import { nodemailerInstance } from '../../NodeMailer'
 import { v4 as uuidv4 } from 'uuid'
 require('dotenv').config()
@@ -25,49 +25,50 @@ class MongoUser {
   }
 
   async requestRegistration (data: RegisterInput): Promise<boolean> {
-    await mongoUser.checkEmailExistance(data.email)
+    await this.checkEmailExistance(data.email)
     const code = this.createConfirmationCode()
-    const confirmation = new Confirmation(code, false)
-    await mongoUser.create({ ...data, confirmation })
+    const verifyAccount = new Confirmation(code, false)
+    await this.create({ ...data, verifyAccount })
     const link = await this.createRegistrationLink(code)
     await this.sendRegistrationEmail( data.email, link)
     return true
   }
 
-  async verifyEmailCode (code: string): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.confirmation.code.value": code })
-    if(!user) throw new Error(ErrorMessages.user_user_not_exists)
-    this.checkConfirmationCode(user)
+  private async checkVerifyAccountCode (code: string): Promise<boolean> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.verifyAccount.code.value": code, "credentials.verifyAccount.confirmed": false })
+    if(!user) throw new Error(ErrorMessages.user_user_not_exists_or_code_already_verified)
+    this.checkExpirationCode(user)
     return true
   }
 
-  async requestRegistrationEmailResend (expiredCode: string): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.confirmation.code.value": expiredCode })
+  async requestRegistrationEmailResend (data: RequestResendInput): Promise<boolean> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.email": data.email, "credentials.verifyAccount.code.value": data.expiredCode, "credentials.verifyAccount.confirmed": false })
     if(!user) throw new Error(ErrorMessages.user_user_not_exists)
     const code = this.createConfirmationCode()
     const confirmation = new Confirmation(code, false)
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
       { _id: new ObjectId(user._id) },
-      { $set: { "credentials.confirmation": confirmation } }
+      { $set: { "credentials.verifyAccount": confirmation } }
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const link = await this.createRegistrationLink(code)
-    await this.sendRegistrationEmail(link, user.credentials.email)
+    await this.sendRegistrationEmail(link, data.email)
     return true
   }
 
   async finalizeRegistration (data: FinalizeRegistrationInput): Promise<AuthData> {
     if(data.password !== data.confirmPassword) throw new Error(ErrorMessages.user_password_not_confirmed)
+    await this.checkVerifyAccountCode(data.unverifiedCode)
     const encryptedPassword = await this.encryptPassword(data.password)
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
-      { "credentials.confirmation.code.value": data.verifiedCode },
+      { "credentials.verifyAccount.code.value": data.unverifiedCode },
       { $set: { 
-        "credentials.confirmation.confirmed": true,
+        "credentials.verifyAccount.confirmed": true,
         "credentials.password": encryptedPassword
       } }
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.confirmation.code.value": data.verifiedCode })
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.verifyAccount.code.value": data.unverifiedCode })
     if(!user) throw new Error(ErrorMessages.user_user_not_exists)
     const tokenData = {
         idUser: user._id.toHexString(),
@@ -81,8 +82,8 @@ class MongoUser {
   }
 
   async requestResetPassword (email: string): Promise<boolean> {
-    const user = await mongoUser.checkEmailExistance(email)
-    if(!user.credentials.confirmation.confirmed) throw new Error(ErrorMessages.user_user_not_confirmed)
+    const user = await mongoUser.getUserByEmail(email)
+    if(!user.credentials.verifyAccount.confirmed) throw new Error(ErrorMessages.user_user_not_confirmed)
     const code = this.createConfirmationCode()
     const resetPassword = new Confirmation(code, false)
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
@@ -91,19 +92,19 @@ class MongoUser {
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const link = await this.createResetPasswordLink(code)
-    await this.sendResetPasswordEmail(link, user.credentials.email)
+    await this.sendResetPasswordEmail(email, link)
     return true
   }
 
-  async verifyResetPasswordCode (code: string): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.resetPassword.code.value": code })
-    if(!user) throw new Error(ErrorMessages.user_user_not_exists)
-    this.checkConfirmationCode(user)
+  private async checkResetPasswordCode (code: string): Promise<boolean> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.resetPassword.code.value": code, "credentials.resetPassword.confirmed": false })
+    if(!user) throw new Error(ErrorMessages.user_user_not_exists_or_code_already_verified)
+    this.checkExpirationCode(user)
     return true
   }
 
-  async requestResetPasswordEmailResend (expiredCode: string): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.resetPassword.code.value": expiredCode })
+  async requestResetPasswordEmailResend (data: RequestResendInput): Promise<boolean> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.email": data.email, "credentials.resetPassword.code.value": data.expiredCode, "credentials.resetPassword.confirmed": false })
     if(!user) throw new Error(ErrorMessages.user_user_not_exists)
     const code = this.createConfirmationCode()
     const resetPassword = new Confirmation(code, false)
@@ -113,22 +114,23 @@ class MongoUser {
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const link = await this.createResetPasswordLink(code)
-    await this.sendResetPasswordEmail(link, user.credentials.email)
+    await this.sendResetPasswordEmail(link, data.email)
     return true
   }
 
   async finalizeResetPassword (data: FinalizeRegistrationInput): Promise<AuthData> {
     if(data.password !== data.confirmPassword) throw new Error(ErrorMessages.user_password_not_confirmed)
+    await this.checkResetPasswordCode(data.unverifiedCode)
     const encryptedPassword = await this.encryptPassword(data.password)
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
-      { "credentials.resetPassword.code.value": data.verifiedCode },
+      { "credentials.resetPassword.code.value": data.unverifiedCode },
       { $set: { 
         "credentials.resetPassword.confirmed": true,
         "credentials.password": encryptedPassword
       } }
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.resetPassword.code.value": data.verifiedCode })
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.resetPassword.code.value": data.unverifiedCode })
     if(!user) throw new Error(ErrorMessages.user_user_not_exists)
     const tokenData = {
         idUser: user._id.toHexString(),
@@ -158,16 +160,15 @@ class MongoUser {
       }
   }
 
-  async create (data: CreateUserInput & { password?: string, confirmation?: Confirmation }, _createdBy?: string){
-    const { password, ...registry } = data
+  async create (data: CreateUserInput & { verifyAccount?: Confirmation }, _createdBy?: string){
+    const { verifyAccount, ...registry } = data
     const now = dayjs().toISOString()
     let credentials = null
     const privileges = []
-    if(data.password){
+    if(data.email && verifyAccount){
       credentials = new Credentials()
       credentials.email = data.email
-      if(password) credentials.password = await this.encryptPassword(password)
-      credentials.confirmation = data.confirmation
+      credentials.verifyAccount = verifyAccount
       privileges.push(Privilege.Manager)
     }
     if(!privileges.length) privileges.push(Privilege.User)
@@ -278,8 +279,8 @@ class MongoUser {
     return uuidv4()
   }
 
-  private checkConfirmationCode (user: User) {
-    const codeCreatedAt = user.credentials.confirmation.code.createdAt
+  private checkExpirationCode (user: User) {
+    const codeCreatedAt = user.credentials.verifyAccount.code.createdAt
     const isExpired = dayjs(codeCreatedAt).add(this.codeExpirationInHours, 'hour').isBefore(dayjs())
     if(isExpired) throw new Error(ErrorMessages.system_confirmation_code_expired)
   }
@@ -299,8 +300,7 @@ class MongoUser {
   }
 
   private async sendResetPasswordEmail(email: string, link: string): Promise<void> {
-    // TO REVISIT
-    // await nodemailerInstance.emails.accountVerification.compileAndSend(email, { link })
+    await nodemailerInstance.emails.resetPassword.compileAndSend(email, { link })
   }
 
   generateJWT(data: any): string {

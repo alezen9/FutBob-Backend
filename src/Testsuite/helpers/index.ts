@@ -32,12 +32,17 @@ export const setupTestsuite = async (config: SetupConfig, apiInstance: ZenServer
 
 	if(config.Manager){
 		// send email
-		const emailSent = await apiInstance.auth.register(manager1)
+		const { password, ...body } = manager1
+		const emailSent = await apiInstance.auth.requestRegistration(body)
 		if(!emailSent) throw new Error(ErrorMessages.system_confirmation_email_not_sent)
 		// get confirmation code from db
 		const user = await MongoDBInstance.collection.user.findOne({ "credentials.email": manager1.email })
 		if(!user) throw new Error(ErrorMessages.user_user_not_exists)
-		const { token } = await apiInstance.auth.confirm(user.credentials.confirmation.code.value, '{ token }')
+		const { token } = await apiInstance.auth.finalizeRegistration({
+			unverifiedCode: user.credentials.verifyAccount.code.value,
+			password,
+			confirmPassword: password
+		}, '{ token }')
 		apiInstance.auth.setToken(token)
 	}
 

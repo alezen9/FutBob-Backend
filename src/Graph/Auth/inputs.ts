@@ -41,7 +41,7 @@ export class RegisterInput {
 @InputType()
 export class FinalizeRegistrationInput {
    @Field()
-   verifiedCode: string
+   unverifiedCode: string
    @Field()
    @MinLength(4)
    @MaxLength(50)
@@ -52,3 +52,12 @@ export class FinalizeRegistrationInput {
    confirmPassword: string
 }
 
+@InputType()
+export class RequestResendInput {
+   @Field()
+   expiredCode: string
+   @Field()
+   @MaxLength(50)
+   @IsEmail()
+   email: string
+}

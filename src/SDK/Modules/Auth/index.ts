@@ -1,6 +1,6 @@
 import { get } from 'lodash'
 import { ZenServer } from "../../"
-import { LoginInput, RegisterInput } from '../../../Graph/Auth/inputs'
+import { FinalizeRegistrationInput, LoginInput, RegisterInput, RequestResendInput } from '../../../Graph/Auth/inputs'
 import { paramsToString } from '../../helpers'
 
 class AuthServer {
@@ -26,22 +26,60 @@ class AuthServer {
       return this._server.API({ query, name: 'Auth_isTokenValid' })
    }
 
-   async register(body: RegisterInput): Promise<any> {
+   /** Start registration flow */
+   async requestRegistration(body: RegisterInput): Promise<any> {
       const query = `
       mutation {
-         Auth_register(body: ${paramsToString(body)})
+         Auth_requestRegistration(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'Auth_register' })
+      return this._server.API({ query, name: 'Auth_requestRegistration' })
    }
 
-   async confirm(code: string, fields: string): Promise<any> {
+   async requestRegistrationEmailResend(body: RequestResendInput): Promise<any> {
       const query = `
-      query {
-         Auth_confirm(code: "${code}")${fields}
+      mutation {
+         Auth_requestRegistrationEmailResend(body: ${paramsToString(body)})
       }`
-      return this._server.API({ query, name: 'Auth_confirm' })
+      return this._server.API({ query, name: 'Auth_requestRegistrationEmailResend' })
    }
 
+   async finalizeRegistration(body: FinalizeRegistrationInput, fields: string): Promise<any> {
+      const query = `
+      mutation {
+         Auth_finalizeRegistration(body: ${paramsToString(body)})${fields}
+      }`
+      return this._server.API({ query, name: 'Auth_finalizeRegistration' })
+   }
+   /** End registration flow */
+
+
+
+   /** Start reset password flow */
+   async requestResetPassword(email: string): Promise<any> {
+      const query = `
+      mutation {
+         Auth_requestResetPassword(email: "${email}")
+      }`
+      return this._server.API({ query, name: 'Auth_requestResetPassword' })
+   }
+
+   async requestResetPasswordEmailResend(body: RequestResendInput): Promise<any> {
+      const query = `
+      mutation {
+         Auth_requestResetPasswordEmailResend(body: ${paramsToString(body)})
+      }`
+      return this._server.API({ query, name: 'Auth_requestResetPasswordEmailResend' })
+   }
+
+   async finalizeResetPassword(body: FinalizeRegistrationInput, fields: string): Promise<any> {
+      const query = `
+      mutation {
+         Auth_finalizeResetPassword(body: ${paramsToString(body)})${fields}
+      }`
+      return this._server.API({ query, name: 'Auth_finalizeResetPassword' })
+   }
+   /** End reset password flow */
+   
    async login(body: LoginInput, fields: string): Promise<any> {
       const query = `
       query {

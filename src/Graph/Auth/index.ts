@@ -1,7 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { mongoUser } from "../../MongoDB/User";
 import { AuthData } from "../../MongoDB/User/Entities";
-import { FinalizeRegistrationInput, LoginInput, RegisterInput } from "./inputs";
+import { FinalizeRegistrationInput, LoginInput, RegisterInput, RequestResendInput } from "./inputs";
 import jwt from 'jsonwebtoken'
 
 @Resolver()
@@ -36,17 +36,11 @@ export class AuthResolver {
 
    // Request registration => email to user => verify code (again)
    @Mutation(() => Boolean)
-   async Auth_requestRegistrationEmailResend(@Arg('expiredCode') expiredCode: string): Promise<Boolean> {
-      return mongoUser.requestRegistrationEmailResend(expiredCode)
+   async Auth_requestRegistrationEmailResend(@Arg('body') body: RequestResendInput): Promise<Boolean> {
+      return mongoUser.requestRegistrationEmailResend(body)
    }
 
-   // Request registration => email to user => verify code
-   @Query(() => Boolean)
-   async Auth_verifyEmailCode(@Arg('code') code: string): Promise<Boolean> {
-      return mongoUser.verifyEmailCode(code)
-   }
-
-   // Request registration => email to user => verify code => finalize with passwords => token
+   // Request registration => email to user => finalize with passwords and unverified code => token
    @Mutation(() => AuthData)
    async Auth_finalizeRegistration(@Arg('body') body: FinalizeRegistrationInput): Promise<AuthData> {
       return mongoUser.finalizeRegistration(body)
@@ -65,17 +59,11 @@ export class AuthResolver {
 
    // Request password reset => email to user => verify code (again)
    @Mutation(() => Boolean)
-   async Auth_requestResetPasswordEmailResend(@Arg('expiredCode') expiredCode: string): Promise<Boolean> {
-      return mongoUser.requestResetPasswordEmailResend(expiredCode)
+   async Auth_requestResetPasswordEmailResend(@Arg('body') body: RequestResendInput): Promise<Boolean> {
+      return mongoUser.requestResetPasswordEmailResend(body)
    }
 
-   // Request password reset => email to user => verify code
-   @Query(() => Boolean)
-   async Auth_verifyResetPAsswordCode(@Arg('code') code: string): Promise<Boolean> {
-      return mongoUser.verifyResetPasswordCode(code)
-   }
-
-   // Request password reset => email to user => verify code => finalize with new passwords => token
+   // Request password reset => email to user => finalize with new passwords and unverified code => token
    @Mutation(() => AuthData)
    async Auth_finalizeResetPassword(@Arg('body') body: FinalizeRegistrationInput): Promise<AuthData> {
       return mongoUser.finalizeResetPassword(body)

@@ -25,19 +25,25 @@ describe('Authentication', () => {
   describe('Signup', () => {
     it('Register a new manager', async () => {
       // send email
-      const emailSent = await apiInstance.auth.register(manager1)
+      const { password, ...body } = manager1
+      const emailSent = await apiInstance.auth.requestRegistration(body)
       if (!emailSent) throw new Error(ErrorMessages.system_confirmation_email_not_sent)
       // get confirmation code from db
       const user = await MongoDBInstance.collection.user.findOne({ 'credentials.email': manager1.email })
       if (!user) throw new Error(ErrorMessages.user_user_not_exists)
-      const { token } = await apiInstance.auth.confirm(user.credentials.confirmation.code.value, '{ token }')
+      const { token } = await apiInstance.auth.finalizeRegistration({
+        unverifiedCode: user.credentials.verifyAccount.code.value,
+        password,
+        confirmPassword: password
+      }, '{ token }')
       apiInstance.auth.setToken(token)
       assert.strictEqual(typeof token, 'string')
     })
 
     it('Try to register a manager with another user\'s email', async () => {
       try {
-        await noTokenApiInstance.auth.register(manager1)
+        const { password, ...body } = manager1
+        await noTokenApiInstance.auth.requestRegistration(body)
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.user_email_already_exists)
       }
@@ -47,7 +53,7 @@ describe('Authentication', () => {
       try {
         const { name, ...rest } = manager1
         // @ts-ignore
-        await noTokenApiInstance.auth.register(rest)
+        await noTokenApiInstance.auth.requestRegistration(rest)
       } catch (error) {
         assert.strictEqual(typeof error, 'string')
         assert.strictEqual(validationErrorRegEx.test(error), true)
@@ -119,13 +125,6 @@ describe('Authentication', () => {
   })
 
   describe('Update user data', () => {
-    // it('Change username ', async () => {
-    //   const newUsername = 'alezen7'
-    //   const ok = await apiInstance.user.changeMyUsername(newUsername)
-    //   assert.strictEqual(ok, true)
-    //   manager1Credentials.username = newUsername
-    // })
-
     it('Change password', async () => {
       const newPassword = 'alezen7'
       const body = {
@@ -135,6 +134,25 @@ describe('Authentication', () => {
       const ok = await apiInstance.user.changeMyPassword(body)
       assert.strictEqual(ok, true)
       manager1Credentials.password = newPassword
+    })
+
+    it('Reset password', async () => {
+      // send email
+      const { email } = manager1
+      const newPassword = 'alezen99'
+      const emailSent = await apiInstance.auth.requestResetPassword(email)
+      if (!emailSent) throw new Error(ErrorMessages.system_confirmation_email_not_sent)
+      // get reset code from db
+      const user = await MongoDBInstance.collection.user.findOne({ 'credentials.email': email })
+      if (!user) throw new Error(ErrorMessages.user_user_not_exists)
+      const { token } = await apiInstance.auth.finalizeResetPassword({
+        unverifiedCode: user.credentials.resetPassword.code.value,
+        password: newPassword,
+        confirmPassword: newPassword
+      }, '{ token }')
+      manager1Credentials.password = newPassword
+      apiInstance.auth.setToken(token)
+      assert.strictEqual(typeof token, 'string')
     })
 
     it('Update some user info', async () => {
@@ -154,14 +172,6 @@ describe('Authentication', () => {
       assert.strictEqual(name, newUserData.name)
       assert.strictEqual(surname, newUserData.surname)
     })
-
-    // it('Try to change username without token', async () => {
-    //   try {
-    //     await noTokenApiInstance.user.changeMyUsername('test')
-    //   } catch (error) {
-    //     assert.strictEqual(error, ErrorMessages.user_unauthenticated)
-    //   }
-    // })
 
     it('Try to change password without token', async () => {
       try {

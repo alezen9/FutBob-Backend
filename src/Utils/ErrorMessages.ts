@@ -6,6 +6,8 @@ const ErrorMessages = Object.freeze({
   system_confirmation_email_not_sent: 'system_confirmation_email_not_sent',
   user_unauthenticated: 'user_unauthenticated',
   user_username_already_exists: 'user_username_already_exists',
+  user_code_not_verified: 'user_code_not_verified',
+  user_user_not_exists_or_code_already_verified: 'user_user_not_exists_or_code_already_verified',
   user_email_already_exists: 'user_email_already_exists',
   user_user_not_exists: 'user_user_not_exists',
   user_password_not_correct: 'user_password_not_correct',
