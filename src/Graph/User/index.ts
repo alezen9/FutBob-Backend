@@ -55,12 +55,6 @@ export class UserResolver {
       if(done) userLoader.clear(idUser)
       return done
    }
-   
-   @Query(() => Boolean)
-   async User_testEmail(@Ctx() ctx: MyContext): Promise<Boolean> {
-      await nodemailerInstance.emails.resetPassword.compileAndSend('aj0715@live.com', { link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstleyVEVO' })
-      return true
-   }
 }
 
 export { PlayerFieldResolver } from './FieldResolvers/player'

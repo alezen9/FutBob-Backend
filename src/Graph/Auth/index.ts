@@ -3,6 +3,7 @@ import { mongoUser } from "../../MongoDB/User";
 import { AuthData } from "../../MongoDB/User/Entities";
 import { FinalizeRegistrationInput, LoginInput, RegisterInput, RequestResendInput } from "./inputs";
 import jwt from 'jsonwebtoken'
+import { nodemailerInstance } from "../../NodeMailer";
 
 @Resolver()
 export class AuthResolver {
@@ -67,5 +68,12 @@ export class AuthResolver {
    @Mutation(() => AuthData)
    async Auth_finalizeResetPassword(@Arg('body') body: FinalizeRegistrationInput): Promise<AuthData> {
       return mongoUser.finalizeResetPassword(body)
+   }
+
+   @Query(() => Boolean)
+   async Auth_testEmail(): Promise<Boolean> {
+      await nodemailerInstance.emails.accountVerification.compileAndSend('aj0715@live.com', { link: 'https://youtube.com', expiresIn: 2 })
+      await nodemailerInstance.emails.resetPassword.compileAndSend('aj0715@live.com', { link: 'https://youtube.com', expiresIn: 2 })
+      return true
    }
 }

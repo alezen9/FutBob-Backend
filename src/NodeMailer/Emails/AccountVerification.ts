@@ -7,6 +7,7 @@ import dayjs from "dayjs"
 
 type Locals = {
    link: string
+   expiresIn: number
 }
 
 class AccountVerification {

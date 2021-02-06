@@ -285,7 +285,7 @@ class MongoUser {
   }
 
   private async sendRegistrationEmail(email: string, link: string): Promise<void> {
-    await nodemailerInstance.emails.accountVerification.compileAndSend(email, { link })
+    await nodemailerInstance.emails.accountVerification.compileAndSend(email, { link, expiresIn: this.codeExpirationInHours })
   }
 
   private async createResetPasswordLink(code: string): Promise<string> {
@@ -294,7 +294,7 @@ class MongoUser {
   }
 
   private async sendResetPasswordEmail(email: string, link: string): Promise<void> {
-    await nodemailerInstance.emails.resetPassword.compileAndSend(email, { link })
+    await nodemailerInstance.emails.resetPassword.compileAndSend(email, { link, expiresIn: this.codeExpirationInHours })
   }
 
   generateJWT(data: any): string {
