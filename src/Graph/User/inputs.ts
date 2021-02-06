@@ -39,7 +39,7 @@ export class CreateUserInput {
    @IsEmail()
    email?: string
    @Field()
-   @IsPhoneNumber('IT')
+   // @IsPhoneNumber('IT')
    phone: string
 }
 @InputType()
@@ -67,6 +67,6 @@ export class UpdateRegistryInput {
    @IsEmail()
    email?: string
    @Field({ nullable: true })
-   @IsPhoneNumber('IT')
+   // @IsPhoneNumber('IT')
    phone?: string
 }

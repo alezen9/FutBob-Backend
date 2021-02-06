@@ -30,7 +30,7 @@ export class RegisterInput {
    @MaxLength(4)
    country: string
    @Field()
-   @IsPhoneNumber('IT')
+   // @IsPhoneNumber('IT')
    phone: string
    @Field()
    @MaxLength(50)

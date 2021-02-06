@@ -21,7 +21,7 @@ class MongoUser {
 
   constructor(){
     this.tokenExpiration = 'Never'
-    this.codeExpirationInHours = 6
+    this.codeExpirationInHours = 2
   }
 
   async requestRegistration (data: RegisterInput): Promise<boolean> {
@@ -286,7 +286,7 @@ class MongoUser {
   }
 
   private async createRegistrationLink(code: string): Promise<string> {
-    const link = `${process.env.BASE_FRONTEND_URL}${process.env.FRONTEND_VERIFY_EMAIL_PATH}/${code}`
+    const link = `${process.env.FRONTEND_FINALIZE_ACCOUNT_URL}/${code}`
     return link
   }
 
@@ -295,7 +295,7 @@ class MongoUser {
   }
 
   private async createResetPasswordLink(code: string): Promise<string> {
-    const link = `${process.env.BASE_FRONTEND_URL}${process.env.FRONTEND_RESET_PASSWORD_PATH}/${code}`
+    const link = `${process.env.FRONTEND_RESET_PASSWORD_URL}/${code}`
     return link
   }
 
