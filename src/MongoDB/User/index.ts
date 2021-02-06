@@ -25,7 +25,7 @@ class MongoUser {
   }
 
   async requestRegistration (data: RegisterInput): Promise<boolean> {
-    await this.checkEmailExistance(data.email)
+    await this.getUserByEmail(data.email)
     const code = this.createConfirmationCode()
     const verifyAccount = new Confirmation(code, false)
     await this.create({ ...data, verifyAccount })
@@ -146,7 +146,6 @@ class MongoUser {
   async login (data: LoginInput): Promise<AuthData> {
     const { email, password } = data
       const user: User = await this.getUserByEmail(email)
-      if (!user) throw new Error(ErrorMessages.user_user_not_exists)
       const isEqual = await bcrypt.compare(password, user.credentials.password)
       if (!isEqual) throw new Error(ErrorMessages.user_password_not_correct)
       const tokenData = {
@@ -248,6 +247,7 @@ class MongoUser {
 
   async getUserByEmail (email: string): Promise<User> {
     const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.email": email })
+    if(!user) throw new Error(ErrorMessages.user_user_not_exists)
     return user
   }
 
@@ -261,12 +261,6 @@ class MongoUser {
       { $set: updateUser }
     )
     return true
-  }
-
-  async checkEmailExistance (email: string): Promise<User> {
-    const user = await this.getUserByEmail(email)
-    if(user)throw new Error(ErrorMessages.user_email_already_exists)
-    return user
   }
 
   private async encryptPassword (password: string): Promise<string> {
