@@ -37,8 +37,8 @@ export class AuthResolver {
 
    // Request registration => email to user => verify code (again)
    @Mutation(() => Boolean)
-   async Auth_requestRegistrationEmailResend(@Arg('body') body: RequestResendInput): Promise<Boolean> {
-      return mongoUser.requestRegistrationEmailResend(body)
+   async Auth_requestRegistrationEmailResend(@Arg('expiredCode') expiredCode: string): Promise<Boolean> {
+      return mongoUser.requestRegistrationEmailResend(expiredCode)
    }
 
    // Request registration => email to user => finalize with passwords and unverified code => token
@@ -60,8 +60,8 @@ export class AuthResolver {
 
    // Request password reset => email to user => verify code (again)
    @Mutation(() => Boolean)
-   async Auth_requestResetPasswordEmailResend(@Arg('body') body: RequestResendInput): Promise<Boolean> {
-      return mongoUser.requestResetPasswordEmailResend(body)
+   async Auth_requestResetPasswordEmailResend(@Arg('expiredCode') expiredCode: string): Promise<Boolean> {
+      return mongoUser.requestResetPasswordEmailResend(expiredCode)
    }
 
    // Request password reset => email to user => finalize with new passwords and unverified code => token

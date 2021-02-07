@@ -10,6 +10,7 @@ const ErrorMessages = Object.freeze({
   user_user_not_exists_or_code_already_verified: 'user_user_not_exists_or_code_already_verified',
   user_email_already_exists: 'user_email_already_exists',
   user_user_not_exists: 'user_user_not_exists',
+  invalid_code_or_not_yet_expired: 'invalid_code_or_not_yet_expired',
   user_password_not_correct: 'user_password_not_correct',
   user_new_old_password_equal: 'user_new_old_password_equal',
   user_update_failed: 'user_update_failed',

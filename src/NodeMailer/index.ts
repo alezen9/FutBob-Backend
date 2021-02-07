@@ -51,9 +51,8 @@ export class ZenNodeMailer {
             clientId: MAILING_SERVICE_CLIENT_ID,
             clientSecret: MAILING_SERVICE_CLIENT_SECRET,
             refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-            accessToken: MAILING_SERVICE_ACCESS_TOKEN,
-            expires: 1484314697598
-         },
+            accessToken: MAILING_SERVICE_ACCESS_TOKEN
+         }
       })
    }
 

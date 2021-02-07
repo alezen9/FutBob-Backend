@@ -25,7 +25,8 @@ class MongoUser {
   }
 
   async requestRegistration (data: RegisterInput): Promise<boolean> {
-    await this.getUserByEmail(data.email)
+    const user = await this.getUserByEmail(data.email)
+    if(user) throw new Error(ErrorMessages.user_email_already_exists)
     const code = this.createConfirmationCode()
     const verifyAccount = new Confirmation(code, false)
     await this.create({ ...data, verifyAccount })
@@ -41,9 +42,9 @@ class MongoUser {
     return true
   }
 
-  async requestRegistrationEmailResend (data: RequestResendInput): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.email": data.email, "credentials.verifyAccount.code.value": data.expiredCode, "credentials.verifyAccount.confirmed": false })
-    if(!user) throw new Error(ErrorMessages.user_user_not_exists)
+  async requestRegistrationEmailResend (expiredCode: string): Promise<boolean> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.verifyAccount.code.value": expiredCode, "credentials.verifyAccount.confirmed": false })
+    if(!user) throw new Error(ErrorMessages.invalid_code_or_not_yet_expired)
     const code = this.createConfirmationCode()
     const confirmation = new Confirmation(code, false)
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
@@ -52,7 +53,7 @@ class MongoUser {
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const link = await this.createRegistrationLink(code)
-    await this.sendRegistrationEmail(link, data.email)
+    await this.sendRegistrationEmail(link, user.credentials.email)
     return true
   }
 
@@ -83,6 +84,7 @@ class MongoUser {
 
   async requestResetPassword (email: string): Promise<boolean> {
     const user = await mongoUser.getUserByEmail(email)
+    if(!user) throw new Error(ErrorMessages.user_user_not_exists)
     if(!user.credentials.verifyAccount.confirmed) throw new Error(ErrorMessages.user_user_not_confirmed)
     const code = this.createConfirmationCode()
     const resetPassword = new Confirmation(code, false)
@@ -103,9 +105,9 @@ class MongoUser {
     return true
   }
 
-  async requestResetPasswordEmailResend (data: RequestResendInput): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.email": data.email, "credentials.resetPassword.code.value": data.expiredCode, "credentials.resetPassword.confirmed": false })
-    if(!user) throw new Error(ErrorMessages.user_user_not_exists)
+  async requestResetPasswordEmailResend (expiredCode: string): Promise<boolean> {
+    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.resetPassword.code.value": expiredCode, "credentials.resetPassword.confirmed": false })
+    if(!user) throw new Error(ErrorMessages.invalid_code_or_not_yet_expired)
     const code = this.createConfirmationCode()
     const resetPassword = new Confirmation(code, false)
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
@@ -114,7 +116,7 @@ class MongoUser {
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const link = await this.createResetPasswordLink(code)
-    await this.sendResetPasswordEmail(link, data.email)
+    await this.sendResetPasswordEmail(link, user.credentials.email)
     return true
   }
 
@@ -146,6 +148,7 @@ class MongoUser {
   async login (data: LoginInput): Promise<AuthData> {
     const { email, password } = data
       const user: User = await this.getUserByEmail(email)
+      if(!user) throw new Error(ErrorMessages.user_user_not_exists)
       const isEqual = await bcrypt.compare(password, user.credentials.password)
       if (!isEqual) throw new Error(ErrorMessages.user_password_not_correct)
       const tokenData = {
@@ -247,7 +250,6 @@ class MongoUser {
 
   async getUserByEmail (email: string): Promise<User> {
     const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.email": email })
-    if(!user) throw new Error(ErrorMessages.user_user_not_exists)
     return user
   }
 
