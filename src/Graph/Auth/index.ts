@@ -71,9 +71,9 @@ export class AuthResolver {
    }
 
    // @Query(() => Boolean)
-   // async Auth_testEmail(): Promise<Boolean> {
-   //    await nodemailerInstance.emails.accountVerification.compileAndSend('aj0715@live.com', { link: 'https://youtube.com', expiresIn: 2 })
-   //    await nodemailerInstance.emails.resetPassword.compileAndSend('aj0715@live.com', { link: 'https://youtube.com', expiresIn: 2 })
+   // async Auth_testEmail(@Arg('email') email: string): Promise<Boolean> {
+   //    await nodemailerInstance.emails.accountVerification.compileAndSend(email, { link: 'https://youtube.com', expiresIn: 2 })
+   //    await nodemailerInstance.emails.resetPassword.compileAndSend(email, { link: 'https://youtube.com', expiresIn: 2 })
    //    return true
    // }
 }

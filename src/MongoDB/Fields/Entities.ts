@@ -1,7 +1,7 @@
 import { Max, Min } from "class-validator"
 import dayjs from "dayjs"
 import { ObjectId } from "mongodb"
-import { InputType, ObjectType, Field as FieldTG, ID, Int, Float } from "type-graphql"
+import { InputType, ObjectType, Field as FieldTG, ID, Int } from "type-graphql"
 import { GeoPoint } from '../Entities'
 
 export enum FieldType {

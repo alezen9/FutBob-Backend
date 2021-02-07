@@ -31,7 +31,7 @@ class MongoUser {
     const verifyAccount = new Confirmation(code, false)
     await this.create({ ...data, verifyAccount })
     const link = await this.createRegistrationLink(code)
-    await this.sendRegistrationEmail( data.email, link)
+    await this.sendRegistrationEmail(data.email, link)
     return true
   }
 
@@ -43,7 +43,11 @@ class MongoUser {
   }
 
   async requestRegistrationEmailResend (expiredCode: string): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.verifyAccount.code.value": expiredCode, "credentials.verifyAccount.confirmed": false })
+    const user: User = await MongoDBInstance.collection.user.findOne({
+      "credentials.verifyAccount.code.value": expiredCode,
+      "credentials.verifyAccount.code.createdAt": { $lt: dayjs().subtract(this.codeExpirationInHours, 'hour').toISOString() },
+      "credentials.verifyAccount.confirmed": false,
+    })
     if(!user) throw new Error(ErrorMessages.invalid_code_or_not_yet_expired)
     const code = this.createConfirmationCode()
     const confirmation = new Confirmation(code, false)
@@ -53,7 +57,7 @@ class MongoUser {
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const link = await this.createRegistrationLink(code)
-    await this.sendRegistrationEmail(link, user.credentials.email)
+    await this.sendRegistrationEmail(user.credentials.email, link)
     return true
   }
 
@@ -106,7 +110,11 @@ class MongoUser {
   }
 
   async requestResetPasswordEmailResend (expiredCode: string): Promise<boolean> {
-    const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.resetPassword.code.value": expiredCode, "credentials.resetPassword.confirmed": false })
+    const user: User = await MongoDBInstance.collection.user.findOne({ 
+      "credentials.resetPassword.code.value": expiredCode,
+      "credentials.resetPassword.code.createdAt": { $lt: dayjs().subtract(this.codeExpirationInHours, 'hour').toISOString() },
+      "credentials.resetPassword.confirmed": false
+    })
     if(!user) throw new Error(ErrorMessages.invalid_code_or_not_yet_expired)
     const code = this.createConfirmationCode()
     const resetPassword = new Confirmation(code, false)
@@ -116,7 +124,7 @@ class MongoUser {
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     const link = await this.createResetPasswordLink(code)
-    await this.sendResetPasswordEmail(link, user.credentials.email)
+    await this.sendResetPasswordEmail(user.credentials.email, link)
     return true
   }
 

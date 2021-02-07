@@ -9,7 +9,6 @@ const {
   MAILING_SERVICE_CLIENT_ID,
   MAILING_SERVICE_CLIENT_SECRET,
   MAILING_SERVICE_REFRESH_TOKEN,
-  MAILING_SERVICE_ACCESS_TOKEN,
   SENDER_EMAIL_ADDRESS
 } = process.env
 
@@ -28,6 +27,10 @@ export class ZenNodeMailer {
 
    constructor() {
       this.smtpTransport = this.createTransporter()
+      this.smtpTransport.verify((err) => {
+         if(err) this.cleanUp()
+         else console.log('Nodemailer is ready baby!')
+      })
       this.assetsPath = path.join(__dirname, '/../..', '/public/assets')
       this.templatesPath = path.join(__dirname, '/../..', '/public/templates')
       this.from = {
@@ -42,18 +45,26 @@ export class ZenNodeMailer {
       /** end modules */
    }
 
+   // async start () {
+   //    this.smtpTransport = await this.createTransporter()
+   //    this.smtpTransport.verify((err, success) => {
+   //       if(err) this.cleanUp()
+   //       else console.log('Nodemailer is ready baby!')
+   //    })
+   // }
+
    private createTransporter(): Mail {
-      return nodemailer.createTransport({
+      const transporter = nodemailer.createTransport({
          service: 'gmail',
          auth: {
             type: 'OAuth2',
             user: SENDER_EMAIL_ADDRESS,
             clientId: MAILING_SERVICE_CLIENT_ID,
             clientSecret: MAILING_SERVICE_CLIENT_SECRET,
-            refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-            accessToken: MAILING_SERVICE_ACCESS_TOKEN
+            refreshToken: MAILING_SERVICE_REFRESH_TOKEN
          }
       })
+      return transporter
    }
 
    cleanUp() {
