@@ -83,14 +83,17 @@ class MongoPlayer {
     /**  USER DATA IS LOCATED IN THE "userData" FIELD IF LOOKUP HAS BEEN ADDED */
     // filter by country
     if(countries.length) {
-      query.push(StageLookupUserForPlayer)
-      query.push({ $match: { 'userData.country': { $in: countries } }})
+      query.push()
+      for(const stage of StageLookupUserForPlayer) query.push(stage)
+      query.push({ $match: { 'userData.registry.country': { $in: countries } }})
       lookupAdded = true
     }
     // filter by searchText
     if(searchText) {
-      if(!lookupAdded) query.push(StageLookupUserForPlayer)
-      const createFullNameField = { $addFields: { "fullName": { $concat: [ "$userData.surname", ' ', "$userData.name" ] } } }
+      if(!lookupAdded) {
+        for(const stage of StageLookupUserForPlayer) query.push(stage)
+      }
+      const createFullNameField = { $addFields: { "fullName": { $concat: [ "$userData.registry.surname", ' ', "$userData.registry.name" ] } } }
       const searchInFullName = { $match: { fullName: new RegExp(escapeStringForRegExp(searchText), 'i') } }
       const deleteFullNameField = { $unset: "fullName" }
       query.push(createFullNameField)
