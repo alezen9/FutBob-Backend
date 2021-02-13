@@ -1,4 +1,4 @@
-import { Max, Min, ValidateNested } from "class-validator"
+import { Max, Min } from "class-validator"
 import dayjs from "dayjs"
 import { ObjectId } from "mongodb"
 import { Field, ID, InputType, Int, ObjectType } from "type-graphql"

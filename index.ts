@@ -21,9 +21,10 @@ import path from 'path'
 require('dotenv').config()
 
 interface ReqWithisAuth extends Request {
-  isAuth?: boolean,
-  idUser?: string,
+  isAuth?: boolean
+  idUser?: string
   privileges?: Privilege[]
+  token?: string
 }
 export interface MyContext {
   req: ReqWithisAuth,

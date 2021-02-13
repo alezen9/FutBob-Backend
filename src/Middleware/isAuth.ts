@@ -33,6 +33,7 @@ const isAuthMiddleware = (req: any, res: any, next: any) => {
   req.isAuth = true
   req.idUser = decodedToken.idUser
   req.privileges = decodePrivileges(decodedToken.privileges)
+  req.token = token
   return next()
 }
 

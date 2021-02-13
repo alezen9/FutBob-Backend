@@ -1,6 +1,6 @@
-import { IsEmail, IsEnum, IsMongoId, IsPhoneNumber, Max, MaxDate, MaxLength, Min, MinDate, MinLength } from "class-validator"
+import { IsEmail, IsEnum, IsMongoId, MaxLength, MinLength } from "class-validator"
 import { Field, InputType, Int } from "type-graphql"
-import { Sex } from "../../MongoDB/User/Entities"
+import { Sex, AdditionalInfo } from "../../MongoDB/User/Entities"
 import { MaxAge } from "../../Utils/customValidators/MaxAge"
 import { MinAge } from "../../Utils/customValidators/MinAge"
 
@@ -35,12 +35,10 @@ export class CreateUserInput {
    @Field()
    @MaxLength(4)
    country: string
-   @Field({ nullable: true })
-   @IsEmail()
-   email?: string
    @Field()
-   // @IsPhoneNumber('IT')
    phone: string
+   @Field(() => AdditionalInfo, { nullable: true })
+   additionalInfo?: AdditionalInfo
 }
 @InputType()
 export class UpdateRegistryInput {
@@ -64,9 +62,7 @@ export class UpdateRegistryInput {
    @MaxLength(4)
    country?: string
    @Field({ nullable: true })
-   @IsEmail()
-   email?: string
-   @Field({ nullable: true })
-   // @IsPhoneNumber('IT')
    phone?: string
+   @Field(() => AdditionalInfo, { nullable: true })
+   additionalInfo?: AdditionalInfo
 }

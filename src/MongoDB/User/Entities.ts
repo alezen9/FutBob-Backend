@@ -1,6 +1,6 @@
 import { Privilege } from "../Entities"
 import { ObjectId } from "mongodb"
-import { Field, ID, Int, ObjectType } from "type-graphql"
+import { Field, ID, InputType, Int, ObjectType } from "type-graphql"
 import { Player } from "../Player/Entities"
 import dayjs from "dayjs"
 import { IsEmail } from "class-validator"
@@ -45,6 +45,24 @@ export class Credentials {
     resetPassword?: Confirmation
 }
 
+type CreateOrUpdateAdditionalInfo = {
+    email?: string
+}
+
+// for the players mainly
+@ObjectType()
+@InputType('additionalInfo')
+export class AdditionalInfo {
+    @Field({ nullable: true })
+    @IsEmail()
+    email?: string
+
+    constructor(data?: CreateOrUpdateAdditionalInfo) {
+        if(!data) return
+        if(data.email) this.email = data.email
+    }
+}
+
 type CreateOrUpdateRegistryType = {
     name?: string
     surname?: string
@@ -52,6 +70,7 @@ type CreateOrUpdateRegistryType = {
     sex?: Sex
     country?: string
     phone?: string
+    additionalInfo?: CreateOrUpdateAdditionalInfo
 }
 @ObjectType()
 export class Registry {
@@ -67,6 +86,8 @@ export class Registry {
     country: string
     @Field()
     phone: string
+    @Field(() => AdditionalInfo, { nullable: true })
+    additionalInfo?: AdditionalInfo
 
     constructor(data?: CreateOrUpdateRegistryType) {
         if(!data) return
@@ -76,6 +97,7 @@ export class Registry {
         if(![null, undefined].includes(data.sex)) this.sex = data.sex
         if(data.country) this.country = data.country
         if(data.phone) this.phone = data.phone
+        if(data.additionalInfo) this.additionalInfo = new AdditionalInfo(data.additionalInfo)
     }
 }
 

@@ -55,6 +55,15 @@ export class UserResolver {
       if(done) userLoader.clear(idUser)
       return done
    }
+
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async User_changeMyEmail(@Ctx() ctx: MyContext, @Arg('newEmail') newEmail: string): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoUser.changeEmail(newEmail, idUser)
+      if(done) userLoader.clear(idUser)
+      return done
+   }
 }
 
 export { PlayerFieldResolver } from './FieldResolvers/player'

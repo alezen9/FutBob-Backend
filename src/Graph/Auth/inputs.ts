@@ -1,6 +1,6 @@
-import { IsEmail, IsEnum, IsPhoneNumber, Max, MaxLength, Min, MinLength } from "class-validator"
+import { IsEmail, IsEnum, MaxLength, MinLength } from "class-validator"
 import { Field, InputType, Int } from "type-graphql"
-import { Confirmation, Sex } from "../../MongoDB/User/Entities"
+import { Sex } from "../../MongoDB/User/Entities"
 import { MaxAge } from "../../Utils/customValidators/MaxAge"
 import { MinAge } from "../../Utils/customValidators/MinAge"
 @InputType()
@@ -30,7 +30,6 @@ export class RegisterInput {
    @MaxLength(4)
    country: string
    @Field()
-   // @IsPhoneNumber('IT')
    phone: string
    @Field()
    @MaxLength(50)
