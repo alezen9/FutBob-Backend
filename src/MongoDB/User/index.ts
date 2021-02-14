@@ -205,8 +205,9 @@ class MongoUser {
 
   async update (data: UpdateRegistryInput, createdBy: string) {
     const { _id, ...registry } = data
-    if(isEmpty(cleanDeep(registry))) return true
     const updatedUser = new User({ registry, updatedAt: dayjs().toISOString() })
+    const { _id: _, updatedAt, ...rest } = updatedUser
+    if(isEmpty(cleanDeep(rest))) return true
     const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
       { $set: normalizeUpdateObject(updatedUser) }

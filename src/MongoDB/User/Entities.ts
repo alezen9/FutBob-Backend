@@ -59,7 +59,7 @@ export class AdditionalInfo {
 
     constructor(data?: CreateOrUpdateAdditionalInfo) {
         if(!data) return
-        if(data.email) this.email = data.email
+        this.email = data.email
     }
 }
 
@@ -97,7 +97,7 @@ export class Registry {
         if(![null, undefined].includes(data.sex)) this.sex = data.sex
         if(data.country) this.country = data.country
         if(data.phone) this.phone = data.phone
-        if(data.additionalInfo) this.additionalInfo = new AdditionalInfo(data.additionalInfo)
+        this.additionalInfo = new AdditionalInfo(data.additionalInfo || {})
     }
 }
 
