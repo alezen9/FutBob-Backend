@@ -121,12 +121,12 @@ describe('Player', () => {
       const { _id } = player1
       await apiInstance.player.update({
         _id,
-        positions: [PlayerPosition.FutsalGoalKeeper]
+        positions: [PlayerPosition.GoalKeeper]
       })
 
       const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, `{ result { _id, positions } }`)
       assert.strictEqual(result.length, 1)
-      assert.strictEqual(isEqual(result[0].positions, [PlayerPosition.FutsalGoalKeeper]), true)
+      assert.strictEqual(isEqual(result[0].positions, [PlayerPosition.GoalKeeper]), true)
     })
 
     it('Update a player score values', async () => {
@@ -172,7 +172,7 @@ describe('Player', () => {
       try {
         await apiInstance.player.update({
           _id,
-          positions: [PlayerPosition.FutsalLeftWing]
+          positions: [PlayerPosition.LeftWing]
         })
       } catch (error) {
         assert.strictEqual(error, ErrorMessages.player_update_failed)

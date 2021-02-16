@@ -16,10 +16,10 @@ export const player1 = {
     }
   },
   positions: [
-    PlayerPosition.FutsalLeftWing,
-    PlayerPosition.FutsalRightWing,
-    PlayerPosition.FutsalBack,
-    PlayerPosition.FutsalGoalKeeper
+    PlayerPosition.LeftWing,
+    PlayerPosition.RightWing,
+    PlayerPosition.Back,
+    PlayerPosition.GoalKeeper
   ],
   state: PhysicalState.Medium,
   score: {
@@ -67,10 +67,10 @@ export const player2 = {
     }
   },
   positions: [
-    PlayerPosition.FutsalLeftWing,
-    PlayerPosition.FutsalRightWing,
-    PlayerPosition.FutsalBack,
-    PlayerPosition.FutsalGoalKeeper
+    PlayerPosition.LeftWing,
+    PlayerPosition.RightWing,
+    PlayerPosition.Back,
+    PlayerPosition.GoalKeeper
   ],
   state: PhysicalState.Top,
   score: {

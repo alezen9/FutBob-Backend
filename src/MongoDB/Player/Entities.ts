@@ -5,11 +5,11 @@ import { Field, ID, InputType, Int, ObjectType } from "type-graphql"
 import { User } from "../User/Entities"
 
 export enum PlayerPosition {
-    FutsalGoalKeeper,
-    FutsalBack,
-    FutsalLeftWing,
-    FutsalRightWing,
-    FutsalForward
+    GoalKeeper,
+    Back,
+    LeftWing,
+    RightWing,
+    Forward
 }
 @ObjectType()
 @InputType('pace')
