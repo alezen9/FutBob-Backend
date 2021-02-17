@@ -6,10 +6,11 @@ import ResetPassword from './Emails/ResetPassword'
 require('dotenv').config()
 
 const {
-  MAILING_SERVICE_CLIENT_ID,
-  MAILING_SERVICE_CLIENT_SECRET,
-  MAILING_SERVICE_REFRESH_TOKEN,
-  SENDER_EMAIL_ADDRESS
+//   MAILING_SERVICE_CLIENT_ID,
+//   MAILING_SERVICE_CLIENT_SECRET,
+//   MAILING_SERVICE_REFRESH_TOKEN,
+  SENDER_EMAIL_ADDRESS,
+  SENDER_EMAIL_PASSWORD
 } = process.env
 
 type EmailModules = {
@@ -28,7 +29,10 @@ export class ZenNodeMailer {
    constructor() {
       this.smtpTransport = this.createTransporter()
       this.smtpTransport.verify((err) => {
-         if(err) this.cleanUp()
+         if(err) {
+            console.error(err)
+            this.cleanUp()
+         }
          else console.log('Nodemailer is ready baby!')
       })
       this.assetsPath = path.join(__dirname, '/../..', '/public/assets')
@@ -45,23 +49,19 @@ export class ZenNodeMailer {
       /** end modules */
    }
 
-   // async start () {
-   //    this.smtpTransport = await this.createTransporter()
-   //    this.smtpTransport.verify((err, success) => {
-   //       if(err) this.cleanUp()
-   //       else console.log('Nodemailer is ready baby!')
-   //    })
-   // }
-
    private createTransporter(): Mail {
       const transporter = nodemailer.createTransport({
          service: 'gmail',
+         // auth: {
+         //    type: 'OAuth2',
+         //    user: SENDER_EMAIL_ADDRESS,
+         //    clientId: MAILING_SERVICE_CLIENT_ID,
+         //    clientSecret: MAILING_SERVICE_CLIENT_SECRET,
+         //    refreshToken: MAILING_SERVICE_REFRESH_TOKEN
+         // }
          auth: {
-            type: 'OAuth2',
             user: SENDER_EMAIL_ADDRESS,
-            clientId: MAILING_SERVICE_CLIENT_ID,
-            clientSecret: MAILING_SERVICE_CLIENT_SECRET,
-            refreshToken: MAILING_SERVICE_REFRESH_TOKEN
+            pass: SENDER_EMAIL_PASSWORD
          }
       })
       return transporter
