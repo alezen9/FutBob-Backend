@@ -6,6 +6,9 @@ import http from 'http'
 import express, { Request, Response } from 'express'
 import { buildSchema } from 'type-graphql'
 /** start resolvers */
+/** ------------------------------ */
+import { _DevResolver } from './src/Graph/_Dev'
+/** ------------------------------ */
 import { AuthResolver } from './src/Graph/Auth'
 import { UserResolver, PlayerFieldResolver } from './src/Graph/User'
 import { PlayerResolver, UserFieldResolver } from './src/Graph/Player'
@@ -45,6 +48,7 @@ const main = async () => {
     const pubsub = new PubSub()
     const schema = await buildSchema({
       resolvers: [
+        _DevResolver,
         AuthResolver,
         UserResolver, PlayerFieldResolver,
         PlayerResolver, UserFieldResolver,
@@ -57,14 +61,21 @@ const main = async () => {
     const server = new ApolloServer({
       schema,
       context: ({ req, res }) => ({ req, res, pubsub }),
-      ...process.env.NODE_ENV === 'development' && {
+      // ...process.env.NODE_ENV === 'development' && {
+      //   introspection: true,
+      //   playground: {
+      //     settings: {
+      //       'editor.theme': 'dark'
+      //     }
+      //   }
+      // }
+      
         introspection: true,
         playground: {
           settings: {
             'editor.theme': 'dark'
           }
         }
-      }
     })
     server.applyMiddleware({ app })
     const httpServer = http.createServer(app)

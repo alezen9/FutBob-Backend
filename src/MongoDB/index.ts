@@ -34,6 +34,7 @@ export class MongoDB {
 
   async startConnection () {
     try {
+      console.log(this.dbUri)
       const client = await MongoClient.connect(
           this.dbUri,
           { useNewUrlParser: true, useUnifiedTopology: true }
@@ -41,7 +42,9 @@ export class MongoDB {
       this.setupCollections(client)
       this.state = MongoState.Connected
     } catch (error) {
-      console.error(error)
+      // console.error(error)
+      console.log('hereeeeeeeeeee')
+      throw error
     }
   }
 
@@ -50,28 +53,23 @@ export class MongoDB {
       // create collections
       client.db(this.dbName).createCollection('User')
       client.db(this.dbName).createCollection('Player')
-      client.db(this.dbName).createCollection('Fields')
+      client.db(this.dbName).createCollection('Field')
       client.db(this.dbName).createCollection('FreeAgent')
-      client.db(this.dbName).createCollection('Appointment')
       // create indexes
       client.db(this.dbName).collection('User').createIndex({ 'credentials.email': 1 })
+      client.db(this.dbName).collection('User').createIndex({ 'credentials.registry.additionalInfo.email': 1 })
       client.db(this.dbName).collection('User').createIndex({ 'credentials.verifyAccount.code.value': 1 })
       client.db(this.dbName).collection('User').createIndex({ 'credentials.resetPassword.code.value': 1 })
       client.db(this.dbName).collection('User').createIndex({ player: 1 })
       client.db(this.dbName).collection('User').createIndex({ createdBy: 1 })
       client.db(this.dbName).collection('Player').createIndex({ createdBy: 1 })
-      client.db(this.dbName).collection('Fields').createIndex({ createdBy: 1 })
-      client.db(this.dbName).collection('Appointment').createIndex({ createdBy: 1 })
-      client.db(this.dbName).collection('Appointment').createIndex({ 'location.coordinates': 1 })
-      client.db(this.dbName).collection('Appointment').createIndex({ timeAndDate: 1 })
-      client.db(this.dbName).collection('Appointment').createIndex({ state: 1 })
+      client.db(this.dbName).collection('Field').createIndex({ createdBy: 1 })
 
       // populate colletion class
       collection.user = client.db(this.dbName).collection('User')
       collection.player = client.db(this.dbName).collection('Player')
-      collection.field = client.db(this.dbName).collection('Fields') // to make singular
+      collection.field = client.db(this.dbName).collection('Field')
       collection.freeAgent = client.db(this.dbName).collection('FreeAgent')
-      collection.appointment = client.db(this.dbName).collection('Appointment')
       // make collections and client available to class
       this.client = client
       this.collection = collection
@@ -82,7 +80,6 @@ export class MongoDB {
     await this.collection.player.deleteMany({})
     await this.collection.field.deleteMany({})
     await this.collection.freeAgent.deleteMany({})
-    await this.collection.appointment.deleteMany({})
   }
 
   async closeConnection () {
