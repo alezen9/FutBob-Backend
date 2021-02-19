@@ -34,7 +34,6 @@ export class MongoDB {
 
   async startConnection () {
     try {
-      console.log(this.dbUri)
       const client = await MongoClient.connect(
           this.dbUri,
           { useNewUrlParser: true, useUnifiedTopology: true }
@@ -42,8 +41,6 @@ export class MongoDB {
       this.setupCollections(client)
       this.state = MongoState.Connected
     } catch (error) {
-      // console.error(error)
-      console.log('hereeeeeeeeeee')
       throw error
     }
   }

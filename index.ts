@@ -61,21 +61,14 @@ const main = async () => {
     const server = new ApolloServer({
       schema,
       context: ({ req, res }) => ({ req, res, pubsub }),
-      // ...process.env.NODE_ENV === 'development' && {
-      //   introspection: true,
-      //   playground: {
-      //     settings: {
-      //       'editor.theme': 'dark'
-      //     }
-      //   }
-      // }
-      
+      ...process.env.NODE_ENV === 'development' && {
         introspection: true,
         playground: {
           settings: {
             'editor.theme': 'dark'
           }
         }
+      }
     })
     server.applyMiddleware({ app })
     const httpServer = http.createServer(app)
