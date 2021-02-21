@@ -1,4 +1,4 @@
-import { IsEnum, IsMongoId, Max, MaxLength, Min, ValidateNested } from 'class-validator'
+import { IsEnum, IsMongoId, Matches, Max, MaxLength, Min, ValidateNested } from 'class-validator'
 import { Field, InputType, Int } from 'type-graphql'
 import { PhysicalState, PlayerPosition, PlayerScore } from '../../MongoDB/Player/Entities'
 import { EnumArrayOf } from '../../Utils/customValidators/EnumArrayOf'
@@ -48,4 +48,19 @@ export class FiltersPlayer {
    @Field({ nullable: true })
    @MaxLength(50)
    searchText?: string
+}
+
+export enum EnumSortPlayer {
+   name = 'name',
+   country = 'country',
+   age = 'age'
+}
+@InputType()
+export class SortPlayer {
+   @Field(() => String, { nullable: true })
+   @IsEnum(EnumSortPlayer)
+   field?: EnumSortPlayer
+   @Field({ nullable: true })
+   @Matches(/ASC|DESC/)
+   sort?: 'ASC'|'DESC'
 }

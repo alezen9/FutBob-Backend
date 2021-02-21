@@ -1,6 +1,6 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { List, Pagination, Privilege } from "../../MongoDB/Entities";
-import { CreatePlayerInput, UpdatePlayerInput, FiltersPlayer } from "./inputs";
+import { CreatePlayerInput, UpdatePlayerInput, FiltersPlayer, SortPlayer } from "./inputs";
 import { MyContext } from "../../../index";
 import { mongoPlayer } from "../../MongoDB/Player";
 import { Player } from "../../MongoDB/Player/Entities"
@@ -11,9 +11,9 @@ export class PlayerResolver {
 
    @Query(() => PaginatedPlayerResponse)
    @Authorized(Privilege.Manager)
-   async Player_getList(@Ctx() ctx: MyContext, @Arg('filters') filters: FiltersPlayer, @Arg('pagination') pagination: Pagination): Promise<List<Player>> {
+   async Player_getList(@Ctx() ctx: MyContext, @Arg('filters') filters: FiltersPlayer, @Arg('pagination') pagination: Pagination, @Arg('sort') sort: SortPlayer): Promise<List<Player>> {
       const { idUser } = ctx.req
-      const result = await mongoPlayer.getList(filters, pagination, idUser)
+      const result = await mongoPlayer.getList(filters, pagination, sort, idUser)
       return result
    }
 

@@ -13,3 +13,6 @@ export const facetCount = ({skip = 10, limit = 100}: { skip?: number, limit?: nu
     result: [{ $skip: skip }, { $limit: limit }]
   }
 })
+
+
+export const transformSortValue = (val: 'ASC'|'DESC') => val === 'ASC' ? 1 : -1
