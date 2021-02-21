@@ -44,13 +44,17 @@ class MongoPlayer {
   }
 
   async delete (_id: string, createdBy: string): Promise<boolean> {
-    const player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+    const player: Player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
     if(!player) throw new Error(ErrorMessages.system_permission_denied)
     await MongoDBInstance.collection.player.deleteOne({ _id: new ObjectId(_id) })
-    await MongoDBInstance.collection.user.updateOne(
-      { _id: new ObjectId(player.user), createdBy: new ObjectId(createdBy) },
-      { $set: { player: null } }
-    )
+    if((player.user).toHexString() === createdBy){
+      await MongoDBInstance.collection.user.updateOne(
+        { _id: new ObjectId(player.user), createdBy: new ObjectId(createdBy) },
+        { $set: { player: null } }
+      )
+    } else {
+      await MongoDBInstance.collection.user.deleteOne({ _id: new ObjectId(player.user) })
+    }
     return true
   }
 

@@ -5,5 +5,5 @@ tsc
 rsync -avum --include='*.ejs' --include='*/' --exclude='*' './src/' './dist/src'
 # copy public dir
 rsync -avum --include='*' './public/' './dist/public'
-# start server with nodemon
-node dist/index.js
+# start server with pm2
+pm2 start dist/index.js

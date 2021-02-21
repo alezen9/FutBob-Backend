@@ -11,8 +11,7 @@
     "dist/**/*"
   ],
   "scripts": {
-    "start": "node dist/index.js",
-    "dev-prod": "./scripts/start_local_prod.sh",
+    "start": "./scripts/start_prod.sh",
     "dev": "./scripts/start_local.sh",
     "build": "tsc",
     "test": "mocha"
