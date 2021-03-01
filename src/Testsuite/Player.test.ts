@@ -39,7 +39,7 @@ describe('Player', () => {
       player1.user._id = userId
       const playerId = await apiInstance.player.create({ ...body, user: userId })
       player1._id = playerId
-      const { result } = await apiInstance.player.getList({}, { skip: 0 }, `{ result { _id, user { _id } } }`)
+      const { result } = await apiInstance.player.getList({}, { skip: 0 }, {}, `{ result { _id, user { _id } } }`)
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0]._id, playerId)
       assert.strictEqual(result[0].user._id, userId)
@@ -88,7 +88,7 @@ describe('Player', () => {
     it('Delete an existing player', async () => {
       const done = await apiInstance.user.delete(player1.user._id)
       assert.strictEqual(done, true)
-      const { result } = await apiInstance.player.getList({}, { skip: 0 }, `{ result { _id } }`)
+      const { result } = await apiInstance.player.getList({}, { skip: 0 }, {}, `{ result { _id } }`)
       assert.strictEqual(result.length, 0)
       player1._id = undefined
       player1.user._id = undefined
@@ -109,7 +109,7 @@ describe('Player', () => {
       const playerId2 = await apiInstance.player.create({ ...body2, user: userId2 })
       player2._id = playerId2
 
-      const { result } = await apiInstance.player.getList({}, { skip: 0 }, `{ result { _id, user { _id } } }`)
+      const { result } = await apiInstance.player.getList({}, { skip: 0 }, {}, `{ result { _id, user { _id } } }`)
       assert.strictEqual(result.length, 2)
       assert.strictEqual(result[0]._id, playerId)
       assert.strictEqual(result[0].user._id, userId)
@@ -124,7 +124,7 @@ describe('Player', () => {
         positions: [PlayerPosition.GoalKeeper]
       })
 
-      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, `{ result { _id, positions } }`)
+      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, {}, `{ result { _id, positions } }`)
       assert.strictEqual(result.length, 1)
       assert.strictEqual(isEqual(result[0].positions, [PlayerPosition.GoalKeeper]), true)
     })
@@ -143,7 +143,7 @@ describe('Player', () => {
         score: newScoreValues
       })
 
-      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, `{ result { _id, score { pace { speed, stamina } } } }`)
+      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, {}, `{ result { _id, score { pace { speed, stamina } } } }`)
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0].score.pace.speed, newScoreValues.pace.speed)
       assert.strictEqual(result[0].score.pace.stamina, newScoreValues.pace.stamina)
@@ -157,7 +157,7 @@ describe('Player', () => {
         name: newName
       })
 
-      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, `{ result { _id, user { _id, registry { name } } } }`)
+      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, {}, `{ result { _id, user { _id, registry { name } } } }`)
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0]._id, _id)
       assert.strictEqual(result[0].user._id, user._id)
@@ -167,7 +167,7 @@ describe('Player', () => {
     it('Try to update a deleted player position', async () => {
       const { user: { _id } } = player1
       await apiInstance.user.delete(_id)
-      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, `{ result { _id } }`)
+      const { result } = await apiInstance.player.getList({ ids: [_id] }, { skip: 0 }, {}, `{ result { _id } }`)
       assert.strictEqual(result.length, 0)
       try {
         await apiInstance.player.update({

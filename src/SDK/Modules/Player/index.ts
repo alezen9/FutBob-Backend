@@ -1,5 +1,5 @@
 import { ZenServer } from "../../"
-import { CreatePlayerInput, FiltersPlayer, UpdatePlayerInput } from "../../../Graph/Player/inputs"
+import { CreatePlayerInput, FiltersPlayer, SortPlayer, UpdatePlayerInput } from "../../../Graph/Player/inputs"
 import { Pagination } from "../../../MongoDB/Entities"
 import { paramsToString } from "../../helpers"
 
@@ -36,10 +36,10 @@ class PlayerServer {
    }
 
 
-   async getList (filters: FiltersPlayer, pagination: Pagination, fields: string) {
+   async getList (filters: FiltersPlayer, pagination: Pagination, sort: SortPlayer, fields: string) {
       const query = `
       query {
-         Player_getList(filters: ${paramsToString(filters)}, pagination: ${paramsToString(pagination)}) ${fields}
+         Player_getList(filters: ${paramsToString(filters)}, pagination: ${paramsToString(pagination)}, sort: ${paramsToString(sort)}) ${fields}
       }`
       return this._server.API({ query, name: 'Player_getList' })
    }
