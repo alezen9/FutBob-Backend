@@ -20,7 +20,8 @@ const ErrorMessages = Object.freeze({
   player_update_failed: 'player_update_failed',
   field_update_failed: 'field_update_failed',
   freeAgent_missing_information: 'freeAgent_missing_information',
-  freeAgent_update_failed: 'freeAgent_update_failed'
+  freeAgent_update_failed: 'freeAgent_update_failed',
+  freeAgent_does_not_exist: 'freeAgent_does_not_exist'
 })
 
 export default ErrorMessages

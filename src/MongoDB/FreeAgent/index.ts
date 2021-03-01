@@ -7,6 +7,9 @@ import { FreeAgent } from './Entities'
 import { facetCount } from '../helpers'
 import { CreateFreeAgentInput, FiltersFreeAgent, UpdateFreeAgentInput } from '../../Graph/FreeAgent/inputs'
 import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helpers'
+import { CreatePlayerInput } from '../../Graph/Player/inputs'
+import { mongoPlayer } from '../Player'
+import ErrorMessages from '../../Utils/ErrorMessages'
 
 class MongoFreeAgent {
 
@@ -40,6 +43,15 @@ class MongoFreeAgent {
   async delete (_id: string, createdBy: string): Promise<boolean> {
     await MongoDBInstance.collection.freeAgent.deleteOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
     return true
+  }
+
+  async registerAsPlaye (_id: string, createPlayerBody: CreatePlayerInput, createdBy: string): Promise<string> {
+    const freeAgent = await this.getFreeAgentById(_id)
+    if(!freeAgent) throw new Error(ErrorMessages.freeAgent_does_not_exist)
+    const _idPlayer = await mongoPlayer.create(createPlayerBody, createdBy)
+    // update free agent in appointments
+    await this.delete(_id, createdBy)
+    return _idPlayer
   }
 
   async getList (filters: FiltersFreeAgent, pagination: Pagination, createdBy: string): Promise<List<FreeAgent>> {

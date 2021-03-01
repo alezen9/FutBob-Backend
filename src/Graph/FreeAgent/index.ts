@@ -5,6 +5,7 @@ import { MyContext } from "../../../index";
 import { PaginatedFreeAgentResponse } from "./types";
 import { mongoFreeAgent } from "../../MongoDB/FreeAgent";
 import { FreeAgent } from "../../MongoDB/FreeAgent/Entities";
+import { CreatePlayerInput } from "../Player/inputs";
 
 @Resolver()
 export class FreeAgentResolver {
@@ -39,5 +40,13 @@ export class FreeAgentResolver {
       const { idUser } = ctx.req
       const done = await mongoFreeAgent.delete(_id, idUser)
       return done
+   }
+
+   @Mutation(() => String)
+   @Authorized(Privilege.Manager)
+   async FreeAgent_registerAsPlayer(@Ctx() ctx: MyContext, @Arg('_id') _id: string,  @Arg('body') body: CreatePlayerInput): Promise<String> {
+      const { idUser } = ctx.req
+      const _idPlayer = await mongoFreeAgent.registerAsPlaye(_id, body, idUser)
+      return _idPlayer
    }
 }
