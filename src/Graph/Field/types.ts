@@ -1,5 +1,5 @@
 import { ObjectType } from "type-graphql";
-import { Field } from "../../MongoDB/Fields/Entities";
+import { Field } from "../../MongoDB/Field/Entities";
 import { PaginatedListOf } from "../genericTypes";
 
 @ObjectType()

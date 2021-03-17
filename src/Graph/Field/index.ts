@@ -3,8 +3,8 @@ import { List, Pagination, Privilege } from "../../MongoDB/Entities";
 import { FiltersField, CreateFieldInput, UpdateFieldInput } from "./inputs";
 import { MyContext } from "../../../index";
 import { PaginatedFieldResponse } from "./types";
-import { Field } from "../../MongoDB/Fields/Entities";
-import { mongoField } from "../../MongoDB/Fields";
+import { Field } from "../../MongoDB/Field/Entities";
+import { mongoField } from "../../MongoDB/Field";
 
 @Resolver()
 export class FieldResolver {

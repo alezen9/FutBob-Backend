@@ -1,7 +1,7 @@
 import { IsEnum, IsMongoId, Max, MaxLength, Min, ValidateNested } from 'class-validator'
 import { Field, InputType, Int } from 'type-graphql'
 import { GeoPoint } from '../../MongoDB/Entities'
-import { FieldState, FieldType, Measurements } from '../../MongoDB/Fields/Entities'
+import { FieldState, FieldType, Measurements } from '../../MongoDB/Field/Entities'
 import { EnumArrayOf } from '../../Utils/customValidators/EnumArrayOf'
 
 @InputType()

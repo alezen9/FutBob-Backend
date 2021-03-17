@@ -1,4 +1,4 @@
-import { FieldState, FieldType } from '../../../MongoDB/Fields/Entities'
+import { FieldState, FieldType } from '../../../MongoDB/Field/Entities'
 
 export const field1 = {
   _id: undefined,
