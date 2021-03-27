@@ -119,6 +119,11 @@ class MongoPlayer {
     const player: Player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id) })
     return player
   }
+
+  async getUserByIds (ids: (string|ObjectId)[]): Promise<Player[]> {
+    const players: Player[] = await MongoDBInstance.collection.player.find({ _id: { $in: ids.map(id => new ObjectId(id)) } }).toArray()
+    return players
+  }
 }
 
 export const mongoPlayer = new MongoPlayer()

@@ -4,9 +4,9 @@ import { User } from "../../MongoDB/User/Entities";
 import ErrorMessages from "../../Utils/ErrorMessages";
 import { Privilege } from "../../MongoDB/Entities";
 import { MyContext } from "../../../index";
-import { userLoader } from "./Loader";
+import { userLoader } from "./loader";
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput }  from './inputs'
-import { playerLoader } from "../Player/Loader";
+import { playerLoader } from "../Player/loader";
 import { nodemailerInstance } from "../../NodeMailer";
 @Resolver()
 export class UserResolver {

@@ -261,6 +261,11 @@ class MongoUser {
     return user
   }
 
+  async getUserByIds (ids: (string|ObjectId)[]): Promise<User[]> {
+    const users: User[] = await MongoDBInstance.collection.user.find({ _id: { $in: ids.map(id => new ObjectId(id)) } }).toArray()
+    return users
+  }
+
   async getManagerByEmail (email: string): Promise<User> {
     const user: User = await MongoDBInstance.collection.user.findOne({ "credentials.email": email, privileges: Privilege.Manager })
     return user
