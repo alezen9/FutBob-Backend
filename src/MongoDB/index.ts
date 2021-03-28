@@ -1,4 +1,4 @@
-import { Collection, IndexSpecification, MongoClient } from 'mongodb'
+import { MongoClient } from 'mongodb'
 import { CollectionContainer } from './Entities'
 require('dotenv').config()
 
