@@ -4,9 +4,9 @@ import { User } from "../../MongoDB/User/Entities";
 import ErrorMessages from "../../Utils/ErrorMessages";
 import { Privilege } from "../../MongoDB/Entities";
 import { MyContext } from "../../../index";
-import { userLoader } from "./loader";
+import { userLoader } from "./loaders";
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput }  from './inputs'
-import { playerLoader } from "../Player/loader";
+import { playerLoader } from "../Player/loaders";
 @Resolver()
 export class UserResolver {
 
