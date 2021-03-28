@@ -115,7 +115,7 @@ class MongoPlayer {
     return result
   }
 
-  async getPlayerById (_id: string): Promise<Player> {
+  async getPlayerById (_id: string|ObjectId): Promise<Player> {
     const player: Player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id) })
     return player
   }

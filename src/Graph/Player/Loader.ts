@@ -5,5 +5,6 @@ import { mongoPlayer } from '../../MongoDB/Player'
 /** Loaders */
 
 export const playerLoader = new DataLoader((playerIds: (string|ObjectId) []) => {
-  return mongoPlayer.getUserByIds(playerIds)
+  const promises = playerIds.map(_id => mongoPlayer.getPlayerById(_id))
+  return Promise.all(promises)
 })
