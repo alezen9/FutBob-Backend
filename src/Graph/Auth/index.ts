@@ -1,7 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { mongoUser } from "../../MongoDB/User";
 import { AuthData } from "../../MongoDB/User/Entities";
-import { FinalizeRegistrationInput, LoginInput, RegisterInput, RequestResendInput } from "./inputs";
+import { FinalizeRegistrationInput, LoginInput, RegisterInput } from "./inputs";
 import jwt from 'jsonwebtoken'
 
 @Resolver()
@@ -19,7 +19,7 @@ export class AuthResolver {
     return true
    }
 
-   @Query(() => AuthData)
+   @Mutation(() => AuthData)
    async Auth_login(@Arg('body') body: LoginInput): Promise<AuthData> {
       return mongoUser.login(body)
    }

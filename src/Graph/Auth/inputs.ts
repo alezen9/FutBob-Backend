@@ -50,13 +50,3 @@ export class FinalizeRegistrationInput {
    @MaxLength(50)
    confirmPassword: string
 }
-
-@InputType()
-export class RequestResendInput {
-   @Field()
-   expiredCode: string
-   @Field()
-   @MaxLength(50)
-   @IsEmail()
-   email: string
-}

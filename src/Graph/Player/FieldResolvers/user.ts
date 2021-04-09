@@ -9,7 +9,7 @@ export class UserFieldResolver implements ResolverInterface<Player> {
    @FieldResolver(() => User)
    // @ts-ignore
    async user(@Root() root: Player): Promise<User> {
-      return userLoader.load(root.user)
+      return userLoader.load(root.user.toHexString())
    }
    
 }

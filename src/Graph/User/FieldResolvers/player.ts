@@ -10,7 +10,7 @@ export class PlayerFieldResolver implements ResolverInterface<User> {
    // @ts-ignore
    async player(@Root() root: User): Promise<Player|null> {
       return root.player
-         ? playerLoader.load(root.player)
+         ? playerLoader.load(root.player.toHexString())
          : null
    }
    

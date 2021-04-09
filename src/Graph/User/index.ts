@@ -23,7 +23,7 @@ export class UserResolver {
    async User_update(@Ctx() ctx: MyContext, @Arg('body') body: UpdateRegistryInput): Promise<Boolean> {
       const { idUser } = ctx.req
       const done = await mongoUser.update(body, idUser)
-      if(done) userLoader.clear(idUser)
+      userLoader.clear(body._id)
       return done
    }
 

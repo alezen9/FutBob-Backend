@@ -10,7 +10,7 @@ import { AuthData, Confirmation, Credentials, User } from './Entities'
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput } from '../../Graph/User/inputs'
 import { isEmpty, get } from 'lodash'
 import cleanDeep from 'clean-deep'
-import { FinalizeRegistrationInput, LoginInput, RegisterInput, RequestResendInput } from '../../Graph/Auth/inputs'
+import { FinalizeRegistrationInput, LoginInput, RegisterInput } from '../../Graph/Auth/inputs'
 import { nodemailerInstance } from '../../NodeMailer'
 import { v4 as uuidv4 } from 'uuid'
 require('dotenv').config()
@@ -208,13 +208,14 @@ class MongoUser {
     const updatedUser = new User({ registry, updatedAt: dayjs().toISOString() })
     const { _id: _, updatedAt, ...rest } = updatedUser
     if(isEmpty(cleanDeep(rest))) return true
-    const { modifiedCount } = await MongoDBInstance.collection.user.updateOne(
+    const toSet = normalizeUpdateObject(updatedUser)
+    const {modifiedCount } = await MongoDBInstance.collection.user.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
-      { $set: normalizeUpdateObject(updatedUser) }
+      { $set: toSet }
     )
     if (modifiedCount === 0) throw new Error(ErrorMessages.user_update_failed)
     return true
-  }
+    }
 
   async delete (_id: string, createdBy: string){
     const user = await MongoDBInstance.collection.user.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
