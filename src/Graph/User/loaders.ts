@@ -1,9 +1,16 @@
 import DataLoader from 'dataloader'
 import { mongoUser } from '../../MongoDB/User'
+import { User } from '../../MongoDB/User/Entities'
 
-/** Loaders */
+const batchUsers = async (ids: string[]) => {
+  const users = await mongoUser.getUserByIds(ids)
+  const userMap = users.reduce<{ [_id: string]: User }>((acc, user) => {
+    return {
+      ...acc,
+      [String(user._id)]: user
+    }
+  }, {})
+  return ids.map(_id => userMap[_id])
+}
 
-export const userLoader = new DataLoader((userIds: string[]) => {
-  const promises = userIds.map(_id => mongoUser.getUserById(_id))
-  return Promise.all(promises)
-})
+export const userLoader = new DataLoader(batchUsers)
