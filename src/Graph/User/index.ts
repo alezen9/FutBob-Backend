@@ -4,10 +4,9 @@ import { User } from "../../MongoDB/User/Entities";
 import ErrorMessages from "../../Utils/ErrorMessages";
 import { Privilege } from "../../MongoDB/Entities";
 import { MyContext } from "../../../index";
-import { userLoader } from "./Loader";
+import { userLoader } from "./loaders";
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput }  from './inputs'
-import { playerLoader } from "../Player/Loader";
-import { nodemailerInstance } from "../../NodeMailer";
+import { playerLoader } from "../Player/loaders";
 @Resolver()
 export class UserResolver {
 
@@ -24,7 +23,7 @@ export class UserResolver {
    async User_update(@Ctx() ctx: MyContext, @Arg('body') body: UpdateRegistryInput): Promise<Boolean> {
       const { idUser } = ctx.req
       const done = await mongoUser.update(body, idUser)
-      if(done) userLoader.clear(idUser)
+      userLoader.clear(body._id)
       return done
    }
 

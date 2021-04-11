@@ -75,6 +75,8 @@ const main = async () => {
     server.installSubscriptionHandlers(httpServer)
 
     httpServer.listen(port)
+    
+    console.log('NODE_ENV: ', process.env.NODE_ENV)
     console.log(`connected to DB, listening on port ${port}`)
   } catch (error) {
     console.log(error)

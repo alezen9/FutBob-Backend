@@ -5,6 +5,7 @@ import { MyContext } from "../../../index";
 import { mongoPlayer } from "../../MongoDB/Player";
 import { Player } from "../../MongoDB/Player/Entities"
 import { PaginatedPlayerResponse } from "./types";
+import { playerLoader } from "./loaders";
 
 @Resolver()
 export class PlayerResolver {
@@ -30,6 +31,7 @@ export class PlayerResolver {
    async Player_update(@Ctx() ctx: MyContext, @Arg('body') body: UpdatePlayerInput): Promise<Boolean> {
       const { idUser } = ctx.req
       const done = await mongoPlayer.update(body, idUser)
+      playerLoader.clear(body._id)
       return done
    }
 

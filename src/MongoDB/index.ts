@@ -38,32 +38,45 @@ export class MongoDB {
           this.dbUri,
           { useNewUrlParser: true, useUnifiedTopology: true }
         )
-      this.setupCollections(client)
+      await this.setupCollections(client)
       this.state = MongoState.Connected
     } catch (error) {
       throw error
     }
   }
 
-  setupCollections(client:MongoClient) {
+  async setupCollections(client: MongoClient) {
       const collection = new CollectionContainer()
-      // create collections
-      client.db(this.dbName).createCollection('User')
-      client.db(this.dbName).createCollection('Player')
-      client.db(this.dbName).createCollection('Field')
-      client.db(this.dbName).createCollection('FreeAgent')
-      client.db(this.dbName).createCollection('Appointment')
-      // create indexes
-      client.db(this.dbName).collection('User').createIndex({ 'credentials.email': 1 })
-      client.db(this.dbName).collection('User').createIndex({ 'credentials.registry.additionalInfo.email': 1 })
-      client.db(this.dbName).collection('User').createIndex({ 'credentials.verifyAccount.code.value': 1 })
-      client.db(this.dbName).collection('User').createIndex({ 'credentials.resetPassword.code.value': 1 })
-      client.db(this.dbName).collection('User').createIndex({ player: 1 })
-      client.db(this.dbName).collection('User').createIndex({ createdBy: 1 })
-      client.db(this.dbName).collection('Player').createIndex({ createdBy: 1 })
-      client.db(this.dbName).collection('Field').createIndex({ createdBy: 1 })
-      // TODO => set indexes for appointments
-
+      // create collections and indexes
+      await this.createCollection(client, {
+        name: 'User',
+        indexes: [
+          { 'credentials.email': 1 },
+          { 'credentials.registry.additionalInfo.email': 1 },
+          { 'credentials.verifyAccount.code.value': 1 },
+          { 'credentials.resetPassword.code.value': 1 },
+          { player: 1 },
+          { createdBy: 1 }
+        ] }
+      )
+      await this.createCollection(client, {
+        name: 'Player',
+        indexes: [
+          { createdBy: 1 }
+        ] }
+      )
+      await this.createCollection(client, {
+        name: 'Field',
+        indexes: [
+          { createdBy: 1 }
+        ] }
+      )
+      await this.createCollection(client, {
+        name: 'FreeAgent',
+        indexes: [
+          { createdBy: 1 }
+        ] }
+      )
       // populate colletion class
       collection.user = client.db(this.dbName).collection('User')
       collection.player = client.db(this.dbName).collection('Player')
@@ -73,6 +86,17 @@ export class MongoDB {
       // make collections and client available to class
       this.client = client
       this.collection = collection
+  }
+
+  private async createCollection(client: MongoClient, config: { name: string, indexes?: any[] }) {
+    const exists = await client.db(this.dbName).listCollections({ name: config.name }).toArray()
+    if(!exists || !exists.length){
+      await client.db(this.dbName).createCollection(config.name)
+    }
+    if(config.indexes && config.indexes.length) {
+      const promises = config.indexes.map(idx => client.db(this.dbName).collection(config.name).createIndex(idx))
+      await Promise.all(promises)
+    }
   }
 
   async clearDb () {

@@ -56,6 +56,12 @@ export const asyncTimeout = async (milliseconds: number, log: boolean = false): 
   setTimeout(() => resolve(), milliseconds);
 })
 
+
+/**
+ * 
+ * @description Transforms a normal object into an object that can be well understood by mongo
+ * @example { field: { secondField: 2 } } => { "field.secondField": 2 }
+ */
 export const normalizeUpdateObject = (obj: any, _key: string = '') => {
   let res = {}
   for(const [key, value] of Object.entries(obj)){

@@ -1,6 +1,6 @@
 import { get } from 'lodash'
 import { ZenServer } from "../../"
-import { FinalizeRegistrationInput, LoginInput, RegisterInput, RequestResendInput } from '../../../Graph/Auth/inputs'
+import { FinalizeRegistrationInput, LoginInput, RegisterInput } from '../../../Graph/Auth/inputs'
 import { paramsToString } from '../../helpers'
 
 class AuthServer {
@@ -35,10 +35,10 @@ class AuthServer {
       return this._server.API({ query, name: 'Auth_requestRegistration' })
    }
 
-   async requestRegistrationEmailResend(body: RequestResendInput): Promise<any> {
+   async requestRegistrationEmailResend(expiredCode: string): Promise<any> {
       const query = `
       mutation {
-         Auth_requestRegistrationEmailResend(body: ${paramsToString(body)})
+         Auth_requestRegistrationEmailResend(expiredCode: ${expiredCode})
       }`
       return this._server.API({ query, name: 'Auth_requestRegistrationEmailResend' })
    }
@@ -63,10 +63,10 @@ class AuthServer {
       return this._server.API({ query, name: 'Auth_requestResetPassword' })
    }
 
-   async requestResetPasswordEmailResend(body: RequestResendInput): Promise<any> {
+   async requestResetPasswordEmailResend(expiredCode: string): Promise<any> {
       const query = `
       mutation {
-         Auth_requestResetPasswordEmailResend(body: ${paramsToString(body)})
+         Auth_requestResetPasswordEmailResend(expiredCode: ${expiredCode})
       }`
       return this._server.API({ query, name: 'Auth_requestResetPasswordEmailResend' })
    }
@@ -82,7 +82,7 @@ class AuthServer {
    
    async login(body: LoginInput, fields: string): Promise<any> {
       const query = `
-      query {
+      mutation {
          Auth_login(body: ${paramsToString(body)})${fields}
       }`
       return this._server.API({ query, name: 'Auth_login' })
