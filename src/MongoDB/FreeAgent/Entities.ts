@@ -10,7 +10,7 @@ type CreateOrUpdateFreeAgent = {
     createdAt?: Date|string
     updatedAt?: Date|string
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 export class FreeAgent {
     @Field(() => ID)
     _id: ObjectId

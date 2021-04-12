@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb'
 import { CollectionContainer } from './Entities'
+import chalk from 'chalk'
 require('dotenv').config()
 
 export enum MongoState {
@@ -40,7 +41,9 @@ export class MongoDB {
         )
       await this.setupCollections(client)
       this.state = MongoState.Connected
+      console.log(chalk.green('[futbob] Connected to DB'))
     } catch (error) {
+      console.error('[futbob] Error while connecting to the DB')
       throw error
     }
   }
@@ -110,6 +113,7 @@ export class MongoDB {
       if(this.client) this.client.close()
       this.state = MongoState.Disconnected
     } catch (error) {
+      console.error('[futbob] Error shutting donw mongo!')
       console.error(error)
     }
   }

@@ -21,6 +21,7 @@ import { authChecker } from './src/Middleware/Authorization'
 import { nodemailerInstance } from './src/NodeMailer'
 import shell from 'shelljs'
 import path from 'path'
+import chalk from 'chalk'
 require('dotenv').config()
 
 interface ReqWithisAuth extends Request {
@@ -61,7 +62,8 @@ const main = async () => {
     const server = new ApolloServer({
       schema,
       context: ({ req, res }) => ({ req, res, pubsub }),
-      ...process.env.NODE_ENV === 'development' && {
+      // ...process.env.NODE_ENV === 'development' && {
+        ...true && {
         introspection: true,
         playground: {
           settings: {
@@ -76,28 +78,24 @@ const main = async () => {
 
     httpServer.listen(port)
     
-    console.log('NODE_ENV: ', process.env.NODE_ENV)
-    console.log(`connected to DB, listening on port ${port}`)
+    console.log(chalk.green(`[futbob] NODE_ENV: ${process.env.NODE_ENV}`))
+    console.log(chalk.green`[futbob] Listening on port ${port}`)
   } catch (error) {
     console.log(error)
     nodemailerInstance.cleanUp()
     try {
       await MongoDBInstance.closeConnection()
-    } catch (error) {
-      console.error('Error shutting donw mongo!')
-    }
+    } catch (error) {}
   }
 }
 
 process.on('SIGINT', async () => {
-  console.log('\nGracefully shutting down and cleaning mess...')
+  console.log(chalk.green('\n[futbob] Gracefully shutting down and cleaning mess...'))
   if (process.env.NODE_ENV !== 'production') {
     nodemailerInstance.cleanUp()
     try {
       await MongoDBInstance.closeConnection()
-    } catch (error) {
-      console.error('Error shutting donw mongo!')
-    }
+    } catch (error) {}
     shell.exec('lsof -ti tcp:27017 | xargs kill')
   }
   process.exit()

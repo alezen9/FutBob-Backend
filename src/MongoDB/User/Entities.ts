@@ -35,7 +35,7 @@ export class Confirmation {
     }
 }
 
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 export class Credentials {
     @Field()
     @IsEmail()
@@ -50,7 +50,7 @@ type CreateOrUpdateAdditionalInfo = {
 }
 
 // for the players mainly
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('additionalInfo')
 export class AdditionalInfo {
     @Field({ nullable: true })
@@ -72,7 +72,7 @@ type CreateOrUpdateRegistryType = {
     phone?: string
     additionalInfo?: CreateOrUpdateAdditionalInfo
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 export class Registry {
     @Field()
     name: string
@@ -113,14 +113,14 @@ type CreateOrUpdateUserType = {
 }
 @ObjectType()
 export class User {
-    @Field(() => ID)
+    @Field(() => ID, { simple: true })
     _id: ObjectId
     createdBy: ObjectId
     createdAt: Date|string
     updatedAt: Date|string
-    @Field(() => Registry)
+    @Field(() => Registry, { simple: true })
     registry: Registry
-    @Field(() => Credentials, { nullable: true })
+    @Field(() => Credentials, { nullable: true, simple: true })
     credentials?: Credentials
     privileges: Privilege[]
     @Field(() => Player, { nullable: true })

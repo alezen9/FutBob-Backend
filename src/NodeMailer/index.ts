@@ -3,6 +3,7 @@ import Mail from 'nodemailer/lib/mailer'
 import AccountVerification from './Emails/AccountVerification'
 import path from 'path'
 import ResetPassword from './Emails/ResetPassword'
+import chalk from 'chalk'
 require('dotenv').config()
 
 const {
@@ -33,7 +34,7 @@ export class ZenNodeMailer {
             console.error(err)
             this.cleanUp()
          }
-         else console.log('Nodemailer is ready baby!')
+         else console.log(chalk.green('[futbob] Nodemailer is ready baby!'))
       })
       this.assetsPath = path.join(__dirname, '/../..', '/public/assets')
       this.templatesPath = path.join(__dirname, '/../..', '/public/templates')

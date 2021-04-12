@@ -15,7 +15,7 @@ export enum FieldState {
    Great
 }
 
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('measurements')
 export class Measurements { // in centimeters
    @FieldTG(() => Int)
@@ -41,7 +41,7 @@ type CreateOrUpdateField = {
    location?: GeoPoint
 }
 
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 export class Field {
    @FieldTG(() => ID)
    _id: ObjectId
