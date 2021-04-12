@@ -6,21 +6,22 @@ import { facetCount } from '../helpers'
 import { get } from 'lodash'
 import { List } from '../Entities'
 import { Appointment } from './Entities'
+import { CreateAppointmentInput } from '../../Graph/Appointment/inputs'
 
 class MongoAppointment {
-  // async create (data: CreateFieldInput, createdBy: string): Promise<string> {
-  //    const now = dayjs().toISOString()
-  //    const _id = new ObjectId()
-  //    const field = new Field({
-  //       _id,
-  //       createdBy,
-  //       createdAt: now,
-  //       updatedAt: now,
-  //       ...data
-  //    })
-  //    await MongoDBInstance.collection.field.insertOne(field)
-  //    return _id.toHexString()
-  // }
+  async create (data: CreateAppointmentInput, createdBy: string): Promise<string> {
+     const now = dayjs().toISOString()
+     const _id = new ObjectId()
+     const appointment = new Appointment({
+        _id,
+        createdBy,
+        createdAt: now,
+        updatedAt: now,
+        ...data
+     })
+     await MongoDBInstance.collection.appointment.insertOne(appointment)
+     return _id.toHexString()
+  }
 
   // async update (data: UpdateFieldInput, createdBy: string): Promise<boolean> {
   //    const { _id, ...rest } = data

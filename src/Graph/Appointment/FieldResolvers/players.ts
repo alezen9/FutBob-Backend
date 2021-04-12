@@ -1,8 +1,8 @@
 import { FieldResolver, Resolver, ResolverInterface, Root } from "type-graphql";
 import { Player } from "../../../MongoDB/Player/Entities";
-import { Appointment, PlayerType, TypePlayerUnion } from "../../../MongoDB/Appointment/Entities";
-import { playerLoader } from "../../Player/Loader";
-import { freeAgentLoader } from "../../FreeAgent/Loader"
+import { Appointment, AppointmentPlayerType, AppointmentTypePlayerUnion } from "../../../MongoDB/Appointment/Entities";
+import { playerLoader } from "../../Player/loaders";
+import { freeAgentLoader } from "../../FreeAgent/loaders"
 import { FreeAgent } from "../../../MongoDB/FreeAgent/Entities"
 
 
@@ -10,27 +10,31 @@ import { FreeAgent } from "../../../MongoDB/FreeAgent/Entities"
 export class PlayerFieldResolver implements ResolverInterface<Appointment> {
 
    @FieldResolver(() => [Player])
-   // @ts-ignore
    async invitedPlayers(@Root() root: Appointment): Promise<(Player|Error)[]> {
-      return playerLoader.loadMany(root.invitedPlayers)
+      return playerLoader.loadMany(root.invites.lists.invited.map(({ player }) => String(player)))
    }
 
-   @FieldResolver(() => [TypePlayerUnion])
-   // @ts-ignore
-   async ditchedPlayers(@Root() root: Appointment): Promise<(Player|FreeAgent|Error)[]> {
-      return [...(root.ditchedPlayers || []).reduce((acc, typedPlayer) => {
-         if(typedPlayer.type === PlayerType.Registered) acc.push(playerLoader.load(typedPlayer.player))
-         if(typedPlayer.type === PlayerType.FreeAgent) acc.push(freeAgentLoader.load(typedPlayer.player))
+   @FieldResolver(() => [Player])
+   async declinedPlayers(@Root() root: Appointment): Promise<(Player|Error)[]> {
+      return playerLoader.loadMany(root.invites.lists.declined.map(String))
+   }
+
+   @FieldResolver(() => [AppointmentTypePlayerUnion])
+   async waitingPlayers(@Root() root: Appointment): Promise<(Player|FreeAgent|Error)[]> {
+      return [...(root.invites.lists.waiting || []).reduce((acc, typedPlayer) => {
+         const _id = String(typedPlayer.player)
+         if(typedPlayer.type === AppointmentPlayerType.Registered) acc.push(playerLoader.load(_id))
+         if(typedPlayer.type === AppointmentPlayerType.FreeAgent) acc.push(freeAgentLoader.load(_id))
          return acc
       }, [])]
    }
 
-   @FieldResolver(() => [TypePlayerUnion])
-   // @ts-ignore
-   async confirmedPlayers(@Root() root: Appointment): Promise<(Player|FreeAgent|Error)[]> {
-      return [...(root.confirmedPlayers || []).reduce((acc, typedPlayer) => {
-         if(typedPlayer.type === PlayerType.Registered) acc.push(playerLoader.load(typedPlayer.player))
-         if(typedPlayer.type === PlayerType.FreeAgent) acc.push(freeAgentLoader.load(typedPlayer.player))
+   @FieldResolver(() => [AppointmentTypePlayerUnion])
+   async waitingPlayers(@Root() root: Appointment): Promise<(Player|FreeAgent|Error)[]> {
+      return [...(root.invites.lists.waiting || []).reduce((acc, typedPlayer) => {
+         const _id = String(typedPlayer.player)
+         if(typedPlayer.type === AppointmentPlayerType.Registered) acc.push(playerLoader.load(_id))
+         if(typedPlayer.type === AppointmentPlayerType.FreeAgent) acc.push(freeAgentLoader.load(_id))
          return acc
       }, [])]
    }

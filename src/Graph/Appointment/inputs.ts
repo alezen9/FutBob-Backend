@@ -1,6 +1,6 @@
 import { IsEnum, IsMongoId, Matches, MaxLength } from 'class-validator'
 import { Field, InputType, Int } from 'type-graphql'
-import { AppointmentState, InviteState, PlayerType } from '../../MongoDB/Appointment/Entities'
+import { AppointmentState, AppointmentPlayerType } from '../../MongoDB/Appointment/Entities'
 import { EnumArrayOf } from '../../Utils/customValidators/EnumArrayOf'
 
 @InputType('typedPlayer')
@@ -9,26 +9,21 @@ export class TypedPlayerInput {
    @IsMongoId()
    player: string
    @Field(() => Int)
-   @IsEnum(PlayerType)
+   @IsEnum(AppointmentPlayerType)
    type: number
 }
 
 @InputType()
 export class CreateAppointmentInput {
-   @Field(() => String, { nullable: true })
-   timeAndDate: Date|string
    @Field()
    @IsMongoId()
    field: string
    @Field(() => Int, { nullable: true })
    autoBlockInvitesQuorum?: number
-   @Field(() => Int, { nullable: true })
-   @IsEnum(InviteState)
-   inviteState: number
+   @Field(() => String, { nullable: true })
+   timeAndDate: Date|string
    @Field(() => [String], { nullable: true })
    invitedPlayers: string[]
-   @Field(() => [TypedPlayerInput], { nullable: true })
-   ditchedPlayers: TypedPlayerInput[]
    @Field(() => [TypedPlayerInput], { nullable: true })
    confirmedPlayers: TypedPlayerInput[]
    notes?: string
@@ -41,7 +36,7 @@ export class AppointmentMatchTeamInput {
     @Field({ nullable: true })
     name?: string
     @Field(() => Int)
-    scoredGoals: number
+    score: number
 }
 
 @InputType('match')

@@ -1,4 +1,5 @@
 import { IsEnum } from "class-validator"
+import dayjs from "dayjs"
 import { ObjectId } from "mongodb"
 import { Field as FieldTG, ID, Int, ObjectType, createUnionType } from "type-graphql"
 import { Field } from "../Field/Entities"
@@ -169,6 +170,21 @@ export class AppointmentInvites {
     lists: AppointmentInviteLists
 }
 
+type CreateOrUpdateAppointment = {
+    _id?: ObjectId|string
+    createdBy?: ObjectId|string
+    createdAt?: Date|string
+    updatedAt?: Date|string
+    timeAndDate?: Date|string
+    field?: ObjectId|string
+    state?: AppointmentState
+    invites?: AppointmentInvites
+    pricePerPlayer?: number
+    stats?: AppointmentStats
+    matches?: AppointmentMatch[]
+    notes?: string
+}
+
 
 @ObjectType()
 export class Appointment {
@@ -194,6 +210,20 @@ export class Appointment {
     matches?: AppointmentMatch[]
     @FieldTG()
     notes?: string
+
+    constructor(data?: CreateOrUpdateAppointment) {
+      if(data._id) this._id = new ObjectId(data._id)
+      if(data.createdBy) this.createdBy = new ObjectId(data.createdBy)
+      if(data.createdAt) this.createdAt = dayjs(data.createdAt).toISOString()
+      if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toISOString()
+      if(data.timeAndDate) this.timeAndDate = dayjs(data.timeAndDate).toISOString()
+      if(data.field) this.field = new ObjectId(data.field)
+      if(data.invites) this.invites = data.invites // da rivedere
+      if(![null, undefined].includes(data.pricePerPlayer)) this.pricePerPlayer = data.pricePerPlayer
+      if(data.stats) this.stats = data.stats // da rivedere
+      if(data.matches) this.matches = data.matches // da rivedere
+      if(data.notes) this.notes = data.notes
+   }
 }
 
 /**
