@@ -54,8 +54,12 @@ export class MongoDB {
       await this.createCollection(client, {
         name: 'User',
         indexes: [
+          { 'registry.additionalInfo.email': 1 },
+          { 'registry.name': 1 },
+          { 'registry.surname': 1 },
+          { 'registry.dateOfBirth': 1 },
+          { 'registry.country': 1 },
           { 'credentials.email': 1 },
-          { 'credentials.registry.additionalInfo.email': 1 },
           { 'credentials.verifyAccount.code.value': 1 },
           { 'credentials.resetPassword.code.value': 1 },
           { player: 1 },
@@ -71,6 +75,8 @@ export class MongoDB {
       await this.createCollection(client, {
         name: 'Field',
         indexes: [
+          { name: 1 },
+          { price: 1 },
           { createdBy: 1 }
         ] }
       )
