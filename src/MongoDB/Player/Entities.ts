@@ -11,7 +11,7 @@ export enum PlayerPosition {
     RightWing,
     Forward
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('pace')
 export class Pace {
     @Field(() => Int)
@@ -23,7 +23,7 @@ export class Pace {
     @Max(100)
     stamina: number
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('shooting')
 export class Shooting {
     @Field(() => Int)
@@ -39,7 +39,7 @@ export class Shooting {
     @Max(100)
     longShots: number
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('passing')
 export class Passing {
     @Field(() => Int)
@@ -55,7 +55,7 @@ export class Passing {
     @Max(100)
     longPassing: number
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('technique')
 export class Technique {
     @Field(() => Int)
@@ -71,7 +71,7 @@ export class Technique {
     @Max(100)
     dribbling: number
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('defense')
 export class Defense {
     @Field(() => Int)
@@ -88,7 +88,7 @@ export class Defense {
     versus: number // 1>1
 }
 
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('physical')
 export class Physical {
     @Field(() => Int)
@@ -96,7 +96,7 @@ export class Physical {
     @Max(100)
     strength: number
 }
-@ObjectType()
+@ObjectType({ simpleResolvers: true })
 @InputType('score')
 export class PlayerScore {
     @Field(() => Pace)
@@ -164,18 +164,18 @@ type CreateOrUpdatePlayerType = {
 }
 @ObjectType()
 export class Player {
-    @Field(() => ID)
+    @Field(() => ID, { simple: true })
     _id: ObjectId
     createdBy: ObjectId
     createdAt: Date|string
     updatedAt: Date|string
     @Field(() => User)
     user: ObjectId
-    @Field(() => [Int]!)
+    @Field(() => [Int]!, { simple: true })
     positions: PlayerPosition[]
-    @Field(() => Int, { nullable: true })
+    @Field(() => Int, { nullable: true, simple: true })
     state?: PhysicalState
-    @Field(() => PlayerScore)
+    @Field(() => PlayerScore, { simple: true })
     score: PlayerScore
 
     constructor(data?: CreateOrUpdatePlayerType){
