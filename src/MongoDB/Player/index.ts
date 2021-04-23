@@ -9,7 +9,7 @@ import { get } from 'lodash'
 import { List, Pagination } from '../Entities'
 import { CreatePlayerInput, FiltersPlayer, SortPlayer, UpdatePlayerInput } from '../../Graph/Player/inputs'
 import ErrorMessages from '../../Utils/ErrorMessages'
-import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helpers'
+import { escapeStringForRegExp, createMongoUpdateObject } from '../../Utils/helpers'
 
 class MongoPlayer {
 
@@ -38,7 +38,7 @@ class MongoPlayer {
     })
     await MongoDBInstance.collection.player.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
-      { $set: normalizeUpdateObject(player) }
+      { $set: createMongoUpdateObject(player) }
     )
     return true
   }

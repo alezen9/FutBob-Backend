@@ -34,8 +34,8 @@ export class AppointmentPlayer {
     goals: number
     @FieldTG(() => Int)
     assists: number
-    @FieldTG(() => [AppointmentPlayerMatchStats])
-    matches?: AppointmentPlayerMatchStats[]
+    @FieldTG(() => AppointmentPlayerMatchStats)
+    matchStats?: AppointmentPlayerMatchStats
     @FieldTG()
     amountPaid: number
 }
@@ -69,9 +69,9 @@ export class AppointmentMatchTeam {
     @FieldTG(() => [AppointmentTypePlayer])
     players: AppointmentTypePlayer[]
     @FieldTG()
-    name: string // if not set by the user automatically set teamA & teamB
+    name: string // if not set by the user automatically set Team A & Team B
     @FieldTG(() => Int)
-    scoredGoals: number
+    score: number
 }
 
 @ObjectType()
@@ -97,7 +97,7 @@ export enum AppointmentPlayerType {
 @ObjectType()
 export class AppointmentTypePlayer {
     @FieldTG(() => AppointmentTypePlayerUnion)
-    player: ObjectId
+    _id: ObjectId
     @FieldTG(() => Int)
     @IsEnum(AppointmentPlayerType)
     type: AppointmentPlayerType
@@ -149,7 +149,7 @@ export class AppointmentInviteLists {
     @FieldTG(() => [AppointmentTypePlayer])
     confirmed: AppointmentTypePlayer[]
     @FieldTG(() => [AppointmentTypePlayer])
-    blacklist: AppointmentTypePlayer[]
+    blacklisted: AppointmentTypePlayer[]
     @FieldTG(() => [Player])
     ignored: ObjectId[] // players that ignored the invite
     
@@ -168,21 +168,6 @@ export class AppointmentInvites {
     checkpointQuorum: number
     @FieldTG(() => AppointmentInviteLists)
     lists: AppointmentInviteLists
-}
-
-type CreateOrUpdateAppointment = {
-    _id?: ObjectId|string
-    createdBy?: ObjectId|string
-    createdAt?: Date|string
-    updatedAt?: Date|string
-    timeAndDate?: Date|string
-    field?: ObjectId|string
-    state?: AppointmentState
-    invites?: AppointmentInvites
-    pricePerPlayer?: number
-    stats?: AppointmentStats
-    matches?: AppointmentMatch[]
-    notes?: string
 }
 
 
@@ -210,20 +195,6 @@ export class Appointment {
     matches?: AppointmentMatch[]
     @FieldTG()
     notes?: string
-
-    constructor(data?: CreateOrUpdateAppointment) {
-      if(data._id) this._id = new ObjectId(data._id)
-      if(data.createdBy) this.createdBy = new ObjectId(data.createdBy)
-      if(data.createdAt) this.createdAt = dayjs(data.createdAt).toISOString()
-      if(data.updatedAt) this.updatedAt = dayjs(data.updatedAt).toISOString()
-      if(data.timeAndDate) this.timeAndDate = dayjs(data.timeAndDate).toISOString()
-      if(data.field) this.field = new ObjectId(data.field)
-      if(data.invites) this.invites = data.invites // da rivedere
-      if(![null, undefined].includes(data.pricePerPlayer)) this.pricePerPlayer = data.pricePerPlayer
-      if(data.stats) this.stats = data.stats // da rivedere
-      if(data.matches) this.matches = data.matches // da rivedere
-      if(data.notes) this.notes = data.notes
-   }
 }
 
 /**
@@ -234,10 +205,9 @@ export class Appointment {
  * 1.2 choose field
  * 1.2.1 set pricePerPlayer
  * 1.3 invite players => Players[]
- * 1.4.1 set withQuorumConstraints (boolean)
- * 1.4.2 if withQuorumConstraints set minQuorum (1-50 included)
- * 1.4.3 if withQuorumConstraints set maxQuorum (1-50 included)
- * 1.4.4 if withQuorumConstraints set checkpointQuorum (1-25)
+ * 1.4.1 optional set minQuorum (1-50 included) // these to be added later
+ * 1.4.2 optional set maxQuorum (1-50 included)
+ * 1.4.3 optional set checkpointQuorum (1-25)
  * => Appointment created
  * 
  * 

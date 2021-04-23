@@ -21,7 +21,12 @@ const ErrorMessages = Object.freeze({
   field_update_failed: 'field_update_failed',
   freeAgent_missing_information: 'freeAgent_missing_information',
   freeAgent_update_failed: 'freeAgent_update_failed',
-  freeAgent_does_not_exist: 'freeAgent_does_not_exist'
+  freeAgent_does_not_exist: 'freeAgent_does_not_exist',
+  appointment_update_failed_due_to_state: 'appointment_update_failed_due_to_state',
+  appointment_must_specify_confirmed_or_invited: 'appointment_must_specify_confirmed_or_invited',
+  appointment_forbidden_removal_invited_players_already_responded: 'appointment_forbidden_removal_invited_players_already_responded',
+  appointment_forbidden_removal_confirmed_players_without_blacklisting: 'appointment_forbidden_removal_confirmed_players_without_blacklisting',
+  appointment_forbidden_removal_confirmed_players: 'appointment_forbidden_removal_confirmed_players'
 })
 
 export default ErrorMessages

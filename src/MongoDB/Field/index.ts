@@ -6,7 +6,7 @@ import { get } from 'lodash'
 import { List, Pagination } from '../Entities'
 import { Field } from './Entities'
 import { CreateFieldInput, FiltersField, UpdateFieldInput } from '../../Graph/Field/inputs'
-import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helpers'
+import { escapeStringForRegExp, createMongoUpdateObject } from '../../Utils/helpers'
 
 class MongoField {
 
@@ -33,7 +33,7 @@ class MongoField {
     })
     await MongoDBInstance.collection.field.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
-      { $set: normalizeUpdateObject(field) }
+      { $set: createMongoUpdateObject(field) }
     )
     return true
   }

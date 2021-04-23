@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb'
+import { ClientSession, MongoClient, TransactionOptions } from 'mongodb'
 import { CollectionContainer } from './Entities'
 import chalk from 'chalk'
 require('dotenv').config()
@@ -107,6 +107,26 @@ export class MongoDB {
       await Promise.all(promises)
     }
   }
+
+  // Enable only with replica set
+  //
+  // createSession() {
+  //   return this.client.startSession()
+  // }
+
+  // startTransaction(session: ClientSession, transactionOptions: TransactionOptions = { readConcern: { level: 'local' }, writeConcern: { w: 'majority' } }) {
+  //   session.startTransaction(transactionOptions)
+  // }
+
+  // async commitTransaction(session: ClientSession) {
+  //   await session.commitTransaction()
+  //   session.endSession()
+  // }
+
+  // async abortTransaction(session: ClientSession) {
+  //   await session.abortTransaction();
+  //   session.endSession();
+  // }
 
   async clearDb () {
     await this.collection.user.deleteMany({})

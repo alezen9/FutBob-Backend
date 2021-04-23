@@ -5,7 +5,7 @@ import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { Privilege } from '../Entities'
 import ErrorMessages from '../../Utils/ErrorMessages'
-import { encodePrivileges, normalizeUpdateObject } from '../../Utils/helpers'
+import { encodePrivileges, createMongoUpdateObject } from '../../Utils/helpers'
 import { AuthData, Confirmation, Credentials, User } from './Entities'
 import { ChangePasswordInput, CreateUserInput, UpdateRegistryInput } from '../../Graph/User/inputs'
 import { isEmpty, get } from 'lodash'
@@ -208,7 +208,7 @@ class MongoUser {
     const updatedUser = new User({ registry, updatedAt: dayjs().toISOString() })
     const { _id: _, updatedAt, ...rest } = updatedUser
     if(isEmpty(cleanDeep(rest))) return true
-    const toSet = normalizeUpdateObject(updatedUser)
+    const toSet = createMongoUpdateObject(updatedUser)
     const {modifiedCount } = await MongoDBInstance.collection.user.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
       { $set: toSet }

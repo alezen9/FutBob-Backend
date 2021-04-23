@@ -6,7 +6,7 @@ import { List, Pagination } from '../Entities'
 import { FreeAgent } from './Entities'
 import { facetCount } from '../helpers'
 import { CreateFreeAgentInput, FiltersFreeAgent, UpdateFreeAgentInput } from '../../Graph/FreeAgent/inputs'
-import { escapeStringForRegExp, normalizeUpdateObject } from '../../Utils/helpers'
+import { escapeStringForRegExp, createMongoUpdateObject } from '../../Utils/helpers'
 import { CreatePlayerInput } from '../../Graph/Player/inputs'
 import { mongoPlayer } from '../Player'
 import ErrorMessages from '../../Utils/ErrorMessages'
@@ -35,7 +35,7 @@ class MongoFreeAgent {
     })
     await MongoDBInstance.collection.freeAgent.updateOne(
       { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
-      { $set: normalizeUpdateObject(freeAgent) }
+      { $set: createMongoUpdateObject(freeAgent) }
     )
     return true
   }
