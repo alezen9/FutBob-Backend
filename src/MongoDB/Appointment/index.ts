@@ -5,7 +5,7 @@ import { facetCount } from '../helpers'
 import { get } from 'lodash'
 import { List } from '../Entities'
 import { Appointment, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, InvitedPlayer } from './Entities'
-import { CreateAppointmentInput, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
+import { CreateAppointmentInput, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
 import { createMongoUpdateObject } from '../../Utils/helpers'
 import ErrorMessages from '../../Utils/ErrorMessages'
 import { Field } from '../Field/Entities'
@@ -312,17 +312,46 @@ class MongoAppointment {
       return true
    }
 
+   async updateInvites (data: UpdateAppointmentStateInput, createdBy: string): Promise<boolean> {
+      const now = dayjs().toISOString()
+      const appointment = new Appointment()
+      appointment.updatedAt = now
+      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: appointment._id, createdBy: new ObjectId(createdBy) })
+      if(data.state === currentAppointment.state) return true
+      if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)) {
+         throw new Error(ErrorMessages.appointment_already_closed)
+      }
+
+      // scheduled => confirmed|canceled
+      // confirmed => completed|canceled| interrupted
+      if(
+         (currentAppointment.state === AppointmentState.Scheduled && ![AppointmentState.Confirmed, AppointmentState.Canceled].includes(data.state))
+         ||
+         currentAppointment.state === AppointmentState.Confirmed && ![AppointmentState.Completed, AppointmentState.Canceled, AppointmentState.Interrupted].includes(data.state)
+      ) {
+         throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
+      }
+
+      appointment.state = data.state
+
+      await MongoDBInstance.collection.appointment.updateOne(
+         { _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) },
+         { $set: createMongoUpdateObject(appointment) }
+      )
+      return true
+   }
+
    // TODO
    //
    // - updateState => when closing appointment update everything related
 
-   async delete (_id: string, createdBy: string): Promise<boolean> {
-         const appointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
-         // Decide when to delete an appointment
-         // if([AppointmentState.Completed, AppointmentState.Canceled, AppointmentState.].includes(appointment.state))
-         // await MongoDBInstance.collection.field.deleteOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
-      return true
-   }
+   // async delete (_id: string, createdBy: string): Promise<boolean> {
+   //       const appointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+   //       Decide when to delete an appointment
+   //       if([AppointmentState.Completed, AppointmentState.Canceled, AppointmentState.].includes(appointment.state))
+   //       await MongoDBInstance.collection.field.deleteOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+   //    return true
+   // }
 
   // async getList (filters: FiltersField, pagination: Pagination, createdBy: string): Promise<List<Field>> {
   //    const {

@@ -88,30 +88,6 @@ export class AppointmentStatsInput {
     individualStats: AppointmentPlayerInput[]
 }
 
-// @InputType()
-// export class UpdateAppointmentInput {
-//    @Field()
-//    _id: string
-//    @Field({ nullable: true })
-//    @IsMongoId()
-//    field?: string
-//    @Field(() => String, { nullable: true })
-//    timeAndDate?: Date|string
-//    @Field(() => EnhancedInvitesInput, { nullable: true })
-//    invites?: EnhancedInvitesInput
-//    @Field(() => [AppointmentMatchInput], { nullable: true })
-//    matches?: AppointmentMatchInput[]
-//    @Field(() => [AppointmentStatsInput], { nullable: true })
-//    stats?: AppointmentStatsInput
-//    @Field(() => String, { nullable: true })
-//    notes?: string
-// }
-
-
-
-
-
-
 @InputType()
 export class UpdateAppointmentMainInput {
    @Field()
@@ -152,9 +128,14 @@ export class UpdateAppointmentStatsInput {
    stats: AppointmentStatsInput
 }
 
-
-
-
+@InputType()
+export class UpdateAppointmentStateInput {
+   @Field()
+   _id: string
+   @Field(() => Int)
+   @EnumArrayOf(AppointmentState)
+   state: AppointmentState
+}
 
 @InputType()
 export class FiltersAppointment {
