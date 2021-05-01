@@ -14,7 +14,7 @@ export class TypedPlayerInput {
    type: number
 }
 
-@InputType('invites')
+@InputType()
 export class SimpleInvitesInput {
     @Field(() => [TypedPlayerInput], { nullable: true })
     confirmed?: TypedPlayerInput[]
@@ -22,7 +22,7 @@ export class SimpleInvitesInput {
     invited?: string[]
 }
 
-@InputType('invites')
+@InputType()
 export class EnhancedInvitesInput extends SimpleInvitesInput {
     @Field(() => [TypedPlayerInput], { nullable: true })
     blacklisted?: TypedPlayerInput[]

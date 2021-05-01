@@ -14,6 +14,7 @@ import { UserResolver, PlayerFieldResolver } from './src/Graph/User'
 import { PlayerResolver, UserFieldResolver } from './src/Graph/Player'
 import { FreeAgentResolver } from './src/Graph/FreeAgent'
 import { FieldResolver } from './src/Graph/Field'
+import { AppointmentFieldResolvers, AppointmentResolver } from './src/Graph/Appointment'
 /** end resolvers */
 import { ApolloServer, PubSub } from 'apollo-server-express'
 import { Privilege } from './src/MongoDB/Entities'
@@ -54,7 +55,8 @@ const main = async () => {
         UserResolver, PlayerFieldResolver,
         PlayerResolver, UserFieldResolver,
         FreeAgentResolver,
-        FieldResolver
+        FieldResolver,
+        AppointmentResolver, AppointmentFieldResolvers
       ],
       dateScalarMode: 'isoDate',
       authChecker
@@ -62,8 +64,8 @@ const main = async () => {
     const server = new ApolloServer({
       schema,
       context: ({ req, res }) => ({ req, res, pubsub }),
-      // ...process.env.NODE_ENV === 'development' && {
-        ...true && {
+      ...process.env.NODE_ENV === 'development' && {
+        // ...true && {
         introspection: true,
         playground: {
           settings: {

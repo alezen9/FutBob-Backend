@@ -50,7 +50,7 @@ class MongoAppointment {
       appointment.invites.lists.declined = []
       if(confirmed.length) appointment.invites.lists.confirmed = confirmed.map(({ _id, type }) => ({ type, _id: new ObjectId(_id) }))
       if(invited.length) appointment.invites.lists.invited = invited.map(id => ({
-         player: new ObjectId(id),
+         _id: new ObjectId(id),
          responses: []
       }))
       appointment.pricePerPlayer = data.pricePerPlayer
@@ -278,16 +278,16 @@ class MongoAppointment {
             let invitedMap: { [_id: string]: InvitedPlayer } = {}
             // check if user is trying to remove invited players that already responded
             const removedWithResponses = currentAppointment.invites.lists.invited.reduce((acc, val) => {
-               const { player, responses } = val
-               if(invited.includes(player.toHexString()) && responses.length) acc.push(val)
-               invitedMap[player.toHexString()] = val
+               const { _id, responses } = val
+               if(invited.includes(_id.toHexString()) && responses.length) acc.push(val)
+               invitedMap[_id.toHexString()] = val
                return acc
             }, [])
             if(removedWithResponses.length) throw new Error(ErrorMessages.appointment_forbidden_removal_invited_players_already_responded)
             appointment.invites.lists.invited = invited.map(id => {
                if(invitedMap[id]) return invitedMap[id]
                return {
-                  player: new ObjectId(id),
+                  _id: new ObjectId(id),
                   responses: []
                }
             })
