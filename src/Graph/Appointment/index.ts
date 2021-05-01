@@ -1,6 +1,6 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { List, Pagination, Privilege } from "../../MongoDB/Entities";
-import { CreateAppointmentInput, FiltersAppointment, SortAppointment } from "./inputs";
+import { CreateAppointmentInput, FiltersAppointment, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from "./inputs";
 import { MyContext } from "../../../index";
 import { PaginatedAppoontmentResponse } from "./types";
 import { mongoAppointment } from "../../MongoDB/Appointment";
@@ -9,13 +9,13 @@ import { Appointment, AppointmentState, AppointmentInvitesState } from "../../Mo
 @Resolver()
 export class AppointmentResolver {
 
-   // @Query(() => PaginatedAppoontmentResponse)
-   // @Authorized(Privilege.Manager)
-   // async Appointment_getList(@Ctx() ctx: MyContext, @Arg('filters') filters: FiltersAppointment, @Arg('pagination') pagination: Pagination, @Arg('sort') sort: SortAppointment): Promise<List<Appointment>> {
-   //    const { idUser } = ctx.req
-   //    const result = await mongoAppointment.getList(filters, pagination, sort, idUser)
-   //    return result
-   // }
+   @Query(() => PaginatedAppoontmentResponse)
+   @Authorized(Privilege.Manager)
+   async Appointment_getList(@Ctx() ctx: MyContext, @Arg('filters') filters: FiltersAppointment, @Arg('pagination') pagination: Pagination, @Arg('sort') sort: SortAppointment): Promise<List<Appointment>> {
+      const { idUser } = ctx.req
+      const result = await mongoAppointment.getList(filters, pagination, sort, idUser)
+      return result
+   }
 
    @Mutation(() => String)
    @Authorized(Privilege.Manager)
@@ -25,38 +25,44 @@ export class AppointmentResolver {
       return _id
    }
 
-   // @Mutation(() => Boolean)
-   // @Authorized(Privilege.Manager)
-   // async Appointment_update(@Ctx() ctx: MyContext, @Arg('body') body: UpdateAppointmentInput): Promise<Boolean> {
-   //    const { idUser } = ctx.req
-   //    const done = await mongoAppointment.update(body, idUser)
-   //    return done
-   // }
-
    @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
-   async Appointment_delete(@Ctx() ctx: MyContext, @Arg('_id') _id: string): Promise<Boolean> {
+   async Appointment_UpdateMainInfo(@Ctx() ctx: MyContext, @Arg('body') body: UpdateAppointmentMainInput): Promise<Boolean> {
       const { idUser } = ctx.req
-      const done = await mongoAppointment.delete(_id, idUser)
+      const done = await mongoAppointment.updateMainInfo(body, idUser)
       return done
    }
 
    @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
-   async Appointment_UpdateState(@Ctx() ctx: MyContext, @Arg('_id') _id: string, @Arg('nextState') nextState: AppointmentState): Promise<Boolean> {
+   async Appointment_UpdateState(@Ctx() ctx: MyContext, @Arg('body') body: UpdateAppointmentStateInput): Promise<Boolean> {
       const { idUser } = ctx.req
-      // const done = await mongoAppointment.updateState(_id, nextState, idUser)
-      // return done
-      return true
+      const done = await mongoAppointment.updateState(body, idUser)
+      return done
    }
 
    @Mutation(() => Boolean)
    @Authorized(Privilege.Manager)
-   async Appointment_UpdateInviteState(@Ctx() ctx: MyContext, @Arg('_id') _id: string, @Arg('nextState') nextState: AppointmentInvitesState): Promise<Boolean> {
+   async Appointment_UpdateStats(@Ctx() ctx: MyContext, @Arg('body') body: UpdateAppointmentStatsInput): Promise<Boolean> {
       const { idUser } = ctx.req
-      // const done = await mongoAppointment.updateInviteState(_id, nextState, idUser)
-      // return done
-      return true
+      const done = await mongoAppointment.updateStats(body, idUser)
+      return done
+   }
+
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async Appointment_UpdateInvites(@Ctx() ctx: MyContext, @Arg('body') body: UpdateAppointmentInvitesInput): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoAppointment.updateInvites(body, idUser)
+      return done
+   }
+
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async Appointment_UpdateMatches(@Ctx() ctx: MyContext, @Arg('body') body: UpdateAppointmentMatchesInput): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoAppointment.updateMatches(body, idUser)
+      return done
    }
 }
 

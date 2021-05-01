@@ -3,14 +3,15 @@ import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { facetCount } from '../helpers'
 import { get } from 'lodash'
-import { List } from '../Entities'
+import { List, Pagination } from '../Entities'
 import { Appointment, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, InvitedPlayer } from './Entities'
-import { CreateAppointmentInput, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
+import { CreateAppointmentInput, FiltersAppointment, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
 import { createMongoUpdateObject } from '../../Utils/helpers'
 import ErrorMessages from '../../Utils/ErrorMessages'
 import { Field } from '../Field/Entities'
 import { mongoField } from '../Field'
 import { Player, PlayerPosition } from '../Player/Entities'
+import { getSortStage } from './helpers'
 
 class MongoAppointment {
   async create (data: CreateAppointmentInput, createdBy: string): Promise<string> {
@@ -312,7 +313,7 @@ class MongoAppointment {
       return true
    }
 
-   async updateInvites (data: UpdateAppointmentStateInput, createdBy: string): Promise<boolean> {
+   async updateState (data: UpdateAppointmentStateInput, createdBy: string): Promise<boolean> {
       const now = dayjs().toISOString()
       const appointment = new Appointment()
       appointment.updatedAt = now
@@ -341,57 +342,39 @@ class MongoAppointment {
       return true
    }
 
-   // TODO
-   //
-   // - updateState => when closing appointment update everything related
+  async getList (filters: FiltersAppointment, pagination: Pagination, sort: SortAppointment, createdBy: string): Promise<List<Appointment>> {
+     const {
+        ids = [],
+        states
+     } = filters
 
-   // async delete (_id: string, createdBy: string): Promise<boolean> {
-   //       const appointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
-   //       Decide when to delete an appointment
-   //       if([AppointmentState.Completed, AppointmentState.Canceled, AppointmentState.].includes(appointment.state))
-   //       await MongoDBInstance.collection.field.deleteOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
-   //    return true
-   // }
+     const { skip = 0, limit } = pagination
+     // set limit to max 100
+     const _limit = !limit || limit < 0 || limit > 100
+        ? 100
+        : limit
 
-  // async getList (filters: FiltersField, pagination: Pagination, createdBy: string): Promise<List<Field>> {
-  //    const {
-  //       ids = [],
-  //       type,
-  //       states = [],
-  //       searchText
-  //    } = filters
+     const query = []
 
-  //    const { skip = 0, limit } = pagination
-  //    // set limit to max 100
-  //    const _limit = !limit || limit < 0 || limit > 100
-  //       ? 100
-  //       : limit
+     // make sure that i can access it
+     query.push({ $match: { createdBy: new ObjectId(createdBy) } })
+     // filter by id
+     if(ids.length) query.push({ $match: { _id: { $in: ids.map(id => new ObjectId(id)) } } })
+     // filter by state
+     if(states.length) query.push({ $match: { state: { $in: states } } })
+      // sort
+      const sortStage = getSortStage(sort)
+      query.push(sortStage)
+     // paginate
+     query.push(facetCount({ skip, limit: _limit }))
 
-  //    const query = []
-
-  //    // make sure that i can access it
-  //    query.push({ $match: { createdBy: new ObjectId(createdBy) } })
-  //    // filter by id
-  //    if(ids.length) query.push({ $match: { _id: { $in: ids.map(id => new ObjectId(id)) } } })
-  //    // filter by state
-  //    if(states.length) query.push({ $match: { state: { $in: states } } })
-  //    // filter by type
-  //    if(type) query.push({ $match: { type }})
-  //    // filter by searchText
-  //    if(searchText) {
-  //       const searchInName = { $match: { name: new RegExp(escapeStringForRegExp(searchText), 'i') } }
-  //       query.push(searchInName)
-  //    }
-  //    // paginate
-  //    query.push(facetCount({ skip, limit: _limit }))
-
-  //    const res: Field[] = await MongoDBInstance.collection.field.aggregate(query).toArray()
-  //    const result = {
-  //       totalCount: get(res, '[0].totalCount[0].count', 0) as number,
-  //       result: get(res, '[0].result', []) as Field[]
-  //    }
-  //    return result
-  // }
+     const res: Appointment[] = await MongoDBInstance.collection.appointment.aggregate(query).toArray()
+     const result = {
+        totalCount: get(res, '[0].totalCount[0].count', 0) as number,
+        result: get(res, '[0].result', []) as Appointment[]
+     }
+     return result
+  }
 
    async getAppointmentById (_id: string, createdBy: string): Promise<Appointment> {
       const appoitment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })

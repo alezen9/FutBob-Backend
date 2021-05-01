@@ -143,12 +143,10 @@ export class FiltersAppointment {
    ids?: string[]
    @Field(() => [Int], { nullable: true })
    @EnumArrayOf(AppointmentState)
-   state?: AppointmentState[]
-   @Field(() => [String], { nullable: true })
-   fields?: string[]
-   @Field({ nullable: true })
-   @MaxLength(50)
-   searchText?: string
+   states?: AppointmentState[]
+   // @Field({ nullable: true })
+   // @MaxLength(50)
+   // searchText?: string
 }
 
 export enum EnumSortAppointment {
