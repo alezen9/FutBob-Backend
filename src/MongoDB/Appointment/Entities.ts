@@ -141,6 +141,13 @@ export class AppointmentInvites {
     lists: AppointmentInviteLists
 }
 
+@ObjectType()
+export class AppointmentDate {
+    @FieldTG(() => String)
+    start: Date|string
+    @FieldTG(() => String)
+    end?: Date|string
+}
 
 @ObjectType()
 export class Appointment {
@@ -149,8 +156,8 @@ export class Appointment {
     createdBy: ObjectId
     createdAt: Date|string
     updatedAt: Date|string
-    @FieldTG(() => String)
-    timeAndDate: Date|string
+    @FieldTG(() => AppointmentDate)
+    date: AppointmentDate
     @FieldTG(() => Field)
     field: ObjectId
     @FieldTG(() => Int)

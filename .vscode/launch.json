@@ -97,6 +97,22 @@
         "${workspaceFolder}/dist/src/Testsuite/FreeAgent.test.js",
       ],
       "cwd": "${workspaceFolder}",
+    },
+    {
+      "name": "Test_Appointment",
+      "type": "node",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "envFile": "${workspaceFolder}/.env",
+      "args": [
+        "--no-timeouts",
+        "--colors",
+        "--exit",
+        "--bail",
+        "${workspaceFolder}/dist/src/Testsuite/Appointment.test.js",
+      ],
+      "cwd": "${workspaceFolder}",
     }
   ]
 }

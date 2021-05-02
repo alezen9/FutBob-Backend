@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb'
 import { facetCount } from '../helpers'
 import { get } from 'lodash'
 import { List, Pagination } from '../Entities'
-import { Appointment, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, InvitedPlayer } from './Entities'
+import { Appointment, AppointmentInviteLists, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, InvitedPlayer, AppointmentDate } from './Entities'
 import { CreateAppointmentInput, FiltersAppointment, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
 import { createMongoUpdateObject } from '../../Utils/helpers'
 import ErrorMessages from '../../Utils/ErrorMessages'
@@ -15,10 +15,9 @@ import { getSortStage } from './helpers'
 
 class MongoAppointment {
   async create (data: CreateAppointmentInput, createdBy: string): Promise<string> {
-     const { confirmed = [], invited = [] } = data.invites || {}
-     if((!confirmed.length) && !invited.length){
-        throw new Error(ErrorMessages.appointment_must_specify_confirmed_or_invited)
-     }
+      const { confirmed = [], invited = [] } = data.invites || {}
+      // check dates
+      this.checkDatesForCreate(data.start, data.end)
       const now = dayjs().toISOString()
       const _id = new ObjectId()
       const appointment = new Appointment()
@@ -29,7 +28,9 @@ class MongoAppointment {
       appointment.updatedAt = now
       // where and when
       appointment.field = new ObjectId(data.field)
-      appointment.timeAndDate = dayjs(data.timeAndDate).toISOString()
+      appointment.date = new AppointmentDate()
+      appointment.date.start = dayjs(data.start).toISOString()
+      if(data.end) appointment.date.end = dayjs(data.end).toISOString()
       // basic
       if(data.notes) appointment.notes = data.notes
       appointment.state = AppointmentState.Scheduled
@@ -44,6 +45,7 @@ class MongoAppointment {
       appointment.invites.minQuorum = 2
       appointment.invites.maxQuorum = 10000
       //
+      appointment.invites.lists = new AppointmentInviteLists()
       appointment.invites.lists.blacklisted = []
       appointment.invites.lists.ignored = []
       appointment.invites.lists.waiting = []
@@ -60,24 +62,66 @@ class MongoAppointment {
             ? 0
             : 150 // 1.50€
       }
+      /**
+       * check if another appointment that matches the following exists:
+       * start => start of existing appointment date
+       * end => end of existing appointment date
+       * _start => start of current appointment date
+       * _end => end of current appointment date
+       * 
+       * 1. current starts before the existing start and ends after its end
+       * => _start < start & _end > end
+       * 2. current starts after the existing start and ends before its end
+       * => _start > start & _end < end
+       * 3. current starts after existing start and ends after existing
+       */
+      // const existingAppointment = await MongoDBInstance.collection.appointment.findOne({
+      //    field: appointment.field,
+      //    $or: [
+      //       { $and: [
+      //          { "date.start": { $gt: appointment.date.start } },
+      //          { $or: [
+      //             { "date.end": { $exists: false } },
+      //             { "date.end": { $exists: true, $lt: appointment } }
+      //          ] }
+      //       ] }
+      //    ]
+      // })
       await MongoDBInstance.collection.appointment.insertOne(appointment)
       return _id.toHexString()
   }
+
+   private checkDatesForCreate(start: Date|string, end?: Date|string) {
+      const _1DayFromNow = dayjs().add(1, 'days')
+      const startDate = dayjs(start).toISOString()
+      const endDate = end ? dayjs(end).toISOString() : null
+      // 1. start date must be at least 1 day from now and not after end
+      const startDateOk = dayjs(startDate).isAfter(_1DayFromNow) && ((endDate && !dayjs(startDate).isAfter(endDate)) || !endDate)
+      // 2. end date must be at after start
+      const endDateOk = !endDate ? true : dayjs(endDate).isAfter(startDate)
+
+      if(!(startDateOk && endDateOk)) throw new Error(ErrorMessages.appointment_error_validation_dates)
+   }
+
+   // private checkDatesForAppointment(start: Date|string, end?: Date|string, _appoitnment?: Appointment) {
+   //    const appointment = _appoitnment || await 
+   // }
 
    async updateMainInfo (data: UpdateAppointmentMainInput, createdBy: string): Promise<boolean> {
       const now = dayjs().toISOString()
       const appointment = new Appointment()
       appointment.updatedAt = now
       if(data.field) appointment.field = new ObjectId(data.field)
-      if(data.timeAndDate) appointment.timeAndDate = dayjs(data.timeAndDate).toISOString()
+      if(data.start) appointment.date.start = dayjs(data.start).toISOString()
+      if(data.end) appointment.date.end = dayjs(data.end).toISOString()
       if(data.notes) appointment.notes = data.notes
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) })
       // Update is allowed only in Scheduled and Confirmed state
       if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
          throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
       }
-      // date/time and field can be modified only while Scheduled
-      if((data.timeAndDate || data.field) && currentAppointment.state !== AppointmentState.Scheduled) {
+      // dates and field can be modified only while Scheduled
+      if((data.start || data.end || data.field) && currentAppointment.state !== AppointmentState.Scheduled) {
          throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
       }
       if(data.field){

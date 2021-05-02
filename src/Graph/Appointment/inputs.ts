@@ -1,4 +1,4 @@
-import { IsEnum, IsMongoId, Matches, MaxLength, MinDate } from 'class-validator'
+import { IsDateString, IsEnum, IsMongoId, Matches, MinDate } from 'class-validator'
 import dayjs from 'dayjs'
 import { Field, InputType, Int } from 'type-graphql'
 import { AppointmentState, AppointmentPlayerType } from '../../MongoDB/Appointment/Entities'
@@ -34,8 +34,13 @@ export class CreateAppointmentInput {
    @IsMongoId()
    field: string
    @Field(() => String)
+   @IsDateString()
    @MinDate(dayjs().add(1, 'days').toDate())
-   timeAndDate: Date|string
+   start: Date|string
+   @Field(() => String, { nullable: true })
+   @IsDateString()
+   @MinDate(dayjs().add(1, 'days').toDate())
+   end?: Date|string
    // Ignore for noe
    //
    // @Field(() => Int, { nullable: true })
@@ -98,8 +103,13 @@ export class UpdateAppointmentMainInput {
    @Field(() => Int, { nullable: true })
    pricePerPlayer?: number
    @Field(() => String, { nullable: true })
+   @IsDateString()
    @MinDate(dayjs().add(1, 'days').toDate())
-   timeAndDate?: Date|string
+   start?: Date|string
+   @Field(() => String, { nullable: true })
+   @IsDateString()
+   @MinDate(dayjs().add(1, 'days').toDate())
+   end?: Date|string
    @Field(() => String, { nullable: true })
    notes?: string
 }
