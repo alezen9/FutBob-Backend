@@ -38,10 +38,12 @@ describe('Appointment', () => {
       const fieldId = await apiInstance.field.create(body)
       field1._id = fieldId
       try {
-        const timeAndDate = dayjs().add(7, 'days').toISOString()
+        const start = dayjs().add(7, 'days').toISOString()
+        const end = dayjs(start).add(2, 'hours').toISOString()
         const appointment = await apiInstance.appointment.create({
           field: fieldId,
-          timeAndDate,
+          start,
+          end,
           pricePerPlayer: 300,
           notes: 'prova aleks first appointment!'
         })
