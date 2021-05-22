@@ -1,7 +1,14 @@
 import { IsEnum } from "class-validator"
 import { ObjectId } from "mongodb"
-import { Field as FieldTG, ID, Int, ObjectType } from "type-graphql"
+import { createUnionType, Field as FieldTG, ID, Int, ObjectType } from "type-graphql"
 import { Field } from "../Field/Entities"
+import { FreeAgent } from "../FreeAgent/Entities"
+import { Player } from "../Player/Entities"
+
+export const AppointmentTypePlayerUnion = createUnionType({
+  name: "AppointmentTypePlayerUnion", // the name of the GraphQL union
+  types: () => [Player, FreeAgent] as const, // function that returns tuple of object types classes
+})
 
 export enum AppointmentPlayerType {
     Registered,
@@ -9,8 +16,8 @@ export enum AppointmentPlayerType {
 }
 @ObjectType()
 export class AppointmentTypePlayer {
-    @FieldTG(() => ID)
-    _id: ObjectId
+    @FieldTG(() => AppointmentTypePlayerUnion)
+    player: ObjectId
     @FieldTG(() => Int)
     @IsEnum(AppointmentPlayerType)
     type: AppointmentPlayerType
@@ -40,7 +47,7 @@ export class AppointmentPlayer {
     @FieldTG(() => AppointmentPlayerMatchStats)
     matchStats?: AppointmentPlayerMatchStats
     @FieldTG()
-    amountPaid: number
+    paidAmount: number
 }
 
 @ObjectType()
@@ -85,6 +92,8 @@ export class AppointmentMatch {
     teamB: AppointmentMatchTeam
     @FieldTG()
     winner: 'teamA'|'teamB'|'draw'
+    @FieldTG()
+    notes?: string
 }
 
 export enum AppointmentInvitesState {
@@ -106,34 +115,35 @@ export enum InviteListType {
 }
 
 @ObjectType()
-export class InviteResponse {
+export class AppointmentInvitesInvitedPlayer {
+    @FieldTG(() => Player)
+    player: ObjectId
     @FieldTG(() => Int)
-    @IsEnum(InviteResponseType)
-    type: InviteResponseType
-    @FieldTG(() => String)
-    createdAt: Date|string
-    @FieldTG(() => Int, { nullable: true })
-    @IsEnum(InviteListType)
-    prevList?: InviteListType
+    totalResponses: number 
 }
 
-export class InvitedPlayer {
-    _id: ObjectId
-    firstOpen?: Date|string // when the user loads invite page for the first time
-    responses: InviteResponse[] // history responses
-}
-
+@ObjectType()
 export class AppointmentInviteLists {
-    invited: InvitedPlayer[]
+    @FieldTG(() => AppointmentInvitesInvitedPlayer)
+    invited: AppointmentInvitesInvitedPlayer[]
+    @FieldTG(() => Player)
     declined: ObjectId[]
+    @FieldTG(() => [AppointmentTypePlayer])
     waiting: AppointmentTypePlayer[]
+    @FieldTG(() => [AppointmentTypePlayer])
     confirmed: AppointmentTypePlayer[]
+    @FieldTG(() => [AppointmentTypePlayer])
     blacklisted: AppointmentTypePlayer[]
-    ignored: ObjectId[] // players that ignored the invite
-    
+    @FieldTG(() => Player)
+    ignored: ObjectId[]
 }
 
+export enum AppointmentInvitesMode {
+    Auto,
+    Manual
+}
 export class AppointmentInvites {
+    mode: AppointmentInvitesMode
     state: AppointmentInvitesState
     minQuorum: number
     maxQuorum: number

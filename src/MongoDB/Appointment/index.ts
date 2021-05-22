@@ -313,7 +313,7 @@ class MongoAppointment {
       const { confirmed = [], invited = [], blacklisted = [] } = data.invites || {}
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: appointment._id, createdBy: new ObjectId(createdBy) })
       if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
-            throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
+         throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
       }
       // invited players can be modified only if the state is still scheduled
       // invited players that have already responded to the invite cannot be removed
