@@ -11,9 +11,9 @@ export class AppointmentResolver {
 
    @Query(() => PaginatedAppoontmentResponse)
    @Authorized(Privilege.Manager)
-   async Appointment_getList(@Ctx() ctx: MyContext, @Arg('filters') filters: FiltersAppointment, @Arg('pagination') pagination: Pagination, @Arg('sort') sort: SortAppointment): Promise<List<Appointment>> {
+   async Appointment_getList(@Ctx() ctx: MyContext, @Arg('filters') filters: FiltersAppointment, @Arg('pagination') pagination: Pagination): Promise<List<Appointment>> {
       const { idUser } = ctx.req
-      const result = await mongoAppointment.getList(filters, pagination, sort, idUser)
+      const result = await mongoAppointment.getList(filters, pagination, idUser)
       return result
    }
 

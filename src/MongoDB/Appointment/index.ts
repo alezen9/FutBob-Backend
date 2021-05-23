@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb'
 import { facetCount } from '../helpers'
 import { get } from 'lodash'
 import { List, Pagination } from '../Entities'
-import { Appointment, AppointmentInviteLists, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, InvitedPlayer, AppointmentDate } from './Entities'
+import { Appointment, AppointmentInviteLists, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, AppointmentDate, AppointmentInvitesInvitedPlayer } from './Entities'
 import { CreateAppointmentInput, FiltersAppointment, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
 import { createMongoUpdateObject } from '../../Utils/helpers'
 import ErrorMessages from '../../Utils/ErrorMessages'
@@ -360,20 +360,20 @@ class MongoAppointment {
       // invited players that have already responded to the invite cannot be removed
       if(currentAppointment.state === AppointmentState.Scheduled) {
          if(invited.length) {
-            let invitedMap: { [_id: string]: InvitedPlayer } = {}
+            let invitedMap: { [_id: string]: AppointmentInvitesInvitedPlayer } = {}
             // check if user is trying to remove invited players that already responded
             const removedWithResponses = currentAppointment.invites.lists.invited.reduce((acc, val) => {
-               const { _id, responses } = val
-               if(invited.includes(_id.toHexString()) && responses.length) acc.push(val)
-               invitedMap[_id.toHexString()] = val
+               const { player, totalResponses } = val
+               if(invited.includes(player.toHexString()) && totalResponses > 0) acc.push(val)
+               invitedMap[player.toHexString()] = val
                return acc
             }, [])
             if(removedWithResponses.length) throw new Error(ErrorMessages.appointment_forbidden_removal_invited_players_already_responded)
-            appointment.invites.lists.invited = invited.map(id => {
+            appointment.invites.lists.invited = invited.map(id=> {
                if(invitedMap[id]) return invitedMap[id]
                return {
-                  _id: new ObjectId(id),
-                  responses: []
+                  player: new ObjectId(id),
+                  totalResponses: 0
                }
             })
          }
@@ -381,13 +381,13 @@ class MongoAppointment {
       // confirmed players can be modified only if the appointment hasn't been completed yet
       if([AppointmentState.Confirmed, AppointmentState.Scheduled].includes(currentAppointment.state)) {
          if(confirmed.length) {
-            const unauthorizedRemoval = !!currentAppointment.invites.lists.confirmed.find(({ _id }) => !confirmed.find(newConfirmedPlayer => _id.toHexString() === newConfirmedPlayer._id) && !blacklisted.find(newBlacklistedPlayer => _id.toHexString() === newBlacklistedPlayer._id))
+            const unauthorizedRemoval = !!currentAppointment.invites.lists.confirmed.find(({ player }) => !confirmed.find(newConfirmedPlayer => player.toHexString() === newConfirmedPlayer._id) && !blacklisted.find(newBlacklistedPlayer => player.toHexString() === newBlacklistedPlayer._id))
             if(unauthorizedRemoval && currentAppointment.state === AppointmentState.Confirmed) throw new Error(ErrorMessages.appointment_forbidden_removal_confirmed_players_without_blacklisting)
-            appointment.invites.lists.confirmed = confirmed.map(confirmedPlayer => ({ ...confirmedPlayer, _id: new ObjectId(confirmedPlayer._id) }))
+            appointment.invites.lists.confirmed = confirmed.map(confirmedPlayer => ({ ...confirmedPlayer, player: new ObjectId(confirmedPlayer._id) }))
          }
 
          if(blacklisted.length) {
-            appointment.invites.lists.blacklisted = blacklisted.map(blacklistedPlayer => ({ ...blacklistedPlayer, _id: new ObjectId(blacklistedPlayer._id) }))
+            appointment.invites.lists.blacklisted = blacklisted.map(blacklistedPlayer => ({ ...blacklistedPlayer, player: new ObjectId(blacklistedPlayer._id) }))
          }
       }
       
