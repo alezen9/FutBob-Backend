@@ -16,16 +16,32 @@ export class TypedPlayerInput {
 
 @InputType()
 export class SimpleInvitesInput {
-    @Field(() => [TypedPlayerInput], { nullable: true })
-    confirmed?: TypedPlayerInput[]
-    @Field(() => [String], { nullable: true })
-    invited?: string[]
+   @Field(() => [TypedPlayerInput], { nullable: true })
+   confirmed?: TypedPlayerInput[]
+   @Field(() => [String], { nullable: true })
+   invited?: string[]
+   @Field(() => Int)
+   minQuorum: number
+   @Field(() => Int)
+   maxQuorum: number
+   @Field(() => Int)
+   checkpointQuorum: number
 }
 
 @InputType()
-export class EnhancedInvitesInput extends SimpleInvitesInput {
-    @Field(() => [TypedPlayerInput], { nullable: true })
-    blacklisted?: TypedPlayerInput[]
+export class EnhancedInvitesInput {
+   @Field(() => [TypedPlayerInput], { nullable: true })
+   blacklisted?: TypedPlayerInput[]
+   @Field(() => [TypedPlayerInput], { nullable: true })
+   confirmed?: TypedPlayerInput[]
+   @Field(() => [String], { nullable: true })
+   invited?: string[]
+   @Field(() => Int, { nullable: true })
+   minQuorum?: number
+   @Field(() => Int, { nullable: true })
+   maxQuorum?: number
+   @Field(() => Int, { nullable: true })
+   checkpointQuorum?: number
 }
 
 @InputType()
@@ -40,15 +56,7 @@ export class CreateAppointmentInput {
    @Field(() => String, { nullable: true })
    @IsDateString()
    @MinDate(dayjs().add(1, 'days').toDate())
-   end?: Date|string
-   // Ignore for noe
-   //
-   // @Field(() => Int, { nullable: true })
-   // checkpointQuorum?: number
-   // @Field(() => Int, { nullable: true })
-   // minQuorum?: number
-   // @Field(() => Int, { nullable: true })
-   // maxQuorum?: number
+   end: Date|string
    @Field(() => Int, { nullable: true })
    pricePerPlayer?: number
    @Field(() => SimpleInvitesInput, { nullable: true })
@@ -69,10 +77,12 @@ export class AppointmentMatchTeamInput {
 
 @InputType('match')
 export class AppointmentMatchInput {
-    @Field(() => AppointmentMatchTeamInput)
-    teamA: AppointmentMatchTeamInput
-    @Field(() => AppointmentMatchTeamInput)
-    teamB: AppointmentMatchTeamInput
+   @Field(() => AppointmentMatchTeamInput)
+   teamA: AppointmentMatchTeamInput
+   @Field(() => AppointmentMatchTeamInput)
+   teamB: AppointmentMatchTeamInput
+   @Field({ nullable: true })
+   notes?: string
 }
 
 @InputType('individualStats')
@@ -85,6 +95,8 @@ export class AppointmentPlayerInput {
    goals: number
    @Field(() => Int)
    assists: number
+   @Field(() => Int)
+   paidAmount: number
 }
 
 @InputType('stats')

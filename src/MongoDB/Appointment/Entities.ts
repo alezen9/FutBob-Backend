@@ -49,6 +49,13 @@ export class AppointmentPlayer {
     @FieldTG()
     paidAmount: number
 }
+@ObjectType()
+export class AppointmentStatsMVP {
+    @FieldTG(() => AppointmentTypePlayer)
+    player: AppointmentTypePlayer
+    @FieldTG()
+    notes?: string
+}
 
 @ObjectType()
 export class AppointmentStats {
@@ -56,8 +63,10 @@ export class AppointmentStats {
     totalGoals: number
     @FieldTG(() => Int)
     totalAssists: number
-    @FieldTG(() => AppointmentTypePlayer)
-    mvp: AppointmentTypePlayer
+    @FieldTG(() => AppointmentStatsMVP, { nullable: true })
+    mvp?: AppointmentStatsMVP
+    @FieldTG(() => [AppointmentTypePlayer])
+    mvpElegible: AppointmentTypePlayer[]
     @FieldTG(() => AppointmentTypePlayer)
     topScorer: AppointmentTypePlayer
     @FieldTG(() => AppointmentTypePlayer)
@@ -156,7 +165,7 @@ export class AppointmentDate {
     @FieldTG(() => String)
     start: Date|string
     @FieldTG(() => String)
-    end?: Date|string
+    end: Date|string
 }
 
 @ObjectType()
