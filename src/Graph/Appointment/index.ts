@@ -1,6 +1,6 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { List, Pagination, Privilege } from "../../MongoDB/Entities";
-import { CreateAppointmentInput, FiltersAppointment, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from "./inputs";
+import { CreateAppointmentInput, FiltersAppointment, SetMpvManuallyInput, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from "./inputs";
 import { MyContext } from "../../../index";
 import { PaginatedAppoontmentResponse } from "./types";
 import { mongoAppointment } from "../../MongoDB/Appointment";
@@ -46,6 +46,14 @@ export class AppointmentResolver {
    async Appointment_UpdateStats(@Ctx() ctx: MyContext, @Arg('body') body: UpdateAppointmentStatsInput): Promise<Boolean> {
       const { idUser } = ctx.req
       const done = await mongoAppointment.updateStats(body, idUser)
+      return done
+   }
+
+   @Mutation(() => Boolean)
+   @Authorized(Privilege.Manager)
+   async Appointment_SetMpvManually(@Ctx() ctx: MyContext, @Arg('body') body: SetMpvManuallyInput): Promise<Boolean> {
+      const { idUser } = ctx.req
+      const done = await mongoAppointment.setMvpManually(body, idUser)
       return done
    }
 

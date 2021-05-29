@@ -160,6 +160,18 @@ export class UpdateAppointmentStateInput {
 }
 
 @InputType()
+export class SetMpvManuallyInput {
+   @Field()
+   @IsMongoId()
+   appointmentId: string
+   @Field()
+   @IsMongoId()
+   playerId: string
+    @Field({ nullable: true })
+   notes?: string
+}
+
+@InputType()
 export class FiltersAppointment {
    @Field(() => [String], { nullable: true })
    ids?: string[]

@@ -5,7 +5,7 @@ import { facetCount } from '../helpers'
 import { get } from 'lodash'
 import { List, Pagination } from '../Entities'
 import { Appointment, AppointmentInviteLists, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, AppointmentDate, AppointmentInvitesInvitedPlayer } from './Entities'
-import { CreateAppointmentInput, FiltersAppointment, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
+import { CreateAppointmentInput, FiltersAppointment, SetMpvManuallyInput, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
 import { createMongoUpdateObject } from '../../Utils/helpers'
 import ErrorMessages from '../../Utils/ErrorMessages'
 import { Field } from '../Field/Entities'
@@ -266,6 +266,31 @@ class MongoAppointment {
       return true
    }
 
+   
+   // DOOOOOOONEEEEEE, don't touch (29.05.2021 at 17:14)
+   async setMvpManually (data: SetMpvManuallyInput, createdBy: string) {
+      const { appointmentId, playerId, notes } = data
+      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(appointmentId), createdBy: new ObjectId(createdBy) })
+      if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
+         throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
+      }
+      const elegiblePlayers = currentAppointment?.stats?.mvpElegible || []
+      const playerFoundInElegible = elegiblePlayers.find(({ player }) => playerId === player.toHexString())
+      if(!playerFoundInElegible) throw new Error(ErrorMessages.appointment_player_not_elegible_as_mvp)
+      const appointment = new Appointment()
+      const now = dayjs().toISOString()
+      appointment.updatedAt = now
+      appointment.stats.mvp = {
+          player: playerFoundInElegible,
+         ...notes && { notes }
+      }
+      await MongoDBInstance.collection.appointment.updateOne(
+         { _id: new ObjectId(appointmentId), createdBy: new ObjectId(createdBy) },
+         { $set: createMongoUpdateObject(appointment) }
+      )
+      return true
+   }
+
 
    // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:02)
    private calculateMVP (players: Player[], freeAgentIds: ObjectId[], stats: AppointmentStats): AppointmentTypePlayer[] {
@@ -398,15 +423,17 @@ class MongoAppointment {
       return true
    }
 
+
+   // DOOOOOOONEEEEEE, don't touch (29.05.2021 at 17:14)
    async updateState (data: UpdateAppointmentStateInput, createdBy: string): Promise<boolean> {
-      const now = dayjs().toISOString()
-      const appointment = new Appointment()
-      appointment.updatedAt = now
-      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: appointment._id, createdBy: new ObjectId(createdBy) })
+      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: data._id, createdBy: new ObjectId(createdBy) })
       if(data.state === currentAppointment.state) return true
       if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)) {
          throw new Error(ErrorMessages.appointment_already_closed)
       }
+      const now = dayjs().toISOString()
+      const appointment = new Appointment()
+      appointment.updatedAt = now
 
       // scheduled => confirmed|canceled
       // confirmed => completed|canceled| interrupted

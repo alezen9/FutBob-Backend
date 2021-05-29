@@ -27,6 +27,7 @@ const ErrorMessages = Object.freeze({
   appointment_forbidden_removal_invited_players_already_responded: 'appointment_forbidden_removal_invited_players_already_responded',
   appointment_forbidden_removal_confirmed_players_without_blacklisting: 'appointment_forbidden_removal_confirmed_players_without_blacklisting',
   appointment_forbidden_removal_confirmed_players: 'appointment_forbidden_removal_confirmed_players',
+  appointment_player_not_elegible_as_mvp: 'appointment_player_not_elegible_as_mvp',
   appointment_already_closed: 'appointment_already_closed',
   appointment_error_validation_dates: 'appointment_error_validation_dates'
 })

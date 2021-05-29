@@ -186,7 +186,7 @@ export class Appointment {
     @FieldTG(() => Int)
     pricePerPlayer: number // in cents, manually set or invited / field price, min 1.50€ if field price is not 0€
     @FieldTG(() => AppointmentStats)
-    stats: AppointmentStats
+    stats?: AppointmentStats
     @FieldTG(() => [AppointmentMatch], { nullable: true })
     matches?: AppointmentMatch[]
     @FieldTG()
