@@ -7,6 +7,7 @@ import ErrorMessages from '../Utils/ErrorMessages'
 import { ZenServer } from '../SDK'
 import { field1, field2 } from './helpers/MockData/fields'
 import dayjs from 'dayjs'
+import { createPlayers } from './helpers/MassiveFakeInserts/createPlayers'
 require('dotenv').config()
 
 const apiInstance = new ZenServer()
@@ -18,7 +19,7 @@ const setupConf = {
 
 describe('Appointment', () => {
   describe('Clear database', () => {
-    it.skip('Should clear database', async () => {
+    it('Should clear database', async () => {
       if (MongoDBInstance.state === MongoState.Disconnected) {
         await MongoDBInstance.startConnection()
       }
@@ -27,13 +28,14 @@ describe('Appointment', () => {
   })
 
   describe('Setup', () => {
-    it.skip('Register a new manager', async () => {
+    it('Register a new manager', async () => {
       await setupTestsuite(setupConf, apiInstance)
+      await createPlayers(50, apiInstance)
     })
   })
 
   describe('Create', () => {
-    it('Create an appointment', async () => {
+    it.skip('Create an appointment', async () => {
       const { _id, ...body } = field1
       const fieldId = await apiInstance.field.create(body)
       field1._id = fieldId

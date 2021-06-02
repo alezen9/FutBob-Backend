@@ -151,12 +151,14 @@ export enum AppointmentInvitesMode {
     Auto,
     Manual
 }
+@ObjectType()
 export class AppointmentInvites {
     // mode: AppointmentInvitesMode
     // state: AppointmentInvitesState
     // minQuorum: number
     // maxQuorum: number
     // checkpointQuorum: number
+     @FieldTG(() => AppointmentInviteLists)
     lists: AppointmentInviteLists
 }
 
