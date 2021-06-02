@@ -20,12 +20,12 @@ export class SimpleInvitesInput {
    confirmed?: TypedPlayerInput[]
    @Field(() => [String], { nullable: true })
    invited?: string[]
-   @Field(() => Int)
-   minQuorum: number
-   @Field(() => Int)
-   maxQuorum: number
-   @Field(() => Int)
-   checkpointQuorum: number
+   // @Field(() => Int)
+   // minQuorum: number
+   // @Field(() => Int)
+   // maxQuorum: number
+   // @Field(() => Int)
+   // checkpointQuorum: number
 }
 
 @InputType()
@@ -36,12 +36,12 @@ export class EnhancedInvitesInput {
    confirmed?: TypedPlayerInput[]
    @Field(() => [String], { nullable: true })
    invited?: string[]
-   @Field(() => Int, { nullable: true })
-   minQuorum?: number
-   @Field(() => Int, { nullable: true })
-   maxQuorum?: number
-   @Field(() => Int, { nullable: true })
-   checkpointQuorum?: number
+   // @Field(() => Int, { nullable: true })
+   // minQuorum?: number
+   // @Field(() => Int, { nullable: true })
+   // maxQuorum?: number
+   // @Field(() => Int, { nullable: true })
+   // checkpointQuorum?: number
 }
 
 @InputType()

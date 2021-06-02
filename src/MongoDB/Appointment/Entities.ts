@@ -152,11 +152,11 @@ export enum AppointmentInvitesMode {
     Manual
 }
 export class AppointmentInvites {
-    mode: AppointmentInvitesMode
-    state: AppointmentInvitesState
-    minQuorum: number
-    maxQuorum: number
-    checkpointQuorum: number
+    // mode: AppointmentInvitesMode
+    // state: AppointmentInvitesState
+    // minQuorum: number
+    // maxQuorum: number
+    // checkpointQuorum: number
     lists: AppointmentInviteLists
 }
 

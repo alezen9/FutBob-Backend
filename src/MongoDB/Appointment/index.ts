@@ -51,11 +51,11 @@ class MongoAppointment {
          appointment.state = AppointmentState.Scheduled
          // invites
          appointment.invites = new AppointmentInvites()
-         appointment.invites.state = AppointmentInvitesState.Open
+         // appointment.invites.state = AppointmentInvitesState.Open
          // these params to be ignored for now
-         appointment.invites.checkpointQuorum = data.invites.checkpointQuorum
-         appointment.invites.minQuorum = data.invites.minQuorum
-         appointment.invites.maxQuorum = data.invites.maxQuorum
+         // appointment.invites.checkpointQuorum = data.invites.checkpointQuorum
+         // appointment.invites.minQuorum = data.invites.minQuorum
+         // appointment.invites.maxQuorum = data.invites.maxQuorum
          //
          appointment.invites.lists = new AppointmentInviteLists()
          appointment.invites.lists.blacklisted = []
@@ -371,7 +371,8 @@ class MongoAppointment {
       return mvps
    }
 
-   
+
+   // DOOOOOOONEEEEEE, don't touch (02.06.2021 at 16:53)
    async updateInvites (data: UpdateAppointmentInvitesInput, createdBy: string): Promise<boolean> {
       const now = dayjs().toISOString()
       const appointment = new Appointment()
@@ -422,8 +423,8 @@ class MongoAppointment {
       )
       return true
    }
-
-
+   
+   
    // DOOOOOOONEEEEEE, don't touch (29.05.2021 at 17:14)
    async updateState (data: UpdateAppointmentStateInput, createdBy: string): Promise<boolean> {
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: data._id, createdBy: new ObjectId(createdBy) })
