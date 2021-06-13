@@ -14,16 +14,17 @@ import { Player, PlayerPosition } from '../Player/Entities'
 
 class MongoAppointment {
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:26)
+   // DOOOOOOONEEEEEE, don't touch (13.06.2021 at 15:56)
    private checkDates(start: Date|string, end: Date|string) {
-      const _1DayFromNow = dayjs().add(1, 'days')
-      const startDate = dayjs(start).toISOString()
-      const endDate = dayjs(end).toISOString()
-      // 1. start date must be at least 1 day from now and not after end
-      const startDateOk = dayjs(startDate).isAfter(_1DayFromNow) && ((endDate && !dayjs(startDate).isAfter(endDate)) || !endDate)
+      if(start && !end) throw new Error(ErrorMessages.appointment_error_validation_dates)
+      // const _1DayFromNow = dayjs().add(1, 'days')
+      const startDate = start ? dayjs(start).toISOString() : undefined
+      const endDate = end ? dayjs(end).toISOString() : undefined
+      // 1. start date must be before end
+      const startDateOk = !startDate ? true : dayjs(startDate).isBefore(end)
       // 2. end date must be after start
-      const endDateOk = !endDate ? true : dayjs(endDate).isAfter(startDate)
-
+      const endDateOk = !endDate ? true : dayjs(endDate).isAfter(start)
+      
       if(!(startDateOk && endDateOk)) throw new Error(ErrorMessages.appointment_error_validation_dates)
    }
 
@@ -105,6 +106,7 @@ class MongoAppointment {
       const appointment = new Appointment()
       appointment.updatedAt = now
       if(data.field) appointment.field = new ObjectId(data.field)
+      if(data.start || data.end) appointment.date = new AppointmentDate()
       if(data.start) appointment.date.start = dayjs(data.start).toISOString()
       if(data.end) appointment.date.end = dayjs(data.end).toISOString()
       if(data.notes) appointment.notes = data.notes
@@ -119,6 +121,7 @@ class MongoAppointment {
          ? 0
          : 150 // 1.50€
       }
+      console.log(createMongoUpdateObject(appointment))
       if(![null, undefined].includes(data.pricePerPlayer)) appointment.pricePerPlayer = data.pricePerPlayer
       await MongoDBInstance.collection.appointment.updateOne(
          { _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) },
@@ -376,6 +379,7 @@ class MongoAppointment {
    async updateInvites (data: UpdateAppointmentInvitesInput, createdBy: string): Promise<boolean> {
       const now = dayjs().toISOString()
       const appointment = new Appointment()
+      appointment._id = new ObjectId(data._id)
       appointment.updatedAt = now
       const { confirmed = [], invited = [], blacklisted = [] } = data.invites || {}
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: appointment._id, createdBy: new ObjectId(createdBy) })
@@ -395,6 +399,8 @@ class MongoAppointment {
                return acc
             }, [])
             if(removedWithResponses.length) throw new Error(ErrorMessages.appointment_forbidden_removal_invited_players_already_responded)
+            if(!appointment.invites) appointment.invites = new AppointmentInvites()
+            if(!appointment.invites.lists) appointment.invites.lists = new AppointmentInviteLists()
             appointment.invites.lists.invited = invited.map(id=> {
                if(invitedMap[id]) return invitedMap[id]
                return {
@@ -407,12 +413,16 @@ class MongoAppointment {
       // confirmed players can be modified only if the appointment hasn't been completed yet
       if([AppointmentState.Confirmed, AppointmentState.Scheduled].includes(currentAppointment.state)) {
          if(confirmed.length) {
+            if(!appointment.invites) appointment.invites = new AppointmentInvites()
+            if(!appointment.invites.lists) appointment.invites.lists = new AppointmentInviteLists()
             const unauthorizedRemoval = !!currentAppointment.invites.lists.confirmed.find(({ player }) => !confirmed.find(newConfirmedPlayer => player.toHexString() === newConfirmedPlayer._id) && !blacklisted.find(newBlacklistedPlayer => player.toHexString() === newBlacklistedPlayer._id))
             if(unauthorizedRemoval && currentAppointment.state === AppointmentState.Confirmed) throw new Error(ErrorMessages.appointment_forbidden_removal_confirmed_players_without_blacklisting)
             appointment.invites.lists.confirmed = confirmed.map(confirmedPlayer => ({ ...confirmedPlayer, player: new ObjectId(confirmedPlayer._id) }))
          }
 
          if(blacklisted.length) {
+            if(!appointment.invites) appointment.invites = new AppointmentInvites()
+            if(!appointment.invites.lists) appointment.invites.lists = new AppointmentInviteLists()
             appointment.invites.lists.blacklisted = blacklisted.map(blacklistedPlayer => ({ ...blacklistedPlayer, player: new ObjectId(blacklistedPlayer._id) }))
          }
       }
@@ -460,7 +470,7 @@ class MongoAppointment {
    async getList (filters: FiltersAppointment, pagination: Pagination, createdBy: string): Promise<List<Appointment>> {
       const {
          ids = [],
-         states
+         states = []
       } = filters
 
       const { skip = 0, limit } = pagination

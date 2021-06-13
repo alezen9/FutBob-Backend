@@ -87,6 +87,11 @@ class MongoField {
     const field: Field = await MongoDBInstance.collection.field.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
     return field
   }
+
+  async getFieldsByIds (ids: (string|ObjectId)[]): Promise<Field[]> {
+    const fields: Field[] = await MongoDBInstance.collection.field.find({ _id: { $in: ids.map(id => new ObjectId(id)) } }).toArray()
+    return fields
+  }
 }
 
 export const mongoField = new MongoField()

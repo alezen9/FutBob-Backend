@@ -8,6 +8,11 @@ import { Player } from "../Player/Entities"
 export const AppointmentTypePlayerUnion = createUnionType({
   name: "AppointmentTypePlayerUnion", // the name of the GraphQL union
   types: () => [Player, FreeAgent] as const, // function that returns tuple of object types classes
+  resolveType: val => {
+    if('user' in val) return Player
+    if('name' in val) return FreeAgent
+    return undefined
+  }
 })
 
 export enum AppointmentPlayerType {
@@ -133,9 +138,9 @@ export class AppointmentInvitesInvitedPlayer {
 
 @ObjectType()
 export class AppointmentInviteLists {
-    @FieldTG(() => AppointmentInvitesInvitedPlayer)
+    @FieldTG(() => [AppointmentInvitesInvitedPlayer])
     invited: AppointmentInvitesInvitedPlayer[]
-    @FieldTG(() => Player)
+    @FieldTG(() => [Player])
     declined: ObjectId[]
     @FieldTG(() => [AppointmentTypePlayer])
     waiting: AppointmentTypePlayer[]
@@ -143,7 +148,7 @@ export class AppointmentInviteLists {
     confirmed: AppointmentTypePlayer[]
     @FieldTG(() => [AppointmentTypePlayer])
     blacklisted: AppointmentTypePlayer[]
-    @FieldTG(() => Player)
+    @FieldTG(() => [Player])
     ignored: ObjectId[]
 }
 

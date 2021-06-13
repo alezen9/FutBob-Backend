@@ -2,6 +2,7 @@ import * as jwt from 'jsonwebtoken'
 import { reduce, isObject, isArray } from 'lodash'
 import dayjs from 'dayjs'
 import { Privilege } from '../MongoDB/Entities'
+import { ObjectID, ObjectId } from 'mongodb'
 
 export const capitalize = (str: string): string =>  {
     return `${str.substr(0, 1).toUpperCase()}${str.substr(1).toLowerCase()}`
@@ -65,7 +66,7 @@ export const asyncTimeout = async (milliseconds: number, log: boolean = false): 
 export const createMongoUpdateObject = (obj: any, _key: string = '') => {
   let res = {}
   for(const [key, value] of Object.entries(obj)){
-    if(isObject(value) && !isArray(value)) {
+    if(isObject(value) && !isArray(value) && !(value instanceof ObjectId || value instanceof ObjectID)) {
       res = {
         ...res,
         ...createMongoUpdateObject(value, `${_key}${key}.`)

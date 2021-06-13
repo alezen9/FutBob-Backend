@@ -4,7 +4,7 @@ import { Field, InputType, Int } from 'type-graphql'
 import { AppointmentState, AppointmentPlayerType } from '../../MongoDB/Appointment/Entities'
 import { EnumArrayOf } from '../../Utils/customValidators/EnumArrayOf'
 
-@InputType('typedPlayer')
+@InputType()
 export class TypedPlayerInput {
    @Field()
    @IsMongoId()
@@ -51,11 +51,11 @@ export class CreateAppointmentInput {
    field: string
    @Field(() => String)
    @IsDateString()
-   @MinDate(dayjs().add(1, 'days').toDate())
+   // @MinDate(dayjs().add(1, 'day').toDate())
    start: Date|string
    @Field(() => String, { nullable: true })
    @IsDateString()
-   @MinDate(dayjs().add(1, 'days').toDate())
+   // @MinDate(dayjs().add(1, 'day').toDate())
    end: Date|string
    @Field(() => Int, { nullable: true })
    pricePerPlayer?: number
@@ -116,11 +116,11 @@ export class UpdateAppointmentMainInput {
    pricePerPlayer?: number
    @Field(() => String, { nullable: true })
    @IsDateString()
-   @MinDate(dayjs().add(1, 'days').toDate())
+   // @MinDate(dayjs().add(1, 'days').toDate())
    start?: Date|string
    @Field(() => String, { nullable: true })
    @IsDateString()
-   @MinDate(dayjs().add(1, 'days').toDate())
+   // @MinDate(dayjs().add(1, 'days').toDate())
    end?: Date|string
    @Field(() => String, { nullable: true })
    notes?: string

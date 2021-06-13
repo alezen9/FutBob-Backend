@@ -43,6 +43,7 @@ export const setupTestsuite = async (config: SetupConfig, apiInstance: ZenServer
 			password,
 			confirmPassword: password
 		}, '{ token }')
+		console.log('token: ', token)
 		apiInstance.auth.setToken(token)
 	}
 

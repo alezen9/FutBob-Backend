@@ -2,6 +2,8 @@ import { FieldResolver, Resolver, ResolverInterface, Root } from "type-graphql";
 import { Appointment, AppointmentInvites, AppointmentPlayerType, AppointmentTypePlayer } from "../../../MongoDB/Appointment/Entities";
 import { playerLoader } from "../../Player/loaders";
 import { freeAgentLoader } from "../../FreeAgent/loaders"
+import { Field } from "../../../MongoDB/Field/Entities";
+import { fieldLoader } from "../../Field/loaders";
 
 @Resolver(of => Appointment)
 export class AppointmentFieldResolvers implements ResolverInterface<Appointment> {
@@ -10,6 +12,12 @@ export class AppointmentFieldResolvers implements ResolverInterface<Appointment>
       return el.type === AppointmentPlayerType.Registered
          ? playerLoader.load(el.player.toHexString())
          : freeAgentLoader.load(el.player.toHexString())
+   }
+
+   @FieldResolver(() => Field)
+   // @ts-ignore
+   async field(@Root() root: Appointment): Promise<Field> {
+      return fieldLoader.load(root.field.toHexString())
    }
 
    @FieldResolver(() => AppointmentInvites)
@@ -42,14 +50,8 @@ export class AppointmentFieldResolvers implements ResolverInterface<Appointment>
                ...el,
                player: this.loadAppointmentPlayer(el)
             })),
-            declined: declined.map(_id => ({
-               _id: _id.toHexString(),
-               player: playerLoader.load(_id.toHexString())
-            })),
-            ignored: ignored.map(_id => ({
-               _id: _id.toHexString(),
-               player: playerLoader.load(_id.toHexString())
-            }))
+            declined: playerLoader.loadMany(declined.map(String)),
+            ignored: playerLoader.loadMany(ignored.map(String))
          }
       }
    }   

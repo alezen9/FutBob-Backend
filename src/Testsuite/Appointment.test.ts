@@ -8,13 +8,17 @@ import { ZenServer } from '../SDK'
 import { field1, field2 } from './helpers/MockData/fields'
 import dayjs from 'dayjs'
 import { createPlayers } from './helpers/MassiveFakeInserts/createPlayers'
+import { AppointmentPlayerType } from '../MongoDB/Appointment/Entities'
+import { sampleSize, uniqBy } from 'lodash'
 require('dotenv').config()
 
 const apiInstance = new ZenServer()
 const noTokenApiInstance = new ZenServer()
 
 const setupConf = {
-  [TestsuiteSetupOperation.Manager]: true
+  [TestsuiteSetupOperation.Manager]: true,
+  [TestsuiteSetupOperation.Fields]: true,
+  [TestsuiteSetupOperation.FreeAgents]: true
 }
 
 describe('Appointment', () => {
@@ -30,54 +34,145 @@ describe('Appointment', () => {
   describe('Setup', () => {
     it('Register a new manager', async () => {
       await setupTestsuite(setupConf, apiInstance)
+    })
+    it('Register 50 registered playres', async () => {
       await createPlayers(50, apiInstance)
     })
   })
 
-  describe('Create', () => {
-    it.skip('Create an appointment', async () => {
-      const { _id, ...body } = field1
-      const fieldId = await apiInstance.field.create(body)
-      field1._id = fieldId
-      try {
-        const start = dayjs().add(7, 'days').toISOString()
-        const end = dayjs(start).add(2, 'hours').toISOString()
-        const appointment = await apiInstance.appointment.create({
-          field: fieldId,
-          start,
-          end,
-          pricePerPlayer: 300,
-          notes: 'prova aleks first appointment!'
-        })
-      } catch (error) {
-        console.log(error)
-      }
-
-      const { result } = await apiInstance.appointment.getList({}, { skip: 0 }, `{ result { _id } }`)
-      assert.strictEqual(result.length, 1)
-      // assert.strictEqual(result[0]._id, freeAgentId1)
-      // assert.strictEqual(result[0].name, freeAgent1.name)
-      // assert.strictEqual(result[0].surname, freeAgent1.surname)
+  describe('Correct flow', () => {
+    let appointmentId
+    it('Create an appointment', async () => {
+      const { result: invitedPlayers } = await apiInstance.player.getList({}, { skip: 0, limit: 20 }, {}, '{ result { _id } }')
+      const { result: fields } = await apiInstance.field.getList({}, { skip: 0 }, '{ result { _id } }')
+      const { result: freeAgents } = await apiInstance.freeAgent.getList({}, { skip: 0 }, '{ result { _id } }')
+      const start = dayjs().add(7, 'days').toISOString()
+      const end = dayjs(start).add(2, 'hours').toISOString()
+      appointmentId = await apiInstance.appointment.create({
+        field: fields[0]._id,
+        start,
+        end,
+        pricePerPlayer: 150,
+        notes: 'First appointment',
+        invites: {
+          confirmed: [{ _id: freeAgents[0]._id, type: AppointmentPlayerType.FreeAgent }],
+          invited: invitedPlayers.map(({ _id }) => _id)
+        }
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({}, { skip: 0 }, '{ result { _id } }')
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(appointments[0]._id, appointmentId)
     })
 
-    // it('Try to create a new free agent without token', async () => {
-    //   try {
-    //     const { _id, ...body } = freeAgent1
-    //     await noTokenApiInstance.freeAgent.create(body)
-    //   } catch (error) {
-    //     assert.strictEqual(error, ErrorMessages.user_unauthenticated)
-    //   }
-    // })
+    it('Edit appointment notes', async () => {
+      const newNotes = 'Still first appointment but updated'
+      await apiInstance.appointment.updateMainInfo({
+        _id: appointmentId,
+        notes: newNotes
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, '{ result { _id, notes } }')
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(appointments[0].notes, newNotes)
+    })
 
-    // it('Try to create a new free agent with missing required fields', async () => {
-    //   try {
-    //     const { _id, name, ...body } = freeAgent1
-    //     // @ts-ignore
-    //     await apiInstance.freeAgent.create(body)
-    //   } catch (error) {
-    //     assert.strictEqual(typeof error, 'string')
-    //     assert.strictEqual(validationErrorRegEx.test(error), true)
-    //   }
-    // })
+    it('Set appointment for tomorrow evening', async () => {
+      const start = dayjs().add(1, 'days').toISOString()
+      const end = dayjs(start).add(2, 'hours').toISOString()
+      await apiInstance.appointment.updateMainInfo({
+        _id: appointmentId,
+        start,
+        end
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, '{ result { _id, date { start, end } } }')
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(dayjs(appointments[0].date.start).isSame(start), true)
+      assert.strictEqual(dayjs(appointments[0].date.end).isSame(end), true)
+    })
+
+    it('Change location (field)', async () => {
+      const { result: fields } = await apiInstance.field.getList({}, { skip: 0 }, '{ result { _id } }')
+      await apiInstance.appointment.updateMainInfo({
+        _id: appointmentId,
+        field: fields[1]._id
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, '{ result { _id, field { _id } } }')
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(appointments[0].field._id, fields[1]._id)
+    })
+
+    it('Change price per player', async () => {
+      await apiInstance.appointment.updateMainInfo({
+        _id: appointmentId,
+        pricePerPlayer: 500 // 5€
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, '{ result { pricePerPlayer } }')
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(appointments[0].pricePerPlayer, 500)
+    })
+
+    it('Change confirmed players', async () => {
+      const { result } = await apiInstance.appointment.getList({}, { skip: 0 }, `{
+        result {
+          _id,
+          invites {
+            lists {
+              invited {
+                player {
+                  _id
+                }
+              },
+              confirmed {
+                type,
+                player {
+                  ...on Player {
+                    _id
+                  },
+                  ...on FreeAgent {
+                    _id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`)
+      const { invites: { lists: { invited = [], confirmed = [] } } } = result[0]
+      const confirmedFromInvited = sampleSize(invited, 7)
+      const newConfirmed = uniqBy([...confirmed.map(el => ({ type: el.type, _id: el.player._id })), ...confirmedFromInvited.map(el => ({ type: AppointmentPlayerType.Registered, _id: el.player._id }))], '_id')
+
+      await apiInstance.appointment.updateInvites({
+        _id: appointmentId,
+        invites: {
+          confirmed: newConfirmed
+        }
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, `{
+        result {
+          _id,
+          invites {
+            lists {
+              invited {
+                player {
+                  _id
+                }
+              },
+              confirmed {
+                type,
+                player {
+                  ...on Player {
+                    _id
+                  },
+                  ...on FreeAgent {
+                    _id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`)
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(appointments[0].invites.lists.confirmed.length, newConfirmed.length)
+    })
   })
 })
