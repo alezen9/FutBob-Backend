@@ -1,6 +1,6 @@
 import { IsDateString, IsEnum, IsMongoId, Matches, MinDate } from 'class-validator'
 import dayjs from 'dayjs'
-import { Field, InputType, Int } from 'type-graphql'
+import { Field, Float, InputType, Int } from 'type-graphql'
 import { AppointmentState, AppointmentPlayerType } from '../../MongoDB/Appointment/Entities'
 import { EnumArrayOf } from '../../Utils/customValidators/EnumArrayOf'
 
@@ -65,7 +65,7 @@ export class CreateAppointmentInput {
    notes?: string
 }
 
-@InputType('matchTeam')
+@InputType()
 export class AppointmentMatchTeamInput {
     @Field(() => [TypedPlayerInput])
     players: TypedPlayerInput[]
@@ -75,7 +75,7 @@ export class AppointmentMatchTeamInput {
     score: number
 }
 
-@InputType('match')
+@InputType()
 export class AppointmentMatchInput {
    @Field(() => AppointmentMatchTeamInput)
    teamA: AppointmentMatchTeamInput
@@ -85,11 +85,11 @@ export class AppointmentMatchInput {
    notes?: string
 }
 
-@InputType('individualStats')
+@InputType()
 export class AppointmentPlayerInput {
    @Field(() => TypedPlayerInput)
    player: TypedPlayerInput
-   @Field(() => Int)
+   @Field(() => Float)
    rating: number
    @Field(() => Int)
    goals: number
@@ -99,7 +99,7 @@ export class AppointmentPlayerInput {
    paidAmount: number
 }
 
-@InputType('stats')
+@InputType()
 export class AppointmentStatsInput {
     @Field(() => [AppointmentPlayerInput])
     individualStats: AppointmentPlayerInput[]
@@ -146,7 +146,7 @@ export class UpdateAppointmentMatchesInput {
 export class UpdateAppointmentStatsInput {
    @Field()
    _id: string
-   @Field(() => [AppointmentStatsInput], { nullable: true })
+   @Field(() => AppointmentStatsInput)
    stats: AppointmentStatsInput
 }
 

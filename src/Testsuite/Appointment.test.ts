@@ -5,11 +5,10 @@ import { describe, it } from 'mocha'
 import { validationErrorRegEx, setupTestsuite, TestsuiteSetupOperation } from './helpers'
 import ErrorMessages from '../Utils/ErrorMessages'
 import { ZenServer } from '../SDK'
-import { field1, field2 } from './helpers/MockData/fields'
 import dayjs from 'dayjs'
 import { createPlayers } from './helpers/MassiveFakeInserts/createPlayers'
 import { AppointmentPlayerType } from '../MongoDB/Appointment/Entities'
-import { sampleSize, uniqBy } from 'lodash'
+import { random, sampleSize, uniqBy } from 'lodash'
 require('dotenv').config()
 
 const apiInstance = new ZenServer()
@@ -137,9 +136,9 @@ describe('Appointment', () => {
         }
       }`)
       const { invites: { lists: { invited = [], confirmed = [] } } } = result[0]
-      const confirmedFromInvited = sampleSize(invited, 7)
+      const confirmedFromInvited = sampleSize(invited, 14)
       const newConfirmed = uniqBy([...confirmed.map(el => ({ type: el.type, _id: el.player._id })), ...confirmedFromInvited.map(el => ({ type: AppointmentPlayerType.Registered, _id: el.player._id }))], '_id')
-
+      // new confirmed contains sample size + 1 = 15 at the moment
       await apiInstance.appointment.updateInvites({
         _id: appointmentId,
         invites: {
@@ -173,6 +172,109 @@ describe('Appointment', () => {
       }`)
       assert.strictEqual(appointments.length, 1)
       assert.strictEqual(appointments[0].invites.lists.confirmed.length, newConfirmed.length)
+    })
+
+    it('Add stats without matches', async () => {
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, `{
+        result {
+          _id,
+          invites {
+            lists {
+              confirmed {
+                type,
+                player {
+                  ...on Player {
+                    _id
+                  },
+                  ...on FreeAgent {
+                    _id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`)
+      const { invites: { lists: { confirmed = [] } } } = appointments[0]
+      const individualStats = confirmed.map(pl => ({
+        player: {
+          _id: pl.player._id,
+          type: pl.type
+        },
+        assists: random(5), // between 0-5
+        goals: random(12), // between 0-12
+        paidAmount: 150,
+        rating: random(5, 10, true) // between 5-10
+      }))
+      individualStats[0] = {
+        player: individualStats[0].player,
+        assists: 5, // between 0-5
+        goals: 13, // between 0-12
+        paidAmount: 150,
+        rating: 10
+      }
+      const bestPlayerId = individualStats[0].player._id
+      await apiInstance.appointment.updateStats({
+        _id: appointmentId,
+        stats: {
+          individualStats
+        }
+      })
+
+      const { result: appointmentsAfter } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, `{ 
+        result {
+          _id,
+          stats {
+            mvp {
+              player {
+                player {
+                  ...on Player {
+                    _id
+                  },
+                  ...on FreeAgent {
+                    _id
+                  }
+                }
+              }
+            },
+            mvpElegible {
+              player {
+                ...on Player {
+                  _id
+                },
+                ...on FreeAgent {
+                  _id
+                }
+              }
+            },
+            topAssistmen {
+              player {
+                ...on Player {
+                  _id
+                },
+                ...on FreeAgent {
+                  _id
+                }
+              }
+            },
+            topScorers {
+              player {
+                ...on Player {
+                  _id
+                },
+                ...on FreeAgent {
+                  _id
+                }
+              }
+            }
+          }
+        }
+      }`)
+
+      assert.strictEqual(appointmentsAfter[0].stats.mvp.player.player._id, bestPlayerId)
+      assert.strictEqual(!!appointmentsAfter[0].stats.mvpElegible.find(el => el.player._id === bestPlayerId), true)
+      assert.strictEqual(!!appointmentsAfter[0].stats.topAssistmen.find(el => el.player._id === bestPlayerId), true)
+      assert.strictEqual(!!appointmentsAfter[0].stats.topScorers.find(el => el.player._id === bestPlayerId), true)
     })
   })
 })

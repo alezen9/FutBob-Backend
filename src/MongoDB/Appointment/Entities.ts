@@ -1,6 +1,6 @@
 import { IsEnum } from "class-validator"
 import { ObjectId } from "mongodb"
-import { createUnionType, Field as FieldTG, ID, Int, ObjectType } from "type-graphql"
+import { createUnionType, Field as FieldTG, Float, ID, Int, ObjectType } from "type-graphql"
 import { Field } from "../Field/Entities"
 import { FreeAgent } from "../FreeAgent/Entities"
 import { Player } from "../Player/Entities"
@@ -43,13 +43,13 @@ export class AppointmentPlayerMatchStats {
 export class AppointmentPlayer {
     @FieldTG(() => AppointmentTypePlayer)
     player: AppointmentTypePlayer
-    @FieldTG(() => Int)
+    @FieldTG(() => Float)
     rating: number
     @FieldTG(() => Int)
     goals: number
     @FieldTG(() => Int)
     assists: number
-    @FieldTG(() => AppointmentPlayerMatchStats)
+    @FieldTG(() => AppointmentPlayerMatchStats, { nullable: true })
     matchStats?: AppointmentPlayerMatchStats
     @FieldTG()
     paidAmount: number
@@ -58,7 +58,7 @@ export class AppointmentPlayer {
 export class AppointmentStatsMVP {
     @FieldTG(() => AppointmentTypePlayer)
     player: AppointmentTypePlayer
-    @FieldTG()
+    @FieldTG({ nullable: true })
     notes?: string
 }
 
@@ -72,10 +72,10 @@ export class AppointmentStats {
     mvp?: AppointmentStatsMVP
     @FieldTG(() => [AppointmentTypePlayer])
     mvpElegible: AppointmentTypePlayer[]
-    @FieldTG(() => AppointmentTypePlayer)
-    topScorer: AppointmentTypePlayer
-    @FieldTG(() => AppointmentTypePlayer)
-    topAssistman: AppointmentTypePlayer
+    @FieldTG(() => [AppointmentTypePlayer])
+    topScorers: AppointmentTypePlayer[]
+    @FieldTG(() => [AppointmentTypePlayer])
+    topAssistmen: AppointmentTypePlayer[]
     @FieldTG(() => [AppointmentPlayer])
     individualStats: AppointmentPlayer[]
 }

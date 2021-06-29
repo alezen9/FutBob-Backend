@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { MongoDBInstance } from '..'
 import { ObjectId } from 'mongodb'
 import { facetCount } from '../helpers'
-import { get } from 'lodash'
+import { get, groupBy, max } from 'lodash'
 import { List, Pagination } from '../Entities'
 import { Appointment, AppointmentInviteLists, AppointmentInvites, AppointmentInvitesState, AppointmentMatch, AppointmentMatchTeam, AppointmentPlayer, AppointmentPlayerMatchStats, AppointmentPlayerType, AppointmentState, AppointmentStats, AppointmentTypePlayer, AppointmentDate, AppointmentInvitesInvitedPlayer } from './Entities'
 import { CreateAppointmentInput, FiltersAppointment, SetMpvManuallyInput, SortAppointment, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from '../../Graph/Appointment/inputs'
@@ -121,7 +121,6 @@ class MongoAppointment {
          ? 0
          : 150 // 1.50€
       }
-      console.log(createMongoUpdateObject(appointment))
       if(![null, undefined].includes(data.pricePerPlayer)) appointment.pricePerPlayer = data.pricePerPlayer
       await MongoDBInstance.collection.appointment.updateOne(
          { _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) },
@@ -180,18 +179,17 @@ class MongoAppointment {
       const now = dayjs().toISOString()
       const appointment = new Appointment()
       appointment.updatedAt = now
-      let topScorer = {} as AppointmentPlayer, topAssistman = {} as AppointmentPlayer
       // setting individual stats and rest of stats aside of mvp
       appointment.stats = data.stats.individualStats.reduce((acc, val) => {
          const currentPlayer: AppointmentPlayer = {
-            player: { ...val.player, player: new ObjectId(val.player._id) },
+            player: { type: val.player.type, player: new ObjectId(val.player._id) },
             assists: val.assists || 0,
             goals: val.goals || 0,
-            rating: val.rating || 0,
+            rating: parseFloat((val.rating || 0).toFixed(2)),
             paidAmount: val.paidAmount || 0
          }
-         if(topScorer.goals < currentPlayer.goals) topScorer = currentPlayer
-         if(topAssistman.assists < currentPlayer.assists) topAssistman = currentPlayer
+         acc.topAssistmen.push(currentPlayer as any)
+         acc.topScorers.push(currentPlayer as any)
          acc.individualStats.push(currentPlayer)
          acc.totalAssists += currentPlayer.assists
          acc.totalGoals += currentPlayer.goals
@@ -199,13 +197,18 @@ class MongoAppointment {
       }, {
          individualStats: [],
          mvp: null,
-         topAssistman: null,
-         topScorer: null,
+         topAssistmen: [],
+         topScorers: [],
          totalAssists: 0,
          totalGoals: 0
       } as AppointmentStats)
-      appointment.stats.topScorer = topScorer.player
-      appointment.stats.topAssistman = topAssistman.player
+      const groupedAssists = groupBy(appointment.stats.topAssistmen as any, 'assists') as Record<number, AppointmentPlayer[]>
+      const maxKeyAssists = max(Object.keys(groupedAssists).map(Number))
+      appointment.stats.topAssistmen = groupedAssists[maxKeyAssists].map(el => el.player)
+      
+      const groupedScorers = groupBy(appointment.stats.topScorers as any, 'goals') as Record<number, AppointmentPlayer[]>
+      const maxKeyScorers= max(Object.keys(groupedScorers).map(Number))
+      appointment.stats.topScorers = groupedScorers[maxKeyScorers].map(el => el.player)
 
       // update matchStats for each player
       let playerMatchStatsMap: { [_id: string]: AppointmentPlayerMatchStats } = {}
@@ -312,8 +315,8 @@ class MongoAppointment {
       }, {})
       const mvpRegistered = players.reduce<{ elegible: AppointmentTypePlayer[], mvpRating: number }>((acc, { _id, positions }) => {
          const CP = coeffMap[positions[0]] // main position is taken in consideration
-         const CG = _id.toHexString() === stats.topScorer.player.toHexString() ? 0.5 : 0
-         const CA = _id.toHexString() === stats.topAssistman.player.toHexString() ? 0.5 : 0
+         const CG = stats.topScorers.find(el => el.player.toHexString() === _id.toHexString()) ? 0.5 : 0
+         const CA = stats.topAssistmen.find(el => el.player.toHexString() === _id.toHexString()) ? 0.5 : 0
          const RATING = ratingMap[_id.toHexString()]
          // MVP formula => RATING + CP + CG + CA
          const res = RATING + CP + CG + CA
@@ -340,8 +343,8 @@ class MongoAppointment {
       })
       const mvpFreeAgents = freeAgentIds.reduce<{ elegible: AppointmentTypePlayer[], mvpRating: number }>((acc, _id) => {
          const RATING = ratingMap[_id.toHexString()]
-         const CG = _id.toHexString() === stats.topScorer.player.toHexString() ? 0.5 : 0
-         const CA = _id.toHexString() === stats.topAssistman.player.toHexString() ? 0.5 : 0
+         const CG = stats.topScorers.find(el => el.player.toHexString() === _id.toHexString()) ? 0.5 : 0
+         const CA = stats.topAssistmen.find(el => el.player.toHexString() === _id.toHexString()) ? 0.5 : 0
          // MVP formula => RATING + CG + CA (no CP here)
          const res = RATING + CG + CA
          const current: AppointmentTypePlayer = {

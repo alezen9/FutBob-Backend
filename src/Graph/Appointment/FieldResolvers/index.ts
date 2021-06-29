@@ -1,5 +1,5 @@
 import { FieldResolver, Resolver, ResolverInterface, Root } from "type-graphql";
-import { Appointment, AppointmentInvites, AppointmentPlayerType, AppointmentTypePlayer } from "../../../MongoDB/Appointment/Entities";
+import { Appointment, AppointmentInvites, AppointmentPlayerType, AppointmentStats, AppointmentTypePlayer } from "../../../MongoDB/Appointment/Entities";
 import { playerLoader } from "../../Player/loaders";
 import { freeAgentLoader } from "../../FreeAgent/loaders"
 import { Field } from "../../../MongoDB/Field/Entities";
@@ -54,5 +54,39 @@ export class AppointmentFieldResolvers implements ResolverInterface<Appointment>
             ignored: playerLoader.loadMany(ignored.map(String))
          }
       }
-   }   
+   } 
+   
+   @FieldResolver(() => AppointmentStats)
+   // @ts-ignore
+   async stats(@Root() root: Appointment) {
+      return {
+         ...root.stats,
+         mvp: {
+            ...root.stats.mvp,
+            player: {
+               ...root.stats.mvp.player,
+               player: this.loadAppointmentPlayer(root.stats.mvp.player)
+            }
+         },
+         mvpElegible: root.stats.mvpElegible.map(el => ({
+            ...el,
+            player: this.loadAppointmentPlayer(el)
+         })),
+         topScorers: root.stats.topScorers.map(el => ({
+            ...el,
+            player: this.loadAppointmentPlayer(el)
+         })),
+         topAssistmen: root.stats.topAssistmen.map(el => ({
+            ...el,
+            player: this.loadAppointmentPlayer(el)
+         })),
+         individualStats: root.stats.individualStats.map(el => ({
+            ...el,
+            player: {
+               ...el.player,
+               player: this.loadAppointmentPlayer(el.player)
+            }
+         }))
+      }
+   } 
 }
