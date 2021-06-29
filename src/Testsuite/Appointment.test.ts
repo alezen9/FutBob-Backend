@@ -306,7 +306,7 @@ describe('Appointment', () => {
         for (let j = i + 1; j < teams.length; j++) {
           const teamAPlayers = teams[i]
           const teamBPlayers = teams[j]
-          matches.push({
+          const match = {
             teamA: {
               players: teamAPlayers.map(pl => ({
                 _id: pl.player._id,
@@ -323,8 +323,9 @@ describe('Appointment', () => {
               name: `Squadra ${faker.random.word()}`,
               score: random(10),
             },
-            notes: faker.lorem.lines(random(1,3))
-          })
+            notes: `match at index: ${matches.length}`
+          }
+          matches.push(match)
         }
       }
       await apiInstance.appointment.updateMatches({
@@ -336,6 +337,8 @@ describe('Appointment', () => {
         result {
           _id,
           matches {
+            notes,
+            winner,
             teamA {
               name,
               score,
@@ -367,6 +370,36 @@ describe('Appointment', () => {
           }
         }
       }`)
+      
+      appointmentsAfter[0].matches.forEach(match => {
+        const { notes, teamA, teamB, winner } = match
+        const beforeMatchIdx = Number(notes.split(':')[1].trim()) // match at index: <idx>
+        const beforeMatch = matches[beforeMatchIdx]
+
+        const expectedWinner = teamA.score === teamB.score
+          ? 'draw'
+          : teamA.score > teamB.score
+            ? 'teamA'
+            : 'teamB'
+
+        assert.strictEqual(notes, beforeMatch.notes)
+        assert.strictEqual(winner, expectedWinner)
+        
+        assert.strictEqual(teamA.name, beforeMatch.teamA.name)
+        assert.strictEqual(teamA.score, beforeMatch.teamA.score)
+        const currentTeamAPlayersIds = teamA.players.map(({ player }) => player._id)
+        const beforeTeamAPlayersIds = beforeMatch.teamA.players.map(({ _id }) => _id)
+        currentTeamAPlayersIds.forEach(_id => assert.strictEqual(beforeTeamAPlayersIds.includes(_id), true))
+
+        assert.strictEqual(teamB.name, beforeMatch.teamB.name)
+        assert.strictEqual(teamB.score, beforeMatch.teamB.score)
+        const currentTeamBPlayersIds = teamB.players.map(({ player }) => player._id)
+        const beforeTeamBPlayersIds = beforeMatch.teamB.players.map(({ _id }) => _id)
+        currentTeamBPlayersIds.forEach(_id => assert.strictEqual(beforeTeamBPlayersIds.includes(_id), true))
+      })
+
     })
+
+    
   })
 })

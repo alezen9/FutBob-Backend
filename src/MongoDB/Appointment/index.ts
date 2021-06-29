@@ -162,6 +162,40 @@ class MongoAppointment {
             ...matchInput.notes && { notes: matchInput.notes }
          }
       })
+      if(currentAppointment.stats && currentAppointment.stats.individualStats) {
+         const playerMatchStatsMap = appointment.matches.reduce<{ [_id: string]: AppointmentPlayerMatchStats }>((acc, match) => {
+            // this assumes that a player is part of only one team: A or B not both
+            // if player is part of both teams it's user's fault xD
+            match.teamA.players.forEach(({ player }) => {
+               const key = player.toHexString()
+               const current = acc[key] || {} as AppointmentPlayerMatchStats
+               acc[key] = {
+                  ...current,
+                  total: (current.total || 0) + 1,
+                  ...match.winner === 'draw' && { draw: (current.draw || 0)+ 1 },
+                  ...match.winner === 'teamA' && { won: (current.won || 0) + 1 },
+                  ...match.winner === 'teamB' && { lost: (current.lost || 0) + 1 }
+               }
+            })
+            match.teamB.players.forEach(({ player }) => {
+               const key = player.toHexString()
+               const current = acc[key] || {} as AppointmentPlayerMatchStats
+               acc[key] = {
+                  ...current,
+                  total: (current.total || 0) + 1,
+                  ...match.winner === 'draw' && { draw: (current.draw || 0)+ 1 },
+                  ...match.winner === 'teamB' && { won: (current.won || 0) + 1 },
+                  ...match.winner === 'teamA' && { lost: (current.lost || 0) + 1 }
+               }
+            })
+            return acc
+         }, {})
+         appointment.stats = new AppointmentStats()
+         appointment.stats.individualStats = currentAppointment.stats.individualStats.map(el => ({
+            ...el,
+            matchStats: playerMatchStatsMap[el.player.player.toHexString()]
+         }))
+      }
       await MongoDBInstance.collection.appointment.updateOne(
          { _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) },
          { $set: createMongoUpdateObject(appointment) }
