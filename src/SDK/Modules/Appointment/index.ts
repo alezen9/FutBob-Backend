@@ -1,5 +1,5 @@
 import { ZenServer } from "../../"
-import { CreateAppointmentInput, FiltersAppointment, SetMpvManuallyInput, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from "../../../Graph/Appointment/inputs"
+import { CreateAppointmentInput, FiltersAppointment, SetMpvManuallyInput, UpdateAppointmentInvitesInput, UpdateAppointmentMainInput, UpdateAppointmentMatchesInput, UpdateAppointmentStateInput, UpdateAppointmentStatsInput } from "../../../Graph/Appointment/inputs"
 import { Pagination } from "../../../MongoDB/Entities"
 import { paramsToString } from "../../helpers"
 
@@ -58,7 +58,7 @@ class AppointmentServer {
       return this._server.API({ query, name: 'Appointment_UpdateInvites' })
    }
 
-   async updateMatches(body: UpdateAppointmentStatsInput): Promise<any> {
+   async updateMatches(body: UpdateAppointmentMatchesInput): Promise<any> {
       const query = `
       mutation {
          Appointment_UpdateMatches(body: ${paramsToString(body)})

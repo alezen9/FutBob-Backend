@@ -8,7 +8,8 @@ import { ZenServer } from '../SDK'
 import dayjs from 'dayjs'
 import { createPlayers } from './helpers/MassiveFakeInserts/createPlayers'
 import { AppointmentPlayerType } from '../MongoDB/Appointment/Entities'
-import { random, sampleSize, uniqBy } from 'lodash'
+import { chunk, random, sampleSize, uniqBy } from 'lodash'
+import faker from 'faker'
 require('dotenv').config()
 
 const apiInstance = new ZenServer()
@@ -275,6 +276,97 @@ describe('Appointment', () => {
       assert.strictEqual(!!appointmentsAfter[0].stats.mvpElegible.find(el => el.player._id === bestPlayerId), true)
       assert.strictEqual(!!appointmentsAfter[0].stats.topAssistmen.find(el => el.player._id === bestPlayerId), true)
       assert.strictEqual(!!appointmentsAfter[0].stats.topScorers.find(el => el.player._id === bestPlayerId), true)
+    })
+
+    it('Add matches', async () => {
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, `{
+        result {
+          _id,
+          invites {
+            lists {
+              confirmed {
+                type,
+                player {
+                  ...on Player {
+                    _id
+                  },
+                  ...on FreeAgent {
+                    _id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`)
+      const { invites: { lists: { confirmed = [] } } } = appointments[0]
+      const teams = chunk(confirmed, 5) as any[][] // 3 subarrays of 5 elements each
+      const matches = []
+      for (let i = 0; i < teams.length - 1; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+          const teamAPlayers = teams[i]
+          const teamBPlayers = teams[j]
+          matches.push({
+            teamA: {
+              players: teamAPlayers.map(pl => ({
+                _id: pl.player._id,
+                type: pl.type
+              })),
+              name: `Squadra ${faker.random.word()}`,
+              score: random(10)
+            },
+            teamB: {
+              players: teamBPlayers.map(pl => ({
+                _id: pl.player._id,
+                type: pl.type
+              })),
+              name: `Squadra ${faker.random.word()}`,
+              score: random(10),
+            },
+            notes: faker.lorem.lines(random(1,3))
+          })
+        }
+      }
+      await apiInstance.appointment.updateMatches({
+        _id: appointmentId,
+        matches
+      })
+
+      const { result: appointmentsAfter } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, `{
+        result {
+          _id,
+          matches {
+            teamA {
+              name,
+              score,
+              players {
+                player {
+                  ...on Player {
+                    _id
+                  },
+                  ...on FreeAgent {
+                    _id
+                  }
+                }
+              }
+            },
+            teamB {
+              name,
+              score,
+              players {
+                player {
+                  ...on Player {
+                    _id
+                  },
+                  ...on FreeAgent {
+                    _id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`)
     })
   })
 })

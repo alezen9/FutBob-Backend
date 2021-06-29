@@ -138,7 +138,7 @@ export class UpdateAppointmentInvitesInput {
 export class UpdateAppointmentMatchesInput {
    @Field()
    _id: string
-   @Field(() => [AppointmentMatchInput], { nullable: true })
+   @Field(() => [AppointmentMatchInput])
    matches: AppointmentMatchInput[]
 }
 

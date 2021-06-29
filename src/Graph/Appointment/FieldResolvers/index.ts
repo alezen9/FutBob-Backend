@@ -1,5 +1,5 @@
 import { FieldResolver, Resolver, ResolverInterface, Root } from "type-graphql";
-import { Appointment, AppointmentInvites, AppointmentPlayerType, AppointmentStats, AppointmentTypePlayer } from "../../../MongoDB/Appointment/Entities";
+import { Appointment, AppointmentInvites, AppointmentMatch, AppointmentPlayerType, AppointmentStats, AppointmentTypePlayer } from "../../../MongoDB/Appointment/Entities";
 import { playerLoader } from "../../Player/loaders";
 import { freeAgentLoader } from "../../FreeAgent/loaders"
 import { Field } from "../../../MongoDB/Field/Entities";
@@ -54,7 +54,7 @@ export class AppointmentFieldResolvers implements ResolverInterface<Appointment>
             ignored: playerLoader.loadMany(ignored.map(String))
          }
       }
-   } 
+   }
    
    @FieldResolver(() => AppointmentStats)
    // @ts-ignore
@@ -88,5 +88,27 @@ export class AppointmentFieldResolvers implements ResolverInterface<Appointment>
             }
          }))
       }
-   } 
+   }
+
+   @FieldResolver(() => [AppointmentMatch])
+   // @ts-ignore
+   async matches(@Root() root: Appointment) {
+      return (root.matches || []).map(match => ({
+         ...match,
+         teamA: {
+            ...match.teamA,
+            players: match.teamA.players.map(el => ({
+               ...el,
+               player: this.loadAppointmentPlayer(el)
+            }))
+         },
+         teamB: {
+            ...match.teamB,
+            players: match.teamB.players.map(el => ({
+               ...el,
+               player: this.loadAppointmentPlayer(el)
+            }))
+         },
+      }))
+   }
 }
