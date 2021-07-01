@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsMongoId, Matches, MinDate } from 'class-validator'
+import { IsDateString, isEnum, IsEnum, IsMongoId, Matches, MinDate } from 'class-validator'
 import dayjs from 'dayjs'
 import { Field, Float, InputType, Int } from 'type-graphql'
 import { AppointmentState, AppointmentPlayerType } from '../../MongoDB/Appointment/Entities'
@@ -155,7 +155,7 @@ export class UpdateAppointmentStateInput {
    @Field()
    _id: string
    @Field(() => Int)
-   @EnumArrayOf(AppointmentState)
+   @IsEnum(AppointmentState)
    state: AppointmentState
 }
 

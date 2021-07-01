@@ -7,7 +7,7 @@ import ErrorMessages from '../Utils/ErrorMessages'
 import { ZenServer } from '../SDK'
 import dayjs from 'dayjs'
 import { createPlayers } from './helpers/MassiveFakeInserts/createPlayers'
-import { AppointmentPlayerType } from '../MongoDB/Appointment/Entities'
+import { AppointmentPlayerType, AppointmentState } from '../MongoDB/Appointment/Entities'
 import { chunk, random, sampleSize, uniqBy } from 'lodash'
 import faker from 'faker'
 require('dotenv').config()
@@ -42,7 +42,7 @@ describe('Appointment', () => {
 
   describe('Correct flow', () => {
     let appointmentId
-    it('Create an appointment', async () => {
+    it('Schedule an appointment', async () => {
       const { result: invitedPlayers } = await apiInstance.player.getList({}, { skip: 0, limit: 20 }, {}, '{ result { _id } }')
       const { result: fields } = await apiInstance.field.getList({}, { skip: 0 }, '{ result { _id } }')
       const { result: freeAgents } = await apiInstance.freeAgent.getList({}, { skip: 0 }, '{ result { _id } }')
@@ -173,6 +173,16 @@ describe('Appointment', () => {
       }`)
       assert.strictEqual(appointments.length, 1)
       assert.strictEqual(appointments[0].invites.lists.confirmed.length, newConfirmed.length)
+    })
+
+    it('Confirm appointment', async () => {
+      await apiInstance.appointment.updateState({
+        _id: appointmentId,
+        state: AppointmentState.Confirmed
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, '{ result { state } }')
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(appointments[0].state, AppointmentState.Confirmed)
     })
 
     it('Add stats without matches', async () => {
@@ -400,6 +410,15 @@ describe('Appointment', () => {
 
     })
 
+    it('Complete appointment', async () => {
+      await apiInstance.appointment.updateState({
+        _id: appointmentId,
+        state: AppointmentState.Completed
+      })
+      const { result: appointments } = await apiInstance.appointment.getList({ ids: [appointmentId] }, { skip: 0 }, '{ result { state } }')
+      assert.strictEqual(appointments.length, 1)
+      assert.strictEqual(appointments[0].state, AppointmentState.Completed)
+    })
     
   })
 })

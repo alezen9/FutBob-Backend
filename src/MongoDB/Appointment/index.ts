@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { MongoDBInstance } from '..'
-import { ObjectId } from 'mongodb'
+import { ObjectID, ObjectId } from 'mongodb'
 import { facetCount } from '../helpers'
 import { get, groupBy, max } from 'lodash'
 import { List, Pagination } from '../Entities'
@@ -14,7 +14,6 @@ import { Player, PlayerPosition } from '../Player/Entities'
 
 class MongoAppointment {
 
-   // DOOOOOOONEEEEEE, don't touch (13.06.2021 at 15:56)
    private checkDates(start: Date|string, end: Date|string) {
       if(start && !end) throw new Error(ErrorMessages.appointment_error_validation_dates)
       // const _1DayFromNow = dayjs().add(1, 'days')
@@ -29,7 +28,6 @@ class MongoAppointment {
    }
 
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:26)
    async create (data: CreateAppointmentInput, createdBy: string): Promise<string> {
          const { confirmed = [], invited = [] } = data.invites || {}
          // check dates
@@ -93,7 +91,6 @@ class MongoAppointment {
    }
 
   
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:15)
    async updateMainInfo (data: UpdateAppointmentMainInput, createdBy: string): Promise<boolean> {
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) })
       // Update is allowed only in Scheduled and Confirmed state
@@ -105,6 +102,10 @@ class MongoAppointment {
       const now = dayjs().toISOString()
       const appointment = new Appointment()
       appointment.updatedAt = now
+      // if appointment confirmed only notes can be modified
+      if(AppointmentState.Confirmed === currentAppointment.state && (data.start || data.end || data.field || ![null, undefined].includes(data.pricePerPlayer))){
+         throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
+      }
       if(data.field) appointment.field = new ObjectId(data.field)
       if(data.start || data.end) appointment.date = new AppointmentDate()
       if(data.start) appointment.date.start = dayjs(data.start).toISOString()
@@ -130,10 +131,9 @@ class MongoAppointment {
    }
 
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:09)
    async updateMatches (data: UpdateAppointmentMatchesInput, createdBy: string): Promise<boolean> {
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) })
-      if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
+      if([AppointmentState.Scheduled, AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
          throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
       }
       const now = dayjs().toISOString()
@@ -204,10 +204,9 @@ class MongoAppointment {
    }
 
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:02)
    async updateStats (data: UpdateAppointmentStatsInput, createdBy: string): Promise<boolean> {
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) })
-      if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
+      if([AppointmentState.Scheduled, AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
          throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
       }
       const now = dayjs().toISOString()
@@ -307,11 +306,10 @@ class MongoAppointment {
    }
 
    
-   // DOOOOOOONEEEEEE, don't touch (29.05.2021 at 17:14)
    async setMvpManually (data: SetMpvManuallyInput, createdBy: string) {
       const { appointmentId, playerId, notes } = data
       const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(appointmentId), createdBy: new ObjectId(createdBy) })
-      if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
+      if([AppointmentState.Scheduled, AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
          throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
       }
       const elegiblePlayers = currentAppointment?.stats?.mvpElegible || []
@@ -332,10 +330,9 @@ class MongoAppointment {
    }
 
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:02)
    private calculateMVP (players: Player[], freeAgentIds: ObjectId[], stats: AppointmentStats): AppointmentTypePlayer[] {
       const coeffMap = {
-         [PlayerPosition.Back]: 0.5,
+         [PlayerPosition.GoalKeeper]: 0.5,
          [PlayerPosition.Back]: 0.5,
          [PlayerPosition.LeftWing]: 0.3,
          [PlayerPosition.RightWing]: 0.3,
@@ -412,7 +409,6 @@ class MongoAppointment {
    }
 
 
-   // DOOOOOOONEEEEEE, don't touch (02.06.2021 at 16:53)
    async updateInvites (data: UpdateAppointmentInvitesInput, createdBy: string): Promise<boolean> {
       const now = dayjs().toISOString()
       const appointment = new Appointment()
@@ -472,15 +468,15 @@ class MongoAppointment {
    }
    
    
-   // DOOOOOOONEEEEEE, don't touch (29.05.2021 at 17:14)
    async updateState (data: UpdateAppointmentStateInput, createdBy: string): Promise<boolean> {
-      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: data._id, createdBy: new ObjectId(createdBy) })
+      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) })
       if(data.state === currentAppointment.state) return true
       if([AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)) {
          throw new Error(ErrorMessages.appointment_already_closed)
       }
       const now = dayjs().toISOString()
       const appointment = new Appointment()
+      appointment._id = new ObjectId(data._id)
       appointment.updatedAt = now
 
       // scheduled => confirmed|canceled
@@ -503,7 +499,6 @@ class MongoAppointment {
    }
 
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:15)
    async getList (filters: FiltersAppointment, pagination: Pagination, createdBy: string): Promise<List<Appointment>> {
       const {
          ids = [],
@@ -539,14 +534,12 @@ class MongoAppointment {
    }
 
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:26)
    async getAppointmentById (_id: string, createdBy: string): Promise<Appointment> {
       const appoitment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
       return appoitment
    }
    
 
-   // DOOOOOOONEEEEEE, don't touch (23.05.2021 at 02:26)
    async getAppointmentsByIds (ids: string[], createdBy?: string|ObjectId): Promise<Appointment[]> {
       const appoitments: Appointment[] = await MongoDBInstance.collection.appointment.find({ _id: { $in: ids.map(id => new ObjectId(id)) }, ...createdBy && { createdBy: new ObjectId(createdBy) } }).toArray()
       return appoitments
