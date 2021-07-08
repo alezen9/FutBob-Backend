@@ -48,6 +48,9 @@ class MongoAppointment {
          // basic
          if(data.notes) appointment.notes = data.notes
          appointment.state = AppointmentState.Scheduled
+         // initialize
+         appointment.matches = []
+         appointment.stats = new AppointmentStats()
          // invites
          appointment.invites = new AppointmentInvites()
          // appointment.invites.state = AppointmentInvitesState.Open
@@ -56,11 +59,6 @@ class MongoAppointment {
          // appointment.invites.minQuorum = data.invites.minQuorum
          // appointment.invites.maxQuorum = data.invites.maxQuorum
          //
-         appointment.invites.lists = new AppointmentInviteLists()
-         appointment.invites.lists.blacklisted = []
-         appointment.invites.lists.ignored = []
-         appointment.invites.lists.waiting = []
-         appointment.invites.lists.declined = []
          if(confirmed.length) appointment.invites.lists.confirmed = confirmed.map(({ _id, type }) => ({ type, player: new ObjectId(_id) }))
          if(invited.length) appointment.invites.lists.invited = invited.map(id => ({ player: new ObjectId(id), totalResponses: 0 }))
          appointment.pricePerPlayer = data.pricePerPlayer
@@ -480,7 +478,7 @@ class MongoAppointment {
       appointment.updatedAt = now
 
       // scheduled => confirmed|canceled
-      // confirmed => completed|canceled| interrupted
+      // confirmed => completed|canceled|interrupted
       if(
          (currentAppointment.state === AppointmentState.Scheduled && ![AppointmentState.Confirmed, AppointmentState.Canceled].includes(data.state))
          ||
@@ -490,6 +488,11 @@ class MongoAppointment {
       }
 
       appointment.state = data.state
+
+      if(data.state === AppointmentState.Canceled) {
+         appointment.matches = []
+         appointment.stats = new AppointmentStats()
+      }
 
       await MongoDBInstance.collection.appointment.updateOne(
          { _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) },

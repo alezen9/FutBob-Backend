@@ -78,6 +78,15 @@ export class AppointmentStats {
     topAssistmen: AppointmentTypePlayer[]
     @FieldTG(() => [AppointmentPlayer])
     individualStats: AppointmentPlayer[]
+
+    constructor() {
+        this.totalGoals = 0
+        this.totalAssists = 0
+        this.topScorers = []
+        this.topAssistmen = []
+        this.mvpElegible = []
+        this.individualStats = []
+    }
 }
 
 export enum AppointmentState {
@@ -150,6 +159,15 @@ export class AppointmentInviteLists {
     blacklisted: AppointmentTypePlayer[]
     @FieldTG(() => [Player])
     ignored: ObjectId[]
+
+    constructor() {
+        this.invited = []
+        this.declined = []
+        this.waiting = []
+        this.confirmed = []
+        this.blacklisted = []
+        this.ignored = []
+    }
 }
 
 export enum AppointmentInvitesMode {
@@ -165,6 +183,10 @@ export class AppointmentInvites {
     // checkpointQuorum: number
      @FieldTG(() => AppointmentInviteLists)
     lists: AppointmentInviteLists
+
+    constructor() {
+        this.lists = new AppointmentInviteLists()
+    }
 }
 
 @ObjectType()

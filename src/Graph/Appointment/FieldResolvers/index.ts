@@ -61,11 +61,13 @@ export class AppointmentFieldResolvers implements ResolverInterface<Appointment>
    async stats(@Root() root: Appointment) {
       return {
          ...root.stats,
-         mvp: {
-            ...root.stats.mvp,
-            player: {
-               ...root.stats.mvp.player,
-               player: this.loadAppointmentPlayer(root.stats.mvp.player)
+         ...root.stats.mvp && {
+            mvp: {
+               ...root.stats.mvp,
+               player: {
+                  ...root.stats.mvp.player,
+                  player: this.loadAppointmentPlayer(root.stats.mvp.player)
+               }
             }
          },
          mvpElegible: root.stats.mvpElegible.map(el => ({
