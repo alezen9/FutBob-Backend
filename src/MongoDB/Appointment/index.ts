@@ -188,11 +188,12 @@ class MongoAppointment {
             })
             return acc
          }, {})
-         appointment.stats = new AppointmentStats()
-         appointment.stats.individualStats = currentAppointment.stats.individualStats.map(el => ({
-            ...el,
-            matchStats: playerMatchStatsMap[el.player.player.toHexString()]
-         }))
+         appointment.stats = {
+            individualStats: currentAppointment.stats.individualStats.map(el => ({
+               ...el,
+               matchStats: playerMatchStatsMap[el.player.player.toHexString()]
+            }))
+         } as AppointmentStats
       }
       await MongoDBInstance.collection.appointment.updateOne(
          { _id: new ObjectId(data._id), createdBy: new ObjectId(createdBy) },
@@ -243,7 +244,7 @@ class MongoAppointment {
 
       // update matchStats for each player
       let playerMatchStatsMap: { [_id: string]: AppointmentPlayerMatchStats } = {}
-      if(currentAppointment.matches) {
+      if(currentAppointment.matches.length) {
          playerMatchStatsMap = currentAppointment.matches.reduce<{ [_id: string]: AppointmentPlayerMatchStats }>((acc, match) => {
             // this assumes that a player is part of only one team: A or B not both
             // if player is part of both teams it's user's fault xD
@@ -305,24 +306,24 @@ class MongoAppointment {
 
    
    async setMvpManually (data: SetMpvManuallyInput, createdBy: string) {
-      const { appointmentId, playerId, notes } = data
-      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(appointmentId), createdBy: new ObjectId(createdBy) })
+      const { _id, mvpId, notes } = data
+      const currentAppointment: Appointment = await MongoDBInstance.collection.appointment.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
       if([AppointmentState.Scheduled, AppointmentState.Canceled, AppointmentState.Completed, AppointmentState.Interrupted].includes(currentAppointment.state)){
          throw new Error(ErrorMessages.appointment_update_failed_due_to_state)
       }
       const elegiblePlayers = currentAppointment?.stats?.mvpElegible || []
-      const playerFoundInElegible = elegiblePlayers.find(({ player }) => playerId === player.toHexString())
+      const playerFoundInElegible = elegiblePlayers.find(({ player }) => mvpId === player.toHexString())
       if(!playerFoundInElegible) throw new Error(ErrorMessages.appointment_player_not_elegible_as_mvp)
-      const appointment = new Appointment()
       const now = dayjs().toISOString()
-      appointment.updatedAt = now
-      appointment.stats.mvp = {
-          player: playerFoundInElegible,
-         ...notes && { notes }
-      }
       await MongoDBInstance.collection.appointment.updateOne(
-         { _id: new ObjectId(appointmentId), createdBy: new ObjectId(createdBy) },
-         { $set: createMongoUpdateObject(appointment) }
+         { _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) },
+         { $set: {
+            updatedAt: now,
+            "stats.mvp": {
+               player: playerFoundInElegible,
+               ...notes && { notes }
+            }
+         } }
       )
       return true
    }

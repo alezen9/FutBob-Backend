@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "start": "./scripts/start_prod.sh",
+    "start-mongo": "./scripts/start_mongo.sh",
     "dev": "./scripts/start_local.sh",
     "build": "tsc",
     "test": "mocha"

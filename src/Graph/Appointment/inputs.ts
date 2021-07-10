@@ -163,10 +163,10 @@ export class UpdateAppointmentStateInput {
 export class SetMpvManuallyInput {
    @Field()
    @IsMongoId()
-   appointmentId: string
+   _id: string
    @Field()
    @IsMongoId()
-   playerId: string
+   mvpId: string
     @Field({ nullable: true })
    notes?: string
 }
