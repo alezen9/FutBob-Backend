@@ -560,7 +560,7 @@ describe('Appointment', () => {
     })
   })
 
-    describe('Correct flow canceled', () => {
+  describe('Correct flow canceled', () => {
     let appointmentId
     it('Schedule an appointment', async () => {
       const { result: invitedPlayers } = await apiInstance.player.getList({}, { skip: 0, limit: 20 }, {}, '{ result { _id } }')
