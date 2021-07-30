@@ -13,7 +13,7 @@ export class CreatePlayerInput {
    positions: PlayerPosition[]
    @Field(() => Int, { nullable: true })
    @IsEnum(PhysicalState)
-   state?: PhysicalState
+   state: PhysicalState
    @Field(() => PlayerScore)
    score: PlayerScore
 }

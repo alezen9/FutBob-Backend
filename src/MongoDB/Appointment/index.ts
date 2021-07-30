@@ -170,9 +170,9 @@ class MongoAppointment {
                acc[key] = {
                   ...current,
                   total: (current.total || 0) + 1,
-                  ...match.winner === 'draw' && { draw: (current.draw || 0)+ 1 },
-                  ...match.winner === 'teamA' && { won: (current.won || 0) + 1 },
-                  ...match.winner === 'teamB' && { lost: (current.lost || 0) + 1 }
+                  draw: (current.draw || 0) + (match.winner === 'draw' ? 1 : 0),
+                  won: (current.draw || 0) + (match.winner === 'teamA' ? 1 : 0),
+                  lost: (current.draw || 0) + (match.winner === 'teamB' ? 1 : 0)
                }
             })
             match.teamB.players.forEach(({ player }) => {
@@ -181,9 +181,9 @@ class MongoAppointment {
                acc[key] = {
                   ...current,
                   total: (current.total || 0) + 1,
-                  ...match.winner === 'draw' && { draw: (current.draw || 0)+ 1 },
-                  ...match.winner === 'teamB' && { won: (current.won || 0) + 1 },
-                  ...match.winner === 'teamA' && { lost: (current.lost || 0) + 1 }
+                  draw: (current.draw || 0) + (match.winner === 'draw' ? 1 : 0),
+                  won: (current.draw || 0) + (match.winner === 'teamB' ? 1 : 0),
+                  lost: (current.draw || 0) + (match.winner === 'teamA' ? 1 : 0)
                }
             })
             return acc

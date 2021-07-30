@@ -3,7 +3,7 @@ import faker from 'faker'
 import { sample, sampleSize } from 'lodash'
 import { CreatePlayerInput } from '../../../Graph/Player/inputs'
 import { CreateUserInput } from '../../../Graph/User/inputs'
-import { PlayerPosition, PlayerScore } from '../../../MongoDB/Player/Entities'
+import { PhysicalState, PlayerPosition, PlayerScore } from '../../../MongoDB/Player/Entities'
 import { Sex } from '../../../MongoDB/User/Entities'
 import { ZenServer } from '../../../SDK'
 
@@ -28,7 +28,8 @@ export const createPlayers = async (n: number, apiInstance: ZenServer) => {
       const playerInput: CreatePlayerInput = {
          positions: sampleSize([PlayerPosition.GoalKeeper, PlayerPosition.Back,PlayerPosition.RightWing, PlayerPosition.LeftWing, PlayerPosition.Forward], 2),
          user: idUser,
-         score: mockScore()
+         score: mockScore(),
+         state: PhysicalState.Top
       }
       const idPlayer = await apiInstance.player.create(playerInput)
    }
