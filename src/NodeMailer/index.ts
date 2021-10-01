@@ -60,7 +60,7 @@ export class ZenNodeMailer {
             clientId: MAILING_SERVICE_CLIENT_ID,
             clientSecret: MAILING_SERVICE_CLIENT_SECRET,
             refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-            accessToken: 'ya29.a0ARrdaM-POsjG3TzVt0MkgASHOxBY3N24cDqKd5OR3J6yMwftORjW29PSHXSIeo1Wup7g1u8rANHODhLQGNdVmVkO6KemJiPeEAoa4aR58f8IdjWuAuINE3UKq34kFriSUbwukXc8XIMEywm0Oyr9dcMkFSU6'
+            accessToken: 'ya29.a0ARrdaM942YPAlQyGMC_39G3K_nnd1RSnO4HbOoW9-DM-PaeCLKE5Vbvs0rQrb4HqDlI05doiZ7koVQ4lfCfsp51U0WssR7f_neNUfjYZODPj2Acj-9FgYTPq4PanGHoCVVc9zx3MR3gSGcLKhpQj9ivH4hBx'
          }
       })
       return transporter
