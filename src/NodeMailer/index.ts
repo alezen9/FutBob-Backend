@@ -7,11 +7,10 @@ import chalk from 'chalk'
 require('dotenv').config()
 
 const {
-//   MAILING_SERVICE_CLIENT_ID,
-//   MAILING_SERVICE_CLIENT_SECRET,
-//   MAILING_SERVICE_REFRESH_TOKEN,
-  SENDER_EMAIL_ADDRESS,
-  SENDER_EMAIL_PASSWORD
+  MAILING_SERVICE_CLIENT_ID,
+  MAILING_SERVICE_CLIENT_SECRET,
+  MAILING_SERVICE_REFRESH_TOKEN,
+  SENDER_EMAIL_ADDRESS
 } = process.env
 
 type EmailModules = {
@@ -52,17 +51,16 @@ export class ZenNodeMailer {
 
    private createTransporter(): Mail {
       const transporter = nodemailer.createTransport({
-         service: 'gmail',
-         // auth: {
-         //    type: 'OAuth2',
-         //    user: SENDER_EMAIL_ADDRESS,
-         //    clientId: MAILING_SERVICE_CLIENT_ID,
-         //    clientSecret: MAILING_SERVICE_CLIENT_SECRET,
-         //    refreshToken: MAILING_SERVICE_REFRESH_TOKEN
-         // }
+         host: 'smtp.gmail.com',
+         port: 465,
+         secure: true,
          auth: {
+            type: 'OAuth2',
             user: SENDER_EMAIL_ADDRESS,
-            pass: SENDER_EMAIL_PASSWORD
+            clientId: MAILING_SERVICE_CLIENT_ID,
+            clientSecret: MAILING_SERVICE_CLIENT_SECRET,
+            refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
+            accessToken: 'ya29.a0ARrdaM-POsjG3TzVt0MkgASHOxBY3N24cDqKd5OR3J6yMwftORjW29PSHXSIeo1Wup7g1u8rANHODhLQGNdVmVkO6KemJiPeEAoa4aR58f8IdjWuAuINE3UKq34kFriSUbwukXc8XIMEywm0Oyr9dcMkFSU6'
          }
       })
       return transporter

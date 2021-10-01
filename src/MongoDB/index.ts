@@ -116,7 +116,7 @@ export class MongoDB {
 
   async closeConnection () {
     try {
-      if(this.client) this.client.close()
+      if(this.client) await this.client.close()
       this.state = MongoState.Disconnected
     } catch (error) {
       console.error('[futbob] Error shutting donw mongo!')

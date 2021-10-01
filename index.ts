@@ -22,6 +22,7 @@ import { nodemailerInstance } from './src/NodeMailer'
 import shell from 'shelljs'
 import path from 'path'
 import chalk from 'chalk'
+import cmd from 'node-cmd'
 require('dotenv').config()
 
 interface ReqWithisAuth extends Request {
@@ -89,16 +90,23 @@ const main = async () => {
   }
 }
 
-process.on('SIGINT', async () => {
+process.on('SIGINT', () => {
+  let cleanedLocal = false
   console.log(chalk.green('\n[futbob] Gracefully shutting down and cleaning mess...'))
   if (process.env.NODE_ENV !== 'production') {
     nodemailerInstance.cleanUp()
-    try {
-      await MongoDBInstance.closeConnection()
-    } catch (error) {}
-    shell.exec('lsof -ti tcp:27017 | xargs kill')
+    MongoDBInstance.closeConnection()
+    .then(() => {
+      cmd.runSync('lsof -ti tcp:27017 | xargs kill')
+      cleanedLocal = true
+    })
+    .catch(() => {})
   }
-  process.exit()
+  while(!cleanedLocal){
+    if(process.env.NODE_ENV === 'production') break
+  }
+  console.log(chalk.green('\n[futbob] All clear, respect!'))
+  process.exit(0)
 })
 
 main()
