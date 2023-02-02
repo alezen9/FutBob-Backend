@@ -22,7 +22,7 @@
     "apollo-server": "^2.16.0",
     "apollo-server-express": "^2.16.0",
     "assert": "^2.0.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "chalk": "^4.1.0",
