@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+npm-debug.log
+yarn.lock
+*.log
+.DS_Store
