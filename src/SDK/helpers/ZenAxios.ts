@@ -6,7 +6,7 @@ class ZenAxios {
       const _self: AxiosInstance = axios.create({
          baseURL: _host || process.env.NODE_ENV === 'production' 
             ? process.env.BASE_API_URL 
-            : 'http://localhost:7000',
+            : 'http://localhost:7001',
          timeout: 100000,
          headers: {
             'Accept': 'application/json',

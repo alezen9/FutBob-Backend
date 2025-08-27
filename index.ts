@@ -72,6 +72,7 @@ const main = async () => {
         }
       }
     })
+    //@ts-ignore
     server.applyMiddleware({ app })
     const httpServer = http.createServer(app)
     server.installSubscriptionHandlers(httpServer)
