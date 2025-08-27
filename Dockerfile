@@ -11,7 +11,8 @@ COPY src ./src
 COPY public ./public
 COPY scripts ./scripts
 
-RUN npm run build
+RUN chmod +x ./scripts/build.sh && sed -i 's/\r$//' ./scripts/build.sh
+RUN bash ./scripts/build.sh
 
 RUN npm prune --omit=dev
 
