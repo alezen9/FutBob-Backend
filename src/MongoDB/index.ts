@@ -35,10 +35,7 @@ export class MongoDB {
 
   async startConnection () {
     try {
-      const client = await MongoClient.connect(
-          this.dbUri,
-          { useNewUrlParser: true, useUnifiedTopology: true }
-        )
+      const client = await MongoClient.connect(this.dbUri)
       await this.setupCollections(client)
       this.state = MongoState.Connected
       console.log(chalk.green('[futbob] Connected to DB'))

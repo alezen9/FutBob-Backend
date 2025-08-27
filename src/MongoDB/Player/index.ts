@@ -44,7 +44,7 @@ class MongoPlayer {
   }
 
   async delete (_id: string, createdBy: string): Promise<boolean> {
-    const player: Player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+    const player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) }) as Player
     if(!player) throw new Error(ErrorMessages.system_permission_denied)
     await MongoDBInstance.collection.player.deleteOne({ _id: new ObjectId(_id) })
     if((player.user).toHexString() === createdBy){
@@ -107,7 +107,7 @@ class MongoPlayer {
     // paginate
     query.push(facetCount({ skip, limit: _limit }))
 
-    const res: Player[] = await MongoDBInstance.collection.player.aggregate(query).toArray()
+    const res = await MongoDBInstance.collection.player.aggregate(query).toArray()
     const result = {
       totalCount: get(res, '[0].totalCount[0].count', 0) as number,
       result: get(res, '[0].result', []) as Player[]
@@ -116,13 +116,13 @@ class MongoPlayer {
   }
 
   async getPlayerById (_id: string|ObjectId): Promise<Player> {
-    const player: Player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id) })
-    return player
+    const player = await MongoDBInstance.collection.player.findOne({ _id: new ObjectId(_id) })
+    return player as Player
   }
 
   async getPlayersByIds (ids: (string|ObjectId)[]): Promise<Player[]> {
-    const players: Player[] = await MongoDBInstance.collection.player.find({ _id: { $in: ids.map(id => new ObjectId(id)) } }).toArray()
-    return players
+    const players = await MongoDBInstance.collection.player.find({ _id: { $in: ids.map(id => new ObjectId(id)) } }).toArray()
+    return players as Player[]
   }
 }
 

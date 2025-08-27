@@ -84,7 +84,7 @@ class MongoFreeAgent {
     // paginate
     query.push(facetCount({ skip, limit: _limit }))
 
-    const res: FreeAgent[] = await MongoDBInstance.collection.freeAgent.aggregate(query).toArray()
+    const res = await MongoDBInstance.collection.freeAgent.aggregate(query).toArray()
     const result = {
       totalCount: get(res, '[0].totalCount[0].count', 0) as number,
       result: get(res, '[0].result', []) as FreeAgent[]
@@ -93,8 +93,8 @@ class MongoFreeAgent {
   }
 
   async getFreeAgentById (_id: string): Promise<FreeAgent> {
-    const freeAgent: FreeAgent = await MongoDBInstance.collection.freeAgent.findOne({ _id: new ObjectId(_id) })
-    return freeAgent
+    const freeAgent = await MongoDBInstance.collection.freeAgent.findOne({ _id: new ObjectId(_id) })
+    return freeAgent as FreeAgent
   }
 }
 

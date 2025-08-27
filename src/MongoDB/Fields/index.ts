@@ -75,7 +75,7 @@ class MongoField {
     // paginate
     query.push(facetCount({ skip, limit: _limit }))
 
-    const res: Field[] = await MongoDBInstance.collection.field.aggregate(query).toArray()
+    const res = await MongoDBInstance.collection.field.aggregate(query).toArray()
     const result = {
       totalCount: get(res, '[0].totalCount[0].count', 0) as number,
       result: get(res, '[0].result', []) as Field[]
@@ -84,8 +84,8 @@ class MongoField {
   }
 
   async getFieldById (_id: string, createdBy: string): Promise<Field> {
-    const field: Field = await MongoDBInstance.collection.field.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
-    return field
+    const field = await MongoDBInstance.collection.field.findOne({ _id: new ObjectId(_id), createdBy: new ObjectId(createdBy) })
+    return field as Field
   }
 }
 

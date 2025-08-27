@@ -9,6 +9,7 @@
       "lib": ["es6", "esnext.asynciterable"],
       "sourceMap": true,
       "outDir": "dist",
+      "skipLibCheck": true,
     },
     "include": ["src", "index.ts"],
     "exclude": ["dist", "node_modules"]
