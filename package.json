@@ -12,7 +12,7 @@
   "scripts": {
     "start": "./scripts/start_prod.sh",
     "dev": "./scripts/start_local.sh",
-    "build": "tsc",
+    "build": "./scripts/build.sh",
     "test": "mocha"
   },
   "author": "Aleksandar Gjoreski",

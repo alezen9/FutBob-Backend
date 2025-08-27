@@ -13,9 +13,3 @@ echo "${yellow}[futbob] Copying templates...${reset}"
 rsync -avum --include='*.ejs' --include='*/' --exclude='*' './src/' './dist/src'
 # copy public dir
 rsync -avum --include='*' './public/' './dist/public'
-# start server with pm2
-echo "${yellow}[futbob] Starting app...${reset}"
-pm2 start dist/index.js
-# save pm2 snapshot
-echo "${yellow}[futbob] Saving pm2 snapshot...${reset}"
-pm2 save
